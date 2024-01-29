@@ -1,0 +1,155 @@
+@import url('https://fonts.googleapis.com/css2?family=Tangerine:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jost:wght@390&display=swap'); 
+
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body{
+    min-height: 100vh;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url(/images/images/pexels-karolina-grabowska-8092975.jpg);
+}
+
+.img-div{
+    display: flex;
+    background-color: rgba(255, 255, 255, 0);
+    padding: 2% 0 2% 2%;
+    color: #212529;
+    font-family: 'Tangerine', cursive;
+    font-size: 2rem;
+
+}
+.login-form{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 70%;
+}
+#form-id{
+    padding: 4%;
+    width: fit-content;
+    margin-right: 3%;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+}
+.input{
+    display: flex;
+    background-color: rgba(255, 255, 255, 0.472);
+    align-items: center;
+    width: 400px;
+    padding-left: 3%;
+    
+}
+input{
+    width: 100%;
+    padding: 3% 4%;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    color: #343A40;
+    font-family: 'Jost', sans-serif;
+    font-size: 20px;
+}
+.input i{
+    font-size: 22px;
+    color: rgb(144, 144, 144);
+}
+
+.loginBtn{
+    border: none;
+    background-color: #090a0b;
+    transition: 0.2s ease;
+    color: white;
+    font-family: 'Jost', sans-serif;
+    font-size: 17px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    width: 40%;
+    padding: 2% 0;
+    cursor: pointer;
+}
+.loginBtn i{
+    margin-left: 10%;
+}
+.loginBtn:hover {
+    background-color: #FF871D;
+}
+.arrow{
+    transition: 1s ease;
+}
+
+.loginBtn:hover .arrow{
+    margin-left: 20%;
+}
+
+.txt-container{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 2%;
+}
+.txt-container h1{
+    font-family: 'Jost', sans-serif;
+    font-size: 40px;
+    letter-spacing: 1px;
+}
+.txt-container p{
+    font-family: 'Jost', sans-serif;
+    font-size: 18px;
+    letter-spacing: 2px;
+}
+a{
+    font-family: 'Jost', sans-serif;
+    font-size: 18px;
+    letter-spacing: 1px;
+    text-decoration: none;
+    color: #212529;
+    transition: 0.3s ease; 
+}
+a:hover{
+    color: #FF871D;
+}
+h3{
+    font-family: 'Jost', sans-serif;
+    letter-spacing: 1px;
+    font-weight: 400;
+    margin-bottom: 1%;
+}
+.err{
+    margin: 1% 0;
+}
+.forgetPassword{
+    margin-bottom: 5%;
+}
+.signup{
+    font-family: 'Jost', sans-serif;
+    font-size: 18px;
+    color: #212529;
+    margin-top: 5%;
+    letter-spacing: 0.5px;
+}
+.spinner-wrapper{
+    background-color: #f1f2f3;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    display: grid;
+    place-items: center;
+    z-index: 9999;
+    transition: all 0.2s;
+  }
+  .spinner-border{
+    height: 60px;
+    width: 60px;
+  }
+span{
+    font-family: 'Jost', sans-serif;
+    letter-spacing: 2px;
+    font-size: 12px;
+  }

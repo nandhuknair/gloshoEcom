@@ -1,0 +1,7 @@
+<% if (userLoggedIn) { %>
+    <%- include('userAfterLogin') %>
+    <%- include('banner') %>
+  <% } else { %>
+    <%- include('userHeader') %>
+    <%- include('banner') %>
+  <% } %>

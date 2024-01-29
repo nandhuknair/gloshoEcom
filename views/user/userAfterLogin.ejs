@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Glosho</title>
+
+  <link rel="icon" href="/images/icon/title logo.png" type="image/icon type">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <link rel="stylesheet" href="/stylesheets/style.css">
+
+</head>
+
+<body>
+  <div class="spinner-wrapper">
+    <div class="spinner-border text-warning" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div class="header">
+    <div class="toggleClass">
+      <i class="fa-solid fa-bars-staggered px-4" onclick="dropDown()" style="cursor: pointer;"></i>
+
+    </div>
+    <div class="nav__data px-4">
+      <a href="#">HOME</a>
+      <a href="#">ABOUT</a>
+      <a href="#">CONTACT</a>
+      <a class="dropdown-toggle dropdown__collection" href="#" role="button" id="dropdownMenuLink"
+        data-bs-toggle="dropdown" aria-expanded="false">
+        COLLECTIONS
+      </a>
+      <div class="dropdown">
+
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+          <li><a class="dropdown-item" href="#">NIKE</a></li>
+          <li><a class="dropdown-item" href="#">NAKED WOLFE</a></li>
+          <li><a class="dropdown-item" href="#">GUCCI</a></li>
+          <li><a class="dropdown-item" href="#">PRADA</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <a class="nav-brand logo" href="#">Glosho</a>
+    <div class="nav__icons px-4">
+    
+        <div class="dropdown navRight">
+            <a href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fa-solid fa-user"></i>
+            </a>
+      
+            <!-- Dropdown Menu -->
+            <ul class="dropdown-menu mt-2" aria-labelledby="userDropdown">
+              <li><a class="dropdown-item" href="/profile">Profile</a></li>
+              <li><a class="dropdown-item" href="/wishlist">Wishlist</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="/logout">Logout</a></li>
+            </ul>
+          </div>
+
+      <a href="/cart">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <span class="badge badge-pill badge-danger">3</span> <!-- Example: Replace with actual cart item count -->
+      </a>
+      <a href="/wishlist">
+        <i class="fa-solid fa-heart"></i>
+        <span class="badge badge-pill badge-danger">5</span> <!-- Example: Replace with actual wishlist item count -->
+      </a>  
+    </div>
+
+  </div>
+
+  <div class="drop__menu pt-3 pb-3" id="drop__menu">
+    <div class="dorp__hover"><a class="" href="#">HOME</a></div>
+    <div class="dorp__hover"><a class="" href="#">MEN</a></div>
+    <div class="dorp__hover"><a class="" href="#">WOMEN</a></div>
+    <div class="dorp__hover"><a class="" href="#">ABOUT </a></div>
+    <div class="dorp__hover"><a class="" href="#">CONTACT</a></div>
+  </div>
+
+  <script>
+
+
+    const spinnerWrapperEl = document.querySelector('.spinner-wrapper')
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        spinnerWrapperEl.style.display = 'none'
+      }, 1000)
+
+    })
+
+    const dropDownMenu = document.getElementById('drop__menu')
+    function dropDown() {
+      console.log('Bar clicked')
+      dropDownMenu.classList.toggle('modal-popup')
+    }
+
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>

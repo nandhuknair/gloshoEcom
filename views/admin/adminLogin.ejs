@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Admin |</title>
+	<link rel="icon" href="/images/icon/title logo.png" type="image/icon type">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+	<link rel="stylesheet" href="/stylesheets/login.css">
+</head>
+
+<body>
+	<div class="spinner-wrapper">
+		<img src="/images/icon/login.svg" alt="My Happy SVG" class="spinner-border" />
+	</div>
+	<div class="main">
+		<div class="img-div">
+			<h1>Glosho | <span style="font-size: 1.5rem;">Admin</span> </h1>
+		</div>
+
+		<div class="login-form">
+			
+			<form action="/login" method="post" id="form-id">
+				<div class="txt-container">
+					<h1>Login</h1>
+					<p class="err">Great to have you back Leader!</p>
+				</div>
+
+				<div class="input">
+					<i class="fa-solid fa-envelope"></i>
+					<input type="email" placeholder="Email" name="email" id="email" onkeyup="validateEmail()" />
+				</div>
+				<p class="err" id="error-email">&nbsp;</p>
+				
+				<div class="input">
+
+					<i class="fa-solid fa-lock"></i>
+					<input type="password" placeholder="Password" name="password" id="password"
+						onkeyup="validatePassword()" />
+				</div>
+
+				<p class="err" id="error-password" style="color: red;">&nbsp;data</p>
+				 
+
+				<p class="forgetPassword"><a href="/admin/forgot_password" class="forget">Forget password ?</a></p>
+
+				<p class="forgetPassword" style="color: #4BB543;">&nbsp;pass</p>   
+
+				<button class="loginBtn" type="submit">Login<i class="fa-solid fa-arrow-right arrow"></i></button>
+
+
+			</form>
+		</div>
+	</div>
+	<script src="/javascripts/validation.js"></script>
+	<script>
+		const spinnerWrapperEl = document.querySelector('.spinner-wrapper')
+		window.addEventListener('load', () => {
+			setTimeout(() => {
+				spinnerWrapperEl.style.display = 'none'
+			}, 500)
+		})
+
+		document.getElementById('form-id').addEventListener('submit', event => {
+
+			let email = document.getElementById('email').value
+			let password = document.getElementById('password').value
+			let isEmaileValid = validateEmail(name)
+			let isPasswordValid = validatePassword(password)
+			if (!(isEmaileValid && isPasswordValid)) {
+				event.preventDefault()
+			}
+		})
+
+	</script>
+</body>
+
+</html>
