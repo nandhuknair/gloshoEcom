@@ -21,7 +21,7 @@
 
 		<div class="login-form">
 			
-			<form action="/login" method="post" id="form-id">
+			<form action="/admin_login" method="post" id="form-id">
 				<div class="txt-container">
 					<h1>Login</h1>
 					<p class="err">Great to have you back Leader!</p>
@@ -40,12 +40,12 @@
 						onkeyup="validatePassword()" />
 				</div>
 
-				<p class="err" id="error-password" style="color: red;">&nbsp;data</p>
+				<p class="err" id="error-password" style="color: red;">&nbsp; <%= data %></p>
 				 
 
 				<p class="forgetPassword"><a href="/admin/forgot_password" class="forget">Forget password ?</a></p>
 
-				<p class="forgetPassword" style="color: #4BB543;">&nbsp;pass</p>   
+				<!-- <p class="forgetPassword" style="color: #4BB543;">&nbsp;pass</p>    -->
 
 				<button class="loginBtn" type="submit">Login<i class="fa-solid fa-arrow-right arrow"></i></button>
 
@@ -54,13 +54,9 @@
 		</div>
 	</div>
 	<script src="/javascripts/validation.js"></script>
+	<script src="/javascripts/spinner.js"></script>
 	<script>
-		const spinnerWrapperEl = document.querySelector('.spinner-wrapper')
-		window.addEventListener('load', () => {
-			setTimeout(() => {
-				spinnerWrapperEl.style.display = 'none'
-			}, 500)
-		})
+		
 
 		document.getElementById('form-id').addEventListener('submit', event => {
 

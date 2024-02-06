@@ -159,14 +159,8 @@
 
     </div>
 </div>
+<script src="/javascripts/spinner.js"></script>
     <script>
-        const spinnerWrapperEl = document.querySelector('.spinner-wrapper')
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                spinnerWrapperEl.style.display = 'none'
-            }, 500)
-        })
-
         localStorage.removeItem("countdown");
 
         const countdownElem = document.getElementById("countdown");

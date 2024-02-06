@@ -1,6 +1,8 @@
 const User = require("../model/userModel");
 const bcrypt = require("bcrypt");
-const nodemailer = require('nodemailer')
+const nodemailer = require('nodemailer');
+const Product = require("../model/productModel");
+const Category = require("../model/categoryModel");
 
 //----------get home paage----------
 
@@ -20,12 +22,6 @@ exports.getSignup = async (req, res) => {
   res.render("user/signup", { data: "" });
 };
 
-//----------get otp paage----------
-
-exports.getOTP = async (req,res) => {
-  res.render('user/otpVerification',{data:""})
-}
-
 //declaring those things outside to transfer the req.body to the otp page 
 
 let reqBody ;
@@ -36,14 +32,14 @@ let OTPData = {
   otp:null,
   expirationTime : null
 }
-  const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'gloshoecom@gmail.com',
-    pass: 'xhde utfz jfib kmlw',
-  },
-});
-let resendForgetOTP;
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL,
+      pass: process.env.PASSWORD,
+    },
+  });
+
   
 //----------signup action----------
 
@@ -51,7 +47,7 @@ exports.signupAction = async (req, res) => {
  
   try {
     reqBody = req.body ;
-    const {email , password , confirmPassword} = reqBody ;
+    const {email , password , confirmPassword} = req.body ;
     req.session.userMail = email ;
     console.log(reqBody);
     const userExist = await User.findOne({ email: email });
@@ -90,6 +86,7 @@ exports.signupAction = async (req, res) => {
     res.render('user/signup', { data: "Error processing registration. Please try again." });
   }
 };
+ 
 
 //----------otp action----------
 
@@ -111,8 +108,6 @@ exports.otpAction = async (req, res) => {
         confirmPassword: hasedconfirmPassword,
       });
       await newUser.save();
-      // req.session.userLoggedIn = true
-      console.log(req.session.userLoggedIn);
       res.redirect("/login");
     } else {
       res.render("user/otpVerification", { data: "Incorrect or Expired otp" });
@@ -127,13 +122,16 @@ exports.otpAction = async (req, res) => {
 //----------login action----------
 
 exports.loginAction = async (req, res) => {
-  console.log("This is req.body of the login", req.body);
   const { email, password } = req.body;
   const userExist = await User.findOne({ email: email });
-  if (userExist.email !== email) {
-    res.render("user/login", { data: "You are not a User Please SignUp", passwordChanged:""});
+  if (!userExist) {
+    res.render("user/login", { data: "You are not a User Please Signup", passwordChanged:""});
   } else {
-    const passwordMatch = await bcrypt.compare(password, userExist.password );
+      if(!userExist.active){
+        res.render('user/login',{data:"You are blocked by admin connect gloshoecom@gmail.com for furthur update",passwordChanged:""})
+        req.session.userLoggedIn = false 
+      }else{
+        const passwordMatch = await bcrypt.compare(password,userExist.password );
       if (!passwordMatch) {
       res.render("user/login", { data: "Wrong Password" , passwordChanged:""});
     } else {
@@ -141,6 +139,8 @@ exports.loginAction = async (req, res) => {
       res.redirect("/");
     }
   }
+ }
+      
 };
 
 //---------- logout action ----------
@@ -163,7 +163,9 @@ exports.sendOTP = async (req,res)=> {
   OTPData.otp = Math.floor(100000 + Math.random() * 900000);
   OTPData.expirationTime = Date.now() + 60000;
   userMail = req.body.email;
-  console.log('User mail is',userMail)
+  const userExist = await User.findOne({email:req.body.email})
+  if(userExist){
+     console.log('User mail is',userMail)
   // Send otp via email
   const mailOptions = {
     from: "gloshoecom@gmail.com",
@@ -180,19 +182,20 @@ exports.sendOTP = async (req,res)=> {
       });
     } else {
       // resendForgetOTP = true
-      res.redirect("/forgot_password/otp");
+      res.render('user/forgetPassOtp',{data:""}) 
     }
   });
+  }else{
+    res.render("user/forgotPassword", {data: "You are not a User please Login."});
+  }
+ 
   } catch (error) {
     console.log(error)
   }
 }
 
-//---------- forget password otp page  ----------
 
-exports.getForgetPassOtp = (req,res)=> {
-  res.render('user/forgetPassOtp',{data:""})
-}
+
 
 //---------- forget password otp action  ----------
 
@@ -204,7 +207,7 @@ exports.postForgetPassOtp = (req,res)=> {
       Date.now() < OTPData.expirationTime &&
       otp === OTPData.otp.toString()
     ) {
-      res.redirect("/reset_password");
+      res.render('user/resetPassword',{data:""}) 
     } else {
       res.render("user/forgetPassOtp", { data: "Incorrect or Expired otp" });
     }
@@ -213,11 +216,7 @@ exports.postForgetPassOtp = (req,res)=> {
   } 
   }
 
-  //---------- get reset password page  ----------
- 
-  exports.resetPassword = (req,res)=>{
-    res.render('user/resetPassword',{data:""}) 
-  }
+
 
    //---------- reset password action  ----------
 
@@ -250,8 +249,10 @@ exports.postForgetPassOtp = (req,res)=> {
 exports.resendOTP = async (req, res) => {
   try {
     const { type } = req.query; // Get the type parameter from the query string
-    console.log('7846782634812634827364]][][]][]]]]]]]]]]]]]]]]]]41237846123417826347  HERE IS THIS REQ QUERY USED============', type)
-
+    if(!type){
+      res.redirect('/login')
+    }else{
+    
     OTPData.otp = Math.floor(100000 + Math.random() * 900000);
     OTPData.expirationTime = Date.now() + 60000;
 
@@ -274,17 +275,46 @@ exports.resendOTP = async (req, res) => {
           res.render('user/forgotPassword', { data: 'Error sending otp. Please try again.' });
           console.log('ERROR OCCURRED AND REDIRECT TO THE RED PAGE')
         } else {
-          res.render('user/otp_Verification', { data: 'Error sending otp. Please try again.' });
+          res.render('user/otp_verification', { data: 'Error sending otp. Please try again.' });
         }
       } else {
         if (type === 'forgot') {
-          res.redirect('/forgot_password/otp');
+          res.render('user/forgetPassOtp',{data:""}) 
         } else {
-          res.redirect('/otp_Verification');
+          res.render('user/otpVerification',{data:""});
         }
       }
     });
-  } catch (error) {
+
+  }}
+   catch (error) {
     console.log(error);
   }
 };
+
+
+exports.listProducts = async (req,res)=> {
+  try {
+    const products = await Product.find({isAvailable:true})
+    let userLoggedIn = req.session.userLoggedIn
+    res.render('user/allProducts',{products,userLoggedIn})
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+
+
+    exports.productDetails = async (req, res) => {
+      try {
+        const { id } = req.query;
+        const product = await Product.findById({_id:id}); 
+        const category = await Category.findById(product.category)
+        let userLoggedIn = req.session.userLoggedIn;
+    
+        res.render('user/productDetails', { product, userLoggedIn , category }); 
+        console.log(error);
+      } catch(error){
+        console.log(error)
+    }  
+  }

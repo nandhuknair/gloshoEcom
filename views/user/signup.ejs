@@ -67,13 +67,9 @@
 		</div>
 	</div>
 	<script src="/javascripts/validation.js"></script>
+	<script src="/javascripts/spinner.js"></script>
 	<script>
-		const spinnerWrapperEl = document.querySelector('.spinner-wrapper')
-		window.addEventListener('load', () => {
-			setTimeout(() => {
-				spinnerWrapperEl.style.display = 'none'
-			}, 500)
-		})
+		
 
 		document.getElementById('form-id').addEventListener('submit', event => {
 			let isNameValid = validateName();

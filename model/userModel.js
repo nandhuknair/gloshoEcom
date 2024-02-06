@@ -23,6 +23,10 @@ const signupSchema = new mongoose.Schema({
     active: {
         type:Boolean,
         default:true
+    },
+    is_admin:{
+        type:Number,
+        default:0
     }
     
 });
