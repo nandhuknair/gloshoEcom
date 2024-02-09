@@ -9,6 +9,15 @@ module.exports = {
     }
   },
 
+  userActivity: (req, res, next) => {
+    if (req.session.userLoggedIn) {
+       next()
+    } else {
+      res.redirect('/login')
+    }
+  },
+
+
 adminSession: (req, res, next) => {
     if (req.session.admin) {
        res.redirect("/admin_panel");

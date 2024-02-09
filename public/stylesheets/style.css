@@ -380,7 +380,7 @@ p{
   content: "";
   display: block;
   height: 1px; /* Adjust the thickness of the underline */
-  width: 15%; /* Adjust the width of the underline */
+  width: 12%; /* Adjust the width of the underline */
   background-color: #FF871D; /* Specify the underline color */
   margin: 1; /* Center the underline */
   margin-top: 5px; /* Adjust the distance between text and underline */
@@ -498,9 +498,138 @@ p{
 
 
 
+/* user profile --------------------------------- */
+
+.link-dark{
+  transition: 0.3s ease;
+}
+.link-dark:hover{
+  background-color: #FF871D;
+  color: white;
+
+}
+
+hr{
+  color: #FF871D;
+}
+
+.fa-clr{
+  color: #212529;
+  padding-left: 5%;
+}
 
 
+/* Sidebar */
 
+.main-container{
+  display: flex;
+  min-height: 100vh;
+  overflow: hidden;
+  background-image: url(/images/images/17580.jpg);
+  background-repeat: no-repeat;
+  background-size:cover ;
+  padding-bottom: 5%;
+
+}
+
+.show-sidebar {
+  display: flex;
+}
+
+.sidebar {
+  min-height: 85vh;
+  width: 280px;
+  display: none;
+}
+
+.show-sidebar {
+  display: flex;
+  transition: transform 5s ease
+}
+
+#sidebardisplay{
+  display: inline;
+  cursor: pointer;
+}
+.bg-clr{
+  background-color: #FF871D;
+  font-size: 1.2rem;
+}
+
+#myOrder{
+  display: none;
+}
+
+#changeUsername{
+  display: none;
+}
+
+#changePassword{
+  display: none;
+}
+
+#manageAddress{
+  display: none;
+}
+
+#wallet{
+  display: none;
+}
+
+.change_userName{
+  outline: none;
+  background-color: #000000;
+  color: #FFEDE1;
+  border: none;
+}
+.change_userName:hover{
+  background-color: #232527;
+  color: white;
+
+}
+.txt-container{
+  margin-left: 10%;
+  height: 80%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.addBtn{
+  padding: 0.5% 4%;
+  border: 0.5px solid #232527;
+  background:transparent;
+  color: #000000;
+  transition: 0.2s ease;
+  font-family: 'Jost', sans-serif;
+  letter-spacing: 1px;
+}  
+
+.addBtn:hover{
+  border: 0.5px solid #FF871D;
+  background-color: #FF871D;
+  color: white;
+}
+
+.addrss-container{
+  overflow: hidden;
+  display: flex;
+  gap: 2%;
+  justify-content: center;
+}
+
+.head_text{
+  font-family: 'Jost', sans-serif;
+  color: #232527;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.para_text{
+  font-family: 'Jost', sans-serif;
+  color: #232527;
+  font-size: 1rem;
+}
 
 
 
@@ -543,6 +672,15 @@ p{
     .carousel-control-next-icon, .carousel-control-prev-icon{
       display: none;
     }
+    .txt-container{
+      margin-left: 0;
+      height: fit-content;
+    }
+
+    .addrss-container{
+      flex-direction: column;
+    }
+    
     
 }
 
@@ -550,5 +688,6 @@ p{
   .drop__menu{
     display: none;
   }
+  
 }
 

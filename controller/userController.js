@@ -8,6 +8,7 @@ const Category = require("../model/categoryModel");
 
 exports.getHome = async function (req, res) {
   res.render("user/index",{userLoggedIn: req.session.userLoggedIn});
+  console.log(req.session.userLoggedIn)
 };
 
 //----------get login paage----------
@@ -88,9 +89,12 @@ exports.signupAction = async (req, res) => {
 };
  
 
+
+
 //----------otp action----------
 
 exports.otpAction = async (req, res) => {
+  console.log("==================asdfar2q35arte5===========================",OTPData.otp)
   const { userName, email, number } = reqBody;
   console.log("reqbody is ", reqBody);
   try {
@@ -135,7 +139,7 @@ exports.loginAction = async (req, res) => {
       if (!passwordMatch) {
       res.render("user/login", { data: "Wrong Password" , passwordChanged:""});
     } else {
-      req.session.userLoggedIn = true;
+      req.session.userLoggedIn = userExist._id;
       res.redirect("/");
     }
   }
@@ -227,7 +231,7 @@ exports.postForgetPassOtp = (req,res)=> {
       const hashedPassword = await bcrypt.hash(password,10)
       const hashedconfirmPassword = await bcrypt.hash(confirmPassword,10)
       console.log('User mail is',userMail)
-      const userExist =await User.findOneAndUpdate({email:userMail},{$set:{password:hashedPassword,confirmPassword:hashedconfirmPassword}},{new:true})
+      const userExist = await User.findOneAndUpdate({email:userMail},{$set:{password:hashedPassword,confirmPassword:hashedconfirmPassword}},{new:true})
       
       if(userExist){
         res.render('user/login',{data: "",passwordChanged:"Successfully changed the password"})
@@ -256,10 +260,9 @@ exports.resendOTP = async (req, res) => {
     OTPData.otp = Math.floor(100000 + Math.random() * 900000);
     OTPData.expirationTime = Date.now() + 60000;
 
-    // Use the type parameter to determine the email address
+ 
     const USERMAIL = type === 'forgot' ? userMail : req.session.userMail;
 
-    // Send otp via email
     const mailOptions = {
       from: 'gloshoecom@gmail.com',
       to: USERMAIL,
@@ -293,6 +296,10 @@ exports.resendOTP = async (req, res) => {
 };
 
 
+
+//----------Product Management---------------------------------------------
+
+
 exports.listProducts = async (req,res)=> {
   try {
     const products = await Product.find({isAvailable:true})
@@ -318,3 +325,216 @@ exports.listProducts = async (req,res)=> {
         console.log(error)
     }  
   }
+
+
+  //----------Profile Management---------------------------------------------
+
+
+  let userMessage = false
+  let userError = false
+  let addressMessage = false
+  let addressError = false
+  let passMessage = false
+  let passError = false
+  let editAddressMessage = false
+  let editAddressError = false
+  let deleteAdressMessage = false
+  let deleteAddressError = true
+  function resetMessageVariables() {
+    userMessage = false;
+    userError = false;
+    addressMessage = false;
+    addressError = false;
+    passMessage = false;
+    passError = false;
+    editAddressMessage = false
+    editAddressError = false
+    deleteAdressMessage = false
+    deleteAddressError = false
+}
+
+  exports.getProfile = async (req, res) => {
+    try {
+      let userId = req.session.userLoggedIn;
+      const user = await User.findOne({ _id: userId });
+      res.render("user/profile", {
+        user: user,
+        userMessage,
+        userError,
+        addressError,
+        addressMessage,
+        passMessage,
+        passError,
+        editAddressMessage,
+        editAddressError,
+        deleteAddressError,
+        deleteAdressMessage,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+  exports.changeUserName = async (req,res)=> {
+    try {
+      resetMessageVariables()
+      const {userName} = req.body
+     
+      const user = await User.findOne({_id:req.session.userLoggedIn})
+      
+      if(userName !== user.userName){
+          await User.findOneAndUpdate({_id:req.session.userLoggedIn},{$set:{userName:userName}},{new:true})
+          userError = false
+          userMessage = true
+        res.redirect('/profile')
+      }
+      
+      else{
+        userMessage = false
+          userError = true
+        res.redirect('/profile')
+      }
+      
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  exports.addAddress = async (req,res)=> {
+      try {
+        resetMessageVariables()
+        const { name, number, address, city, state, pincode, landmark } = req.body;
+          
+        const user = await User.findById(req.session.userLoggedIn);
+        if (user.address.length >= 5) {
+          addressMessage = false
+          addressError = true
+          res.redirect('/profile')
+        } else {
+          const newAddress = {
+            name,
+            number,
+            address,
+            city,
+            state,
+            pincode,
+            landmark,
+          };
+          user.address.push(newAddress);
+
+          await user.save();
+          addressError = false
+          addressMessage = true
+          
+          res.redirect('/profile')
+        }
+      } catch (error) {
+        console.log(error);
+      }
+  }
+
+  exports.changePassword = async(req,res)=> {
+    try {
+      resetMessageVariables()
+      const {oldPassword , newPassword , confirmPassword} = req.body
+      const user = await User.findById(req.session.userLoggedIn)
+      const passwordMatch = await bcrypt.compare(oldPassword,user.password );
+      
+      if(passwordMatch && newPassword===confirmPassword){
+        const hashedPassword = await bcrypt.hash(newPassword,10)
+        const hashedconfirmPassword = await bcrypt.hash(confirmPassword,10)
+         await User.findOneAndUpdate({_id:req.session.userLoggedIn},{$set:{password:hashedPassword,confirmPassword:hashedconfirmPassword}},{new:true})
+         passError = false
+         passMessage = true
+         res.redirect('/profile')
+
+        }else{
+          
+          passMessage = false
+          passError = true
+          res.redirect('/profile')
+        }
+      }
+    catch (error) {
+        console.log(error)
+    }
+  }
+
+
+  exports.editAddress = async (req, res) => {
+    try {
+        resetMessageVariables();
+        const { userName, number, address, city, state, pincode, landmark } = req.body;
+        const { addressId } = req.params;
+
+        const user = await User.findById(req.session.userLoggedIn);
+
+        // Find the index of the address in the user's address array
+        const addressIndex = user.address.findIndex(addr => addr._id.toString() === addressId);
+
+        if (addressIndex === -1) {
+            
+            console.log('Address index not found:', addressId);
+            
+            editAddressError = true
+            res.redirect('/profile');
+        } else {
+           
+            user.address[addressIndex].name = userName;
+            user.address[addressIndex].number = number;
+            user.address[addressIndex].address = address;
+            user.address[addressIndex].city = city;
+            user.address[addressIndex].state = state;
+            user.address[addressIndex].pincode = pincode;
+            user.address[addressIndex].landmark = landmark;
+
+            
+            await user.save();
+            editAddressMessage = true
+            
+            res.redirect('/profile');
+        }
+    } catch (error) {
+        console.log(error);
+        
+    }
+};
+
+
+
+  exports.deleteAddress = async(req,res)=>{
+    try {
+      resetMessageVariables()
+      const {addressId} = req.params
+      console.log('Entered to delete addres')
+      const user = await User.findById(req.session.userLoggedIn)
+      const addressIndex = user.address.findIndex(addr => addr._id === addressId)
+      if(!addressIndex){
+        deleteAdressMessage = false
+        deleteAddressError = true
+        res.redirect('/profile')
+      }else{
+        user.address.splice(addressIndex,1)
+        await user.save()
+        deleteAdressMessage = true
+        deleteAddressError = false
+        res.redirect('/profile')
+      }
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+
+  exports.resetMessage = async (req,res)=> {
+    try {
+      resetMessageVariables()
+      res.redirect('/profile')
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
