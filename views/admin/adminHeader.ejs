@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Glosho | Admin</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <!-- Choices.js-->
+  <link rel="stylesheet" href="/stylesheets/choices.min.css">
+
+  <!-- Google fonts - Muli-->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Muli:300,400,700">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- theme stylesheet-->
+  <link rel="stylesheet" href="/stylesheets/style.default.css" id="theme-stylesheet">
+  <!-- Custom stylesheet - for your changes-->
+  <link rel="stylesheet" href="/stylesheets/custom.css">
+  <!-- Favicon-->
+  <link rel="icon" href="images/icon/title logo.png" type="image/icon type">
+</head>
+
+<body>
+  <header class="header">
+    <nav class="navbar navbar-expand-lg py-3 bg-dash-dark-2 border-bottom border-dash-dark-1 z-index-10">
+      <div class="search-panel">
+        <div class="search-inner d-flex align-items-center justify-content-center">
+          <div class="close-btn d-flex align-items-center position-absolute top-0 end-0 me-4 mt-2 cursor-pointer">
+            <span>Close </span>
+            <svg class="svg-icon svg-icon-md svg-icon-heavy text-gray-700 mt-1">
+              <use xlink:href="#close-1"> </use>
+            </svg>
+          </div>
+          <div class="row w-100">
+            <div class="col-lg-8 mx-auto">
+              <form class="px-4" id="searchForm" action="#">
+                <div class="input-group position-relative flex-column flex-lg-row flex-nowrap">
+                  <input class="form-control shadow-0 bg-none px-0 w-100" type="search" name="search"
+                    placeholder="What are you searching for...">
+                  <button
+                    class="btn btn-link text-gray-600 px-0 text-decoration-none fw-bold cursor-pointer text-center"
+                    type="submit">Search</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="container-fluid d-flex align-items-center justify-content-between py-1">
+        <div class="navbar-header d-flex align-items-center"><a class="navbar-brand text-uppercase text-reset"
+            href="/admin_panel">
+            <div class="brand-text brand-big"><strong class="text-primary">Glosho</strong><strong>Admin</strong></div>
+            <div class="brand-text brand-sm"><strong class="text-primary">G</strong><strong>S</strong></div>
+          </a>
+          <button class="sidebar-toggle">
+            <i class="fa-solid fa-bars-staggered"></i>
+          </button>
+        </div>
+
+        <li class="list-inline-item logout px-lg-2"> <a class="nav-link text-sm text-reset px-1 px-lg-0" id="logout"
+            href="/admin_logout"> <span class="d-none d-sm-inline-block">Logout </span>
+            <i class="fa-solid fa-right-from-bracket px-2"></i></a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+  <div class="d-flex align-items-stretch">
+    <!-- Sidebar Navigation-->
+    <nav id="sidebar">
+      <!-- Sidebar Header-->
+     
+      <ul class="list-unstyled">
+        <li class="sidebar-item"><a class="sidebar-link" href="/admin_panel">
+            <i class="fa-solid fa-shop svg-icon mt-3" style="font-size: 20px;"></i>
+            <span>Dashboard </span></a></li>
+
+        <li class="sidebar-item "><a class="sidebar-link " href="/admin_products">
+            <i class="fa-solid fa-cart-plus svg-icon mt-3" style="font-size: 20px;"></i>
+            <span>Products </span></a></li>
+
+        <li class="sidebar-item "><a class="sidebar-link" href="/admin_usermanagement">
+            <i class="fa-solid fa-users svg-icon mt-3" style="font-size: 20px;"></i>
+            <span>Users </span></a></li>
+
+            
+        <li class="sidebar-item "><a class="sidebar-link" href="/admin_coupon">
+            <i class="fa-solid fa-ticket svg-icon mt-3" style="font-size: 20px;"></i>
+            <span>Coupon</span></a></li>
+
+        <li class="sidebar-item "><a class="sidebar-link" href="/admin_orders">
+          <i class="fa-solid fa-box-archive svg-icon mt-3" style="font-size: 20px;"></i>
+            <span>Orders </span></a></li>
+
+        <li class="sidebar-item "><a class="sidebar-link" href="/admin_saleReport">
+            <i class="fa-solid fa-shop svg-icon mt-3" style="font-size: 20px;"></i>
+            <span>Sales report </span></a></li>
+
+        <li class="sidebar-item "><a class="sidebar-link" href="/admin_category">
+            <i class="fa-solid fa-layer-group svg-icon mt-3" style="font-size: 20px;"></i>
+            <span>Category </span></a></li>
+
+        <li class="sidebar-item "><a class="sidebar-link" href="/admin_banner">
+            <i class="fa-solid fa-money-check svg-icon mt-3" style="font-size: 20px;"></i>
+            <span>Banner </span></a></li>
+            
+          </ul>
+        </nav>

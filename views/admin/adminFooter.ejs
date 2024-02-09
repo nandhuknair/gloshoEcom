@@ -1,0 +1,87 @@
+ <!-- Page Footer-->
+ <!-- <footer class="position-absolute bottom-0 bg-dash-dark-2 text-white text-center py-3 w-100 text-xs" id="footer"> -->
+    <!-- <div class="container-fluid text-center"> -->
+      <!-- Please do not remove the backlink to us unless you support us at https://bootstrapious.com/donate. It is part of the license conditions. Thank you for understanding :)-->
+      <!-- <p class="mb-0 text-dash-gray">2024 &copy; All right recieved <a href="https://bootstrapious.com">Glosho</a>.</p> -->
+    <!-- </div> -->
+  <!-- </footer> -->
+  </div>
+  </div>
+  <!-- JavaScript files-->
+  <script>
+    // Define the truncateDescription function
+    function truncateDescription(text, limit) {
+      return text.length > limit ? text.slice(0, limit) + '...' : text;
+    }
+  </script>
+  <script src="/vendor/bootstrap.bundle.min.js"></script>
+  <script src="/vendor/ust-validate.min.js"></script>
+  <script src="/vendor/Chart.min.js"></script>
+  <script src="/vendor/choices.min.js"></script>
+  <script src="/vendor/charts-home.js"></script>
+  <!-- Main File-->
+  <script src="/vendor/front.js"></script>
+  <script>
+   
+   document.getElementById('modalInputFile').addEventListener('change', function(event) {
+  const previewContainer = document.getElementById('previewContainer');
+  const files = event.target.files;
+
+  previewContainer.innerHTML = ''; // Clear previous previews
+
+  for (const file of files) {
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+      const imgElement = document.createElement('img');
+      imgElement.src = e.target.result;
+      imgElement.style.maxWidth = '110px';
+      imgElement.style.maxHeight = '110px';
+      imgElement.style.marginTop = '10px';
+      previewContainer.style.display = 'flex'
+
+      previewContainer.appendChild(imgElement);
+    };
+
+    reader.readAsDataURL(file);
+  }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const descriptionContainers = document.querySelectorAll('.description-container');
+
+    descriptionContainers.forEach(container => {
+      const truncatedDescription = container.querySelector('.truncated-description');
+      const fullDescription = container.querySelector('.full-description');
+      const readMoreBtn = container.querySelector('.read-more-btn');
+      const readLessBtn = container.querySelector('.read-less-btn');
+
+      readMoreBtn.addEventListener('click', function () {
+        truncatedDescription.style.display = 'none';
+        fullDescription.style.display = 'inline';
+        readMoreBtn.style.display = 'none';
+        readLessBtn.style.display = 'inline';
+      });
+
+      readLessBtn.addEventListener('click', function () {
+        truncatedDescription.style.display = 'inline';
+        fullDescription.style.display = 'none';
+        readMoreBtn.style.display = 'inline';
+        readLessBtn.style.display = 'none';
+      });
+    });
+  });
+
+  // Define the truncateDescription function
+  function truncateDescription(text, limit) {
+    return text.length > limit ? text.slice(0, limit) + '...' : text;
+  }
+
+    </script>
+  </script>
+  <!-- FontAwesome CSS - loading as last, so it doesn't block rendering-->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css"
+    integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+</body>
+
+</html>

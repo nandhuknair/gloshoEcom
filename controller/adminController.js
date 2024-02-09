@@ -346,7 +346,7 @@ exports.getProducts = async (req, res) => {
           .skip(skip)
           .limit(perPage);
 
-      const categories = await Category.find({});
+      const categories = await Category.find({active:true});
 
       res.render('admin/productManagement', { product, errMessage: "", categories, totalPages, currentPage: page });
   } catch (error) {

@@ -1,0 +1,300 @@
+<%- include('adminHeader') %>
+
+<div class="container">
+
+  <h3 class="mt-5" style="letter-spacing: 1.5px;">PRODUCTS</h3>
+
+  <div class="card-body pt-0 text-end">
+    <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#myModalAdd">ADD</button>
+  </div>
+  
+  <p style="color: rgba(255, 0, 0, 0.714);"> <%= errMessage %></p>
+
+  <!-- Modal -->
+  <div class="col-lg-12">
+    <div class="card mb-0">
+      <div class="card-header"></div>
+        <div class="card me-5 mt-3">
+        <div class="table-responsive">
+          <table class="table mb-0 table-striped table-hover">
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Size</th>
+                <th>Images</th>
+                <th>Category</th>
+                <th>Collections</th>
+                <th>Description</th>
+                <th>Stock</th>
+                <th>Status</th>
+                <th>Updation</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <% product.forEach((data, index) => { %>
+                <% if (!data.isAvailable) { %>
+                  <tr style="background-color: rgba(255, 0, 0, 0.419);">
+                  <% } else { %>
+                    <tr>
+                    <% } %>
+                      <th scope="row">
+                        <%= index+1 %>
+                      </th>
+                      <td>
+                        <%= data.productName %>
+                      </td>
+                      <td>$ <%= data.price %>
+                      </td>
+                      <td>
+                        <%= data.size %>
+                      </td>
+                      <td><img src="/assets/uploads/<%= data.image[data.image.length-1] %>" height="50px" width="50px" alt=""></td>
+
+                      <td>
+                        <%= data.category ? data.category.category : 'No Category' %>
+                      </td>
+                      <td>
+                        <%= data.collection %>
+                      </td>
+                      <td >
+                         <div class="description-container">
+                          <div class="truncated-description"></div>
+                          <span class="full-description" style="display: none;"><%= data.description %></span>
+                          <button class="read-more-btn">Read <i class="fa-solid fa-angle-down"></i></button>
+                          <div class="row justify-content-end">
+                          <button class="read-less-btn" style="display: none;">Hide<i class="fa-solid fa-angle-up ms-2"></i></button></div>
+                        </div>
+                      </td>
+                      
+                     
+
+                      <td>
+                        <%= data.stock %>
+                      </td>
+                      <% if (data.isAvailable) { %>
+                        <td>Available</td>
+                        <% } else { %>
+                          <td>Unavailable</td>
+                          <% } %>
+
+                            <td>
+                              <a href="" data-bs-toggle="modal" data-bs-target="#myModalEdit<%= index %>">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                              </a>
+                              <% if (data.isAvailable) { %>
+                                <a href="/admin_unlist_product?id=<%= data._id %>"><i
+                                    class="fa-regular fa-circle-xmark ms-3"></i></a>
+                                <% } else { %>
+                                  <a href="/admin_list_product?id=<%= data._id %>"><i
+                                      class="fa-solid fa-check ms-3"></i></a>
+                                  <% } %>
+                            </td>
+                    </tr>
+
+                    <!-- Modal for Editing Category -->
+                    <!-- Modal -->
+                    <div class="modal fade text-start" id="myModalEdit<%= index %>" tabindex="-1"
+                      aria-labelledby="myModalLabel" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="myModalLabel">Edit Products</h5>
+                            <button class="btn-close btn-close-white" type="button" data-bs-dismiss="modal"
+                              aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <p></p>
+                            <form action="/admin_edit_product?id=<%= data._id %>" method="post"
+                              enctype="multipart/form-data" multiple
+                              accept="image/png, image/gif, image/jpeg, image/jpg ,image/webp" required>
+                              <div class="mb-3">
+                                <label class="form-label" for="modalInputEmail1">Product Name</label>
+                                <input class="form-control" id="modalInputEmail1" type="text" name="productName"
+                                  aria-describedby="emailHelp" value="<%= data.productName %>" required>
+                              </div>
+
+                              <div class="mb-3">
+                                <label class="form-label" for="modalInputEmail1">Price</label>
+                                <input class="form-control" id="modalInputEmail1" type="number" name="price"
+                                  aria-describedby="emailHelp" value="<%= data.price %>" required>
+                              </div>
+
+                              <div class="mb-3">
+                                <label class="form-label" for="modalInputSize<%= index %>">Size</label>
+                                <select class="form-select" id="modalInputSize<%= index %>" name="size"
+                                  aria-describedby="emailHelp">
+                                  <option value="M" <%= data.size === 'M' ? 'selected' : '' %>>M</option>
+                                  <option value="S" <%= data.size === 'S' ? 'selected' : '' %>>S</option>
+                                  <option value="L" <%= data.size === 'L' ? 'selected' : '' %>>L</option>
+                                </select>
+                              </div>
+
+                              <div class="mb-3">
+                                <label class="form-label" for="modalInputCategory<%= index %>">Categories</label>
+                                <select class="form-select" id="modalInputCategory<%= index %>" name="category">
+                                  <% categories.forEach(category => { %>
+                                      <option value="<%= category._id %>" <%= data && data.category && data.category._id.toString() === category._id.toString() ? 'selected' : '' %>><%= category.category %></option>
+                                  <% }); %>
+                                </select>
+                              </div>
+
+
+                              <div class="mb-3">
+                                <label class="form-label" for="modalInputCollection<%= index %>">Collections</label>
+                                <select class="form-select" id="modalInputCollection<%= index %>" name="collection"
+                                  aria-describedby="emailHelp">
+                                  <option value="Men" <%= data.collection === 'Men' ? 'selected' : '' %>>Men</option>
+                                  <option value="Women" <%= data.collection === 'Women' ? 'selected' : '' %>>Women</option>
+                                </select>
+                              </div>
+
+                              <div class="mb-3">
+                                <label class="form-label" for="modalInputDescription<%= index %>">Description</label>
+                                <input class="form-control" id="modalInputDescription<%= index %>" type="text"
+                                  value="<%= data.description %>" name="description" aria-describedby="emailHelp"
+                                  required>
+                              </div>
+
+                              <div class="mb-3">
+                                <label class="form-label" for="modalInputEmail1">Stock </label>
+                                <input class="form-control" id="modalInputEmail1" type="number"
+                                  value="<%= data.stock %>" name="stock" aria-describedby="emailHelp"
+                                  required>
+                              </div>
+
+                              <% data.image.forEach(image=> { %>
+                                <img src="/assets/uploads/<%= image %>" height="60px" width="60px">
+                              <% }); %>
+
+                              <div class="mb-3">
+                                <label class="form-label" for="modalInputEmail1">Images</label>
+                                <p style="color: red;">Can only add up to 12 images *</p>
+                                <input class="form-control" id="modalInputEmail1" type="file" name="images"
+                                  aria-describedby="emailHelp" multiple>
+                              </div>
+
+                              <div class="modal-footer">
+                                <button class="btn btn-secondary" type="button"
+                                  data-bs-dismiss="modal">Close</button>
+                                <button class="btn btn-primary" type="submit">Save </button>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                <% }); %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Button for Adding Category -->
+
+
+  <!-- Modal for Adding Category -->
+  <div class="modal fade text-start" id="myModalAdd" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="myModalLabel">Add Products</h5>
+          <button class="btn-close btn-close-white" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="/admin_add_product" method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+              <label class="form-label" for="modalInputEmail1">Product Name</label>
+              <input class="form-control" id="modalInputEmail1" type="text" name="productName"
+                aria-describedby="emailHelp" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label" for="modalInputEmail1">Price</label>
+              <input class="form-control" id="modalInputEmail1" type="number" name="price"
+                aria-describedby="emailHelp" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label" for="modalInputEmail1">Size</label>
+              <select class="form-select" id="categories" name="size" aria-describedby="emailHelp">
+                <option value="M">M</option>
+                <option value="S">S</option>
+                <option value="L">L</option>
+              </select> 
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label" for="modalInputEmail1">Categories</label>
+              <select class="form-select" id="categories" name="category" aria-describedby="emailHelp">
+                <% categories.forEach(category => { %>
+                  <option value="<%= category._id %>"><%= category.category %></option>
+                <% }); %>
+         </select></div>
+ 
+         
+    
+            
+
+            <div class="mb-3">
+              <label class="form-label" for="modalInputEmail1">Collections</label>
+              <select class="form-select" id="categories" name="collection" aria-describedby="emailHelp">
+                <option value="Men">Men</option>
+                <option value="Women">Women</option>
+       
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label" for="modalInputEmail1">Description</label>
+              <input class="form-control" id="modalInputEmail1" type="" name="description"
+                aria-describedby="emailHelp" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label" for="modalInputEmail1">Stock </label>
+              <input class="form-control" id="modalInputEmail1" type="number" name="stock"
+                aria-describedby="emailHelp" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label" for="modalInputEmail1">Images</label>
+              <p style="color: red;">Can only add up to 12 images *</p>
+              
+              <div id="previewContainer" class="row mb-4"></div>
+              <input class="form-control" id="modalInputFile" type="file" name="images" aria-describedby="emailHelp" multiple required>
+            </div>
+            
+            <div class="modal-footer">
+              <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+              <button class="btn btn-primary" type="submit">Add</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Modal for Adding Category -->
+
+
+  <nav aria-label="Page navigation">
+    <ul class="pagination">
+        <% if (currentPage > 1) { %>
+            <li class="page-item"><a class="page-link" href="/admin_products?page=<%= currentPage - 1 %>">Previous</a></li>
+        <% } %>
+        <% for (let i = 1; i <= totalPages; i++) { %>
+            <li class="page-item <%= currentPage === i ? 'active' : '' %>"><a class="page-link" href="/admin_products?page=<%= i %>"><%= i %></a></li>
+        <% } %>
+        <% if (currentPage < totalPages) { %>
+            <li class="page-item"><a class="page-link" href="/admin_products?page=<%= currentPage + 1 %>">Next</a></li>
+        <% } %>
+    </ul>
+</nav>
+
+</div>
+
+<%- include('adminFooter') %>

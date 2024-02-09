@@ -1,0 +1,45 @@
+<% if (userLoggedIn) { %>
+        <%- include('userAfterLogin') %>
+      <% } else { %>
+        <%- include('userHeader') %>
+ <% } %>
+<div class="container-fluid px-4">
+<img src="images/images/men-s-shoes-clothing-accessories.jpg" width="100%" alt="">
+</div>
+<section class="section-products">
+    <div class="container">
+            
+        <div class="col-md-8 col-lg-6">
+             
+                  <h2 class="heading">ALL PRODUCTS</h2>
+             
+              </div>
+       
+            <div class="row">
+                    <% products.forEach((data,index) => { %>
+                    <!-- Single Product -->
+                    <div class="col-md-6 col-lg-4 col-xl-3 mb-4">
+                            <div id="product-1" class="single-product">
+                                    <div class="part-1" style="background: url('/assets/uploads/<%= data.image[data.image.length-1] %>'); background-size: cover;
+                                        transition: all 0.3s;
+                                        background-position:center;">
+                                            <ul>
+                                                    <li><a href="#"><i class="fas fa-shopping-cart"></i></a></li>
+                                                    <li><a href="#"><i class="fas fa-heart"></i></a></li>
+                                                    <li><a href="/product?id=<%= data._id %>"><i class="fas fa-expand"></i></a></li>
+                                            </ul>
+                                    </div>
+                                    <div class="part-2">
+                                            <h3 class="product-title" style="letter-spacing: 1px;"><%= data.productName %></h3>
+                                            <!-- <h4 class="product-old-price">$79.99</h4> -->
+                                            <h4 class="product-price" style="color: #FF871D;">$<%= data.price %></h4>
+                                    </div>
+                            <!-- background-position:center;transition: all 0.3s;background-size: cover;  -->
+                   </div> </div>
+
+                    <% }); %>
+            </div>
+    </div>
+</section>
+
+<%- include('userFooter') %>

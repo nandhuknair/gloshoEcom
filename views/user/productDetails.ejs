@@ -1,0 +1,99 @@
+<% if (userLoggedIn) { %>
+    <%- include('userAfterLogin') %>
+        <% } else { %>
+            <%- include('userHeader') %>
+                <% } %>
+                    <% console.log("Product:", product); %>
+                        <% console.log("Product category:", product.category); %>
+                            <div class="container">
+                                <div class="d-inline-flex align-items-center mt-3">
+                                    <a href="/" class="mb-3">HOME</a>
+                                    <i class="fa-solid fa-chevron-right me-2 ms-2 mb-3"></i>
+                                    <p class="span mb-3">
+                                        <%= product.collection.toUpperCase() %>
+                                    </p>
+                                </div>
+                                <div class="row mt-5" style="margin-bottom: 10%;">
+                                    <div class="col-md-6 ">
+                                        <div id="mainImgContainer"
+                                            class="border rounded-4 mb-3 d-flex justify-content-center">
+                                            <a data-fslightbox="mygalley" id="zoomimg"
+                                                style="background-image: url('/assets/uploads/<%= product.image[0] %>');"
+                                                class="rounded-4 zoom" onmousemove="zoom(event)" data-type="image"
+                                                href="">
+                                                <img id="mainImage"
+                                                    style="max-width: 100%; max-height: 100%; margin: auto;"
+                                                    class="rounded-4 fit"
+                                                    src="/assets/uploads/<%= product.image[0] %>" />
+                                            </a>
+                                        </div>
+                                        <div class="d-flex justify-content-center mb-3">
+                                            <% for (let i=0; i < product.image.length; i++) { %>
+                                                <a onmouseenter="changeMainImg('<%= product.image[i] %>')"
+                                                    data-fslightbox="mygalley" class="border mx-1 rounded-2"
+                                                    data-type="image" href="" class="item-thumb">
+                                                    <img class="rounded-2 img-fluid"
+                                                        src="/assets/uploads/<%= product.image[i] %>" />
+                                                </a>
+                                                <% } %>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-6 product-details mt-5">
+                                        <div class="card-body">
+                                            <h2 class="product_heading">
+                                                <%= product.productName %>
+                                            </h2>
+                                            <div class="d-flex justify-content-end ">
+                                                <div class="heart"><i class="fa-solid fa-heart"></i></div>
+                                            </div>
+                                            <p class="product_price">$ <%= product.price %> USD</p>
+                                            <h4 class="product_category">
+                                                <%= category.category %>
+                                            </h4>
+                                            <p class="card-text">
+                                                <%= product.description %>
+                                            </p>
+                                            <div class="d-flex flex-column product_offer mt-4">
+                                                <p>Special Offer</p>
+                                                <p>> Free Delivery Available </p>
+                                                <p>> Coupon available </p>
+                                            </div>
+                                            <p class="product_size">Size: <%= product.size %>
+                                            </p>
+                                          
+                                                <form action="/cart" class="d-flex mt-3">
+                                                     <input type="number" style="width: 6vh;" value="1">
+                                                    <button type="submit" class="product_cart">ADD TO CART</button>
+                                                </form>
+                                            
+                                                <a href="/checkout?id=<%= product._id %>"><button type="submit" class="mt-4 product_checkout">BUY IT NOW</button></a>
+                                        </div>
+
+                                    </div>
+
+
+
+                                </div>
+
+                                <div class="container  text-center mt-5 " style="margin-bottom: 6%;">
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-6 col-sm-12 border py-4 align-items-center">
+                                            <i class="fa-solid fa-plane-up fa-4x mb-3 bg-fa-product"></i>
+                                            <p class="lead mt-4">WORLDWIDE SHIPPING</p>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 border py-4">
+                                            <i class="fa-solid fa-clipboard-check fa-4x mb-3 bg-fa-product"></i>
+                                            <p class="lead mt-4">100% SECURE CHECKOUT</p>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 border py-4">
+                                            <i class="fas fa-undo-alt fa-4x mb-3 bg-fa-product"></i>
+                                            <p class="lead mt-4">FREE 60-DAY RETURNS WORLDWIDE</p>
+                                        </div>
+                                    </div>
+                                </div>
+</div>
+
+
+
+                            <%- include('userFooter') %>
