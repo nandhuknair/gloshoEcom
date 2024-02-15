@@ -15,7 +15,7 @@
     <hr>
     <ul class="nav flex-column ">
       <li class="nav-item my-2" id="myOrderItem" onclick="viewMyOrderPage()">
-        <a href="#" class="nav-link link-dark">
+        <a href="/my_order" class="nav-link link-dark">
           <i class="fa-solid fa-house-chimney me-3" ></i>
           My Order
         </a>
@@ -66,7 +66,7 @@
     
   </div></div>
 
-  <i class="fa-solid fa-bars-staggered mt-5 ms-4 " id="sidebardisplay"></i>
+  <i class="fa-solid fa-bars-staggered mt-2 ms-4 " id="sidebardisplay"></i>
 
   <!-- ---------------------------------- ALERT MANAGE ------------------------------------------------------------ -->
 
@@ -76,42 +76,42 @@
       <% if (userMessage) { %>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
           <strong>Holy <%= user.userName %>!</strong> Successfully Changed Username
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          <a href="/resetMessage"> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></a>
         </div>
         <% } %>
     
           <% if (userError) { %>
             <div class="alert alert-warning alert-dismissible fade show" role="alert">
               <strong>Sorry <%= user.userName %> 😓</strong> Same Userame Try Another One
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              <a href="/resetMessage"> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></a>
             </div>
             <% } %>
     
               <% if (addressError) { %>
                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
                   <strong>Sorry <%= user.userName %> 😓</strong> Adress Limit Exceeded
-                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  <a href="/resetMessage"> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></a>
                 </div>
                 <% } %>
     
                   <% if (addressMessage) { %>
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                       <strong>Holy <%= user.userName %>!</strong> Address added Successfully
-                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      <a href="/resetMessage"> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></a>
                     </div>
                     <% } %>
 
                     <% if (passMessage) { %>
                       <div class="alert alert-success alert-dismissible fade show" role="alert">
                         <strong>Holy <%= user.userName %>!</strong> Successfully Changed Password
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <a href="/resetMessage"> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></a>
                       </div>
                       <% } %>
 
                       <% if (passError) { %>
                         <div class="alert alert-warning alert-dismissible fade show" role="alert">
                           <strong>Sorry <%= user.userName %> 😓</strong> Error Occur While Changing The Password Please Try Again
-                          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                          <a href="/resetMessage"> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></a>
                         </div>
                         <% } %>
 
@@ -125,7 +125,7 @@
                           <% if (editAddressError) { %>
                             <div class="alert alert-warning alert-dismissible fade show" role="alert">
                               <strong>Sorry <%= user.userName %> 😓</strong> Error Occur While Editinig The Address Please Try Again
-                              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                              <a href="/resetMessage"> <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></a>
                             </div>
                             <% } %>
 
@@ -153,7 +153,29 @@
 <div class="d-flex justify-content-end">
 
   <a href="" data-bs-toggle="modal" data-bs-target="#myModalEdit<%= index %>"><i class="fa-solid fa-user-pen"></i></a>
-  <a href="/delete_address/<%= data._id %>"><i class="fa-solid fa-trash-can ms-3"></i></a> 
+  <a href="" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa-solid fa-trash ms-3"></i> </a> 
+
+                          
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="background-color: rgba(0, 0, 0, 0.534);">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="head_text" id="exampleModalLabel">ARE YOU SURE</h5>
+          <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+        <p class="para_text">Permenently Delete The Address ⚠️</p>  
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">NO</button>
+         <a href="/delete_address/<%= data._id %>"><button type="button" class="btn btn-primary">YES</button></a> 
+        </div>
+      </div>
+    </div>
+  </div>
+
+
 
   <!-- Edit product modal window start  -->
 
@@ -238,216 +260,13 @@
 <!-- ----------------------------my order page ---------------------------------------- -->
 
   <div class="col-lg-9 mt-5 ms-5" id="myOrder">
-    <h4 class="heading">MY ORDER</h4>
-    <div class="container txt-container">
-      <div class="container">
-        <div class="row">
-          
-          <table id="example" class="table table-striped table-bordered" cellspacing="0" width="100%">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Position</th>
-                <th>Office</th>
-                <th>Age</th>
-                <th>Start date</th>
-                <th>Salary</th>
-              </tr>
-            </thead>
-            <tfoot>
-              <tr>
-                <th>Name</th>
-                <th>Position</th>
-                <th>Office</th>
-                <th>Age</th>
-                <th>Start date</th>
-                <th>Salary</th>
-              </tr>
-            </tfoot>
-            <tbody>
-              <tr>
-                <td>Tiger Nixon</td>
-                <td>System Architect</td>
-                <td>Edinburgh</td>
-                <td>61</td>
-                <td>2011/04/25</td>
-                <td>$320,800</td>
-              </tr>
-              <tr>
-                <td>Garrett Winters</td>
-                <td>Accountant</td>
-                <td>Tokyo</td>
-                <td>63</td>
-                <td>2011/07/25</td>
-                <td>$170,750</td>
-              </tr>
-              <tr>
-                <td>Ashton Cox</td>
-                <td>Junior Technical Author</td>
-                <td>San Francisco</td>
-                <td>66</td>
-                <td>2009/01/12</td>
-                <td>$86,000</td>
-              </tr>
-              <tr>
-                <td>Cedric Kelly</td>
-                <td>Senior Javascript Developer</td>
-                <td>Edinburgh</td>
-                <td>22</td>
-                <td>2012/03/29</td>
-                <td>$433,060</td>
-              </tr>
-              <tr>
-                <td>Airi Satou</td>
-                <td>Accountant</td>
-                <td>Tokyo</td>
-                <td>33</td>
-                <td>2008/11/28</td>
-                <td>$162,700</td>
-              </tr>
-              <tr>
-                <td>Brielle Williamson</td>
-                <td>Integration Specialist</td>
-                <td>New York</td>
-                <td>61</td>
-                <td>2012/12/02</td>
-                <td>$372,000</td>
-              </tr>
-              <tr>
-                <td>Herrod Chandler</td>
-                <td>Sales Assistant</td>
-                <td>San Francisco</td>
-                <td>59</td>
-                <td>2012/08/06</td>
-                <td>$137,500</td>
-              </tr>
-              <tr>
-                <td>Rhona Davidson</td>
-                <td>Integration Specialist</td>
-                <td>Tokyo</td>
-                <td>55</td>
-                <td>2010/10/14</td>
-                <td>$327,900</td>
-              </tr>
-              <tr>
-                <td>Colleen Hurst</td>
-                <td>Javascript Developer</td>
-                <td>San Francisco</td>
-                <td>39</td>
-                <td>2009/09/15</td>
-                <td>$205,500</td>
-              </tr>
-              <tr>
-                <td>Sonya Frost</td>
-                <td>Software Engineer</td>
-                <td>Edinburgh</td>
-                <td>23</td>
-                <td>2008/12/13</td>
-                <td>$103,600</td>
-              </tr>
-              <tr>
-                <td>Jena Gaines</td>
-                <td>Office Manager</td>
-                <td>London</td>
-                <td>30</td>
-                <td>2008/12/19</td>
-                <td>$90,560</td>
-              </tr>
-              <tr>
-                <td>Quinn Flynn</td>
-                <td>Support Lead</td>
-                <td>Edinburgh</td>
-                <td>22</td>
-                <td>2013/03/03</td>
-                <td>$342,000</td>
-              </tr>
-              <tr>
-                <td>Charde Marshall</td>
-                <td>Regional Director</td>
-                <td>San Francisco</td>
-                <td>36</td>
-                <td>2008/10/16</td>
-                <td>$470,600</td>
-              </tr>
-              <tr>
-                <td>Haley Kennedy</td>
-                <td>Senior Marketing Designer</td>
-                <td>London</td>
-                <td>43</td>
-                <td>2012/12/18</td>
-                <td>$313,500</td>
-              </tr>
-              <tr>
-                <td>Tatyana Fitzpatrick</td>
-                <td>Regional Director</td>
-                <td>London</td>
-                <td>19</td>
-                <td>2010/03/17</td>
-                <td>$385,750</td>
-              </tr>
-              <tr>
-                <td>Michael Silva</td>
-                <td>Marketing Designer</td>
-                <td>London</td>
-                <td>66</td>
-                <td>2012/11/27</td>
-                <td>$198,500</td>
-              </tr>
-              <tr>
-                <td>Paul Byrd</td>
-                <td>Chief Financial Officer (CFO)</td>
-                <td>New York</td>
-                <td>64</td>
-                <td>2010/06/09</td>
-                <td>$725,000</td>
-              </tr>
-              <tr>
-                <td>Gloria Little</td>
-                <td>Systems Administrator</td>
-                <td>New York</td>
-                <td>59</td>
-                <td>2009/04/10</td>
-                <td>$237,500</td>
-              </tr>
-              <tr>
-                <td>Bradley Greer</td>
-                <td>Software Engineer</td>
-                <td>London</td>
-                <td>41</td>
-                <td>2012/10/13</td>
-                <td>$132,000</td>
-              </tr>
-              <tr>
-                <td>Dai Rios</td>
-                <td>Personnel Lead</td>
-                <td>Edinburgh</td>
-                <td>35</td>
-                <td>2012/09/26</td>
-                <td>$217,500</td>
-              </tr>
-              <tr>
-                <td>Jenette Caldwell</td>
-                <td>Development Lead</td>
-                <td>New York</td>
-                <td>30</td>
-                <td>2011/09/03</td>
-                <td>$345,000</td>
-              </tr>
-         
-            </tbody>
-          </table>
-      
-        </div>
-      </div>
-      
-      
-      
-    </div>
+    
 </div>
 
 <!-- ----------------------------Change username page ---------------------------------------- -->
 
-<div class="col-lg-9 mt-5 ms-5 " id="changeUsername" >
+<div class="col-lg-9 mt-5 ms-5" id="changeUsername">
+  <div class="container txt-container" style="height: fit-content;">
   <h4 class="heading">CHANGE USERNAME</h4>
   <form action="/change_userName" method="post" class="d-inline-flex flex-column">
   <h6>ENTER YOUR NEW USERNAME</h6>
@@ -455,10 +274,12 @@
   <button class="mt-4 change_userName">CHANGE</button>
 </form>
 </div>
+</div>
 
 <!-- ----------------------------Change password page ---------------------------------------- -->
 
 <div class="col-lg-9 mt-5 ms-5" id="changePassword" >
+  <div class="container txt-container" style="height: fit-content;">
   <h4 class="heading">CHANGE PASSWORD</h4>
   <form action="/change_password" method="post" class="d-inline-flex flex-column">
     <h6>ENTER YOUR OLD PASSWORD</h6>
@@ -470,6 +291,9 @@
     <button class="mt-3 change_userName">CHANGE</button>
   </form>
 </div>
+</div>
+
+
 
 <!-- ----------------------------Manage address page ---------------------------------------- -->
 
@@ -492,7 +316,27 @@
          <div class="d-flex justify-content-end">
 
           <a href="" data-bs-toggle="modal" data-bs-target="#myModalEdit2<%= index %>"><i class="fa-solid fa-user-pen"></i></a>
-          <a href="/delete_address/<%= data._id %>"><i class="fa-solid fa-trash-can ms-3"></i></a> 
+          <a href="" data-bs-toggle="modal" data-bs-target="#exampleModal2"><i class="fa-solid fa-trash ms-3"></i> </a> 
+
+                          
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="background-color: rgba(0, 0, 0, 0.534);">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="head_text" id="exampleModalLabel">ARE YOU SURE</h5>
+          <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+        <p class="para_text">Permenently Delete The Address ⚠️</p>  
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">NO</button>
+         <a href="/delete_address/<%= data._id %>"><button type="button" class="btn btn-primary">YES</button></a> 
+        </div>
+      </div>
+    </div>
+  </div>
         
           <!-- Edit product modal window start  -->
         
@@ -634,19 +478,22 @@
     </div>
     <!-- End Modal for Adding Address -->
   </div>
+
 </div>
 
 <!-- ----------------------------wallet page ---------------------------------------- -->
 
 <div class="col-lg-9 mt-5 ms-5" id="wallet">
+  <div class="container txt-container" style="height: fit-content;">
   <h2 class="heading">WALLET</h2>
   <div class="container txt-container">
   </div>
 </div>
-
-
 </div>
 
+
+<!-- ------------------------------Main container end---------------------------------------------- -->
+</div>
 
 
 <script>

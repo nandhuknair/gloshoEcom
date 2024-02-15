@@ -14,6 +14,7 @@
                   <h2 class="heading">ALL PRODUCTS</h2>
              
               </div>
+
        
             <div class="row">
                     <% products.forEach((data,index) => { %>
@@ -24,22 +25,76 @@
                                         transition: all 0.3s;
                                         background-position:center;">
                                             <ul>
-                                                    <li><a href="#"><i class="fas fa-shopping-cart"></i></a></li>
+
+                                                
+                                                <li>
+
+                                                    <% if (userLoggedIn) { %>
+
+                                                               <button data-bs-toggle="modal" data-bs-target="#exampleModalCart" class="cart_button" value="<%= data._id %>"><i class="fas fa-shopping-cart"></i></button>
+                                                        
+
+                                                              <% } else { %>
+                                                                <a href="/login"><i class="fas fa-shopping-cart"></i></a>
+                                                         <% } %> 
+                                                        
+                                        
+                         </li>
                                                     <li><a href="#"><i class="fas fa-heart"></i></a></li>
                                                     <li><a href="/product?id=<%= data._id %>"><i class="fas fa-expand"></i></a></li>
                                             </ul>
                                     </div>
                                     <div class="part-2">
                                             <h3 class="product-title" style="letter-spacing: 1px;"><%= data.productName %></h3>
-                                            <!-- <h4 class="product-old-price">$79.99</h4> -->
+                                         
                                             <h4 class="product-price" style="color: #FF871D;">$<%= data.price %></h4>
                                     </div>
-                            <!-- background-position:center;transition: all 0.3s;background-size: cover;  -->
+                           
                    </div> </div>
+
+           <!-- Modal -->
+           
+           <div class="modal fade" id="exampleModalCart" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <!-- <h5 class="head_text" id="exampleModalLabel">ARE YOU SURE</h5> -->
+                      <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                    <p class="para_text text-center">Product Successfully Added To The Cart ✅ </p>  
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
 
                     <% }); %>
             </div>
     </div>
 </section>
 
+<script>
+   let cartBtns = document.querySelectorAll('.cart_button')
+        cartBtns.forEach(cartBtn => {
+
+                cartBtn.addEventListener('click', () => {
+                        console.log(cartBtn.value)
+                        fetch('http://localhost:9000/cart', {
+                                method: 'POST',
+                                headers: {
+                                        'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                        quantity: 1,
+                                        productId: cartBtn.value
+                                })
+                        })
+                                .catch(error => console.log(error))
+                })
+        })
+
+
+</script>
 <%- include('userFooter') %>

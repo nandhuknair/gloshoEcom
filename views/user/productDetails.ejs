@@ -6,13 +6,33 @@
                     <% console.log("Product:", product); %>
                         <% console.log("Product category:", product.category); %>
                             <div class="container">
-                                <div class="d-inline-flex align-items-center mt-3">
-                                    <a href="/" class="mb-3">HOME</a>
-                                    <i class="fa-solid fa-chevron-right me-2 ms-2 mb-3"></i>
-                                    <p class="span mb-3">
-                                        <%= product.collection.toUpperCase() %>
-                                    </p>
-                                </div>
+                                    <div class="d-inline-flex align-items-center mt-3">
+                                        <a href="/" class="mb-3">HOME</a>
+                                        <i class="fa-solid fa-chevron-right me-2 ms-2 mb-3"></i>
+                                        <p class="span mb-3">
+                                            <%= product.collection.toUpperCase() %>
+                                        </p>
+                                    </div>
+
+
+                                    <div class="modal fade" id="isInCart" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                         <div class="modal-dialog" role="document">
+                                           <div class="modal-content">
+                                             <div class="modal-header">
+                                               <!-- <h5 class="head_text" id="exampleModalLabel">ARE YOU SURE</h5> -->
+                                               <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                                             </div>
+                                             <div class="modal-body">
+                                             <p class="para_text text-center">Product Already Added To The <a style="color: crimson;" href="/cart">Cart</a> ✅ </p>  
+                                    
+                                             </div>
+                                           </div>
+                                         </div>
+                                       </div>
+                         
+
+
+
                                 <div class="row mt-5" style="margin-bottom: 10%;">
                                     <div class="col-md-6 ">
                                         <div id="mainImgContainer"
@@ -62,9 +82,19 @@
                                             <p class="product_size">Size: <%= product.size %>
                                             </p>
                                           
-                                                <form action="/cart" class="d-flex mt-3">
-                                                     <input type="number" style="width: 6vh;" value="1">
-                                                    <button type="submit" class="product_cart">ADD TO CART</button>
+                                                <form action="/cart" method="post" id="addToCart" class="d-flex mt-3">
+                                                     <input type="number" name="quantity" id="quantity" value="1" hidden>
+                                                     <input type="text" value="<%= product._id %>" name="productId" hidden>
+
+                                                     <% if(isInCart){ %>
+                                                     <a data-bs-toggle="modal" data-bs-target="#isInCart" class="product_cart" style="cursor: pointer;">ADD TO CART</a>
+
+                                                      <% } else{ %>  
+                                                        <button type="submit" id="cartSubmitBtn" class="product_cart">ADD TO CART</button>
+
+                                                     <% } %>
+                                                     
+                                                   
                                                 </form>
                                             
                                                 <a href="/checkout?id=<%= product._id %>"><button type="submit" class="mt-4 product_checkout">BUY IT NOW</button></a>
@@ -77,7 +107,7 @@
                                 </div>
 
                                 <div class="container  text-center mt-5 " style="margin-bottom: 6%;">
-                                    <div class="row">
+                                    <div class="row pro_detail_container">
                                         <div class="col-lg-4 col-md-6 col-sm-12 border py-4 align-items-center">
                                             <i class="fa-solid fa-plane-up fa-4x mb-3 bg-fa-product"></i>
                                             <p class="lead mt-4">WORLDWIDE SHIPPING</p>
@@ -94,6 +124,5 @@
                                 </div>
 </div>
 
-
-
                             <%- include('userFooter') %>
+

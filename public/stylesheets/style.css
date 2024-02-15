@@ -26,6 +26,7 @@ a:hover{
 p{
   font-family: 'Jost', sans-serif;
   letter-spacing: 1.5px;
+  color: #495057;
 }
 
 /* spinner */
@@ -338,9 +339,27 @@ p{
   box-shadow: 0 2px 20px rgb(50 50 50 / 10%);
   transition: color 0.2s;
 }
+.cart_button,.wishlist_button{
+  border: none; outline: none;
+  display: inline-block;
+  width: 40px;
+  line-height: 38px;
+  background-color: #ffffff;
+  color: #444444;
+  text-align: center;
+  box-shadow: 0 2px 20px rgb(50 50 50 / 10%);
+  transition: color 0.2s;
+  padding: 0;
+  margin: 0;
+  padding-bottom: 2px ;
+}
+
+.cart_button:hover{
+  color: #FF871D;
+}
 
 .section-products .single-product .part-1 ul li a:hover {
-  color: #fe302f;
+  color: #FF871D;
 }
 
 .section-products .single-product .part-2 .product-title {
@@ -466,7 +485,6 @@ p{
   border: none;
   outline: none;
   padding:  1% 10%;
-  margin-left: 3%;
   transition: 1s ease;
 }
 .product_cart:hover{
@@ -479,14 +497,21 @@ p{
  letter-spacing: 2px;
  border: none;
  outline: none;
- padding: 1.5% 17%;
+ padding: 1.5% 15.4%;
 }
 .product_checkout:hover{
   background-color: #000000;
 }
 .bg-fa-product{
-  color: #ff871de3;
+  color: #bdbdbde3;
+  transition: color 0.4s ease;
 }
+
+.pro_detail_container:hover .bg-fa-product{
+  color: #1a1a1a;
+}
+
+
 .shipping_content{
   margin-top: 10%;
 }
@@ -534,10 +559,13 @@ hr{
 
 .show-sidebar {
   display: flex;
+  position: fixed;
+  background-color: white;
+  margin-top: 2%;
 }
 
 .sidebar {
-  min-height: 85vh;
+  min-height: fit-content;
   width: 280px;
   display: none;
 }
@@ -556,25 +584,10 @@ hr{
   font-size: 1.2rem;
 }
 
-#myOrder{
+#myOrder,#changeUsername,#changePassword,#manageAddress,#wallet{
   display: none;
 }
 
-#changeUsername{
-  display: none;
-}
-
-#changePassword{
-  display: none;
-}
-
-#manageAddress{
-  display: none;
-}
-
-#wallet{
-  display: none;
-}
 
 .change_userName{
   outline: none;
@@ -654,33 +667,23 @@ hr{
   }
 }
 
-/* // paginate */
-
-.paginate_button {
-  min-width: 4rem;
-  display: inline-block;
-  text-align: center;
-  padding: 1rem 1.6rem;
-  margin-top: -1rem;
-  border: 2px solid lightblue;
-  &:not(.previous) {
-    border-left: none;
-  }
-  &.previous {
-    border-radius: 8px 0 0 8px;
-    min-width: 7rem;
-  }
-  &.next {
-    border-radius: 0 8px 8px 0;
-    min-width: 7rem;
-  }
-
-  &:hover {
-    cursor: pointer;
-    background-color: #eee;
-    text-decoration: none;
-  }
+.limit_msg{
+  background-color:#28AF5B ;
+  padding: 1% 3%;
+  text-transform: uppercase;
 }
+
+#plusBtn,#minusBtn,#quantity{
+  background: none;
+  border: none;
+  outline: none;
+}
+
+#totalPriceText{
+  color: #FF871D;
+}
+
+
 
 
 
@@ -738,7 +741,9 @@ hr{
     .addrss-container{
       flex-direction: column;
     }
-    
+    .main-container{
+      min-height: fit-content;
+    }
     
 }
 

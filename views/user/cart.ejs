@@ -1,0 +1,236 @@
+<%- include('userAfterLogin') %>
+
+    <div class="main-container" style="flex-direction: column;">
+        <div class="container-fluid">
+
+            <div class="d-inline-flex align-items-center mt-4 ms-3">
+                <a href="/all_products" class="">PRODUCTS</a>
+                <i class="fa-solid fa-chevron-right me-2 ms-2 "></i>
+                <p class="span mt-3">CART</a>
+            </div>
+            
+        </div>
+        <% if (stockLimitError) { %>
+            <div class="container-fluid d-flex justify-content-end "><p class="limit_msg me-4"><%= stockLimitError %></p></div>
+            <% } %>
+
+            <% if (quantityLimitError) { %>
+                <div class="container-fluid d-flex justify-content-end "><p class="limit_msg me-4"><%= quantityLimitError %></p></div>
+                <% } %>
+        
+
+        <% if (cartItem.length === 0) { %>
+            <div class="container mt-4 text-center justify-content align-items-center">
+                <div class="row"><img src="/images/icon/empty-cart.svg"  height="400px" alt="cart-empty-svg"></div>
+                <div class="row"><h3  class="head_text">YOUR CART IS EMPTY</h3>
+                <p style="color: #23252777;">Looks like you haven't added anything to your cart yet</p>
+                <a href="/all_products"><button class="product_checkout">Continue Shopping</button></a>
+            </div>
+                    
+                
+          </div>  
+        <% } else { %>
+            
+          
+        
+        <% cartItem.forEach((item,index )=> { %>
+  
+        <div class="container border-bottom mt-4">
+            
+            <div class="row">
+                <div class="d-flex">
+                    <img src="/assets/uploads/<%= item.productId.image[item.productId.image.length-1] %>" alt="<%= item.productId.productName %>" height="100%" width="17%">
+                    <div class="d-flex flex-column ms-5 justify-content-center">
+                        <h3><%= item.productId.productName %></h3>
+                         <p>Size:<%= item.productId.size %></p>
+                        <p>Collection: <%= item.productId.collection %></p>
+                        
+                        <a href="" data-bs-toggle="modal" data-bs-target="#exampleModal<%= index %>" class="d-flex align-items-center"><i class="fa-solid fa-trash"></i> <p class="mb-0 ms-2">Remove items</p></a> 
+
+                          
+                          <!-- Modal -->
+                          <div class="modal fade" id="exampleModal<%= index %>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 class="head_text" id="exampleModalLabel">ARE YOU SURE</h5>
+                                  <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                <p class="para_text">Remove This Product From The Cart ⚠️</p>  
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">NO</button>
+                                 <a href="/remove_cart_products?cartItemId=<%= item._id %>"><button type="button" class="btn btn-primary">YES</button></a> 
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+
+                        <a href="" class="d-flex align-items-center mt-3"><i class="fa-solid fa-heart" style="color: #FF871D;"></i> <p class="mb-0 ms-2">Add To Whishlist</p></a> 
+                        
+                        <a href="" data-bs-toggle="modal" data-bs-target="#myModalEdit<%= index %>" class="d-flex align-items-center mt-3"><p class="mb-0">Edit</p><i class="fa-solid fa-pen-to-square ms-2"></i></a> 
+
+                        <!-- Edit product modal window start  -->
+                      
+                        <div class="modal fade text-start" id="myModalEdit<%= index %>" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+                          <div class="modal-dialog">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="myModalLabel">Edit Quantity</h5>
+                                <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                              </div>
+                              <div class="modal-body">
+                                <form action="/edit_cart?cartItemId=<%= item._id %>" method="post">
+                                  <div class="mb-3">
+                                    <img src="/assets/uploads/<%= item.productId.image[item.productId.image.length-1] %>" alt="<%= item.productId.productName %>" height="100%" width="17%">
+                                  <h3 class="head_text"><%= item.productId.productName %></h3>
+                                
+                                      <div class="d-inline-flex justify-content-center align-items-center">
+                                        <button id="minusBtn"><i class="fa-solid fa-minus"></i></button>
+                                        <div class="ps-4"><input type="text" id="quantity" name="quantity" class="form-control input-number" value="12" style="width: 65px;" readonly></div>
+                                        <button id="plusBtn"><i class="fa-solid fa-plus"></i></button>
+                                      </div>
+
+
+                                      <input type="text" name="" id="productId" value="<%= item.productId.stock %>" hidden>
+                                  </div>
+                                    <div class="modal-footer">
+                                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                                    <button class="btn btn-primary" id="saveEditBtn" value="<%= index %>" type="submit">Save & Edit</button>
+                                  </div>
+                                </form>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- End Modal for Adding Address -->
+
+                        
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <div class="d-flex flex-column align-items-end">
+                    <p class="mb-0">Quantity: <%= item.quantity %></p>
+                    <p class="mt-3">$<%= item.totalPrice %></p>
+                </div>
+            </div>
+        </div>
+
+        
+<% }); %>
+<div class="container d-flex justify-content-end mt-3">
+<form action="/checkout" method="post" class="d-flex flex-column align-items-end">
+  <div class="d-flex align-items-center justify-content-center"><p class="">Shipping :&nbsp;&nbsp;</p> <p id="shipping">Free</p></div> 
+ <div class="d-flex align-items-center justify-content-center"><p class="totalPrice">YOUR ORDER SUMMARY :&nbsp;&nbsp;</p> <p id="totalPriceText"></p></div> 
+
+ <input type="totalPrice" id="totalPriceInput" value="" hidden>
+ <input type="text" id="cartItems" value="<%= cartItemJSON %>" hidden>
+
+  <button type="submit" class="product_checkout" style="width: fit-content;">BUY NOW</button>
+
+</form>
+</div>
+<% } %>
+
+
+
+
+</div>
+
+<script>
+ // Function to add event listeners to plus and minus buttons
+function addQuantityListeners() {
+    let minusButtons = document.querySelectorAll('[id^="myModalEdit"] #minusBtn');
+    let plusButtons = document.querySelectorAll('[id^="myModalEdit"] #plusBtn');
+    let quantityInputs = document.querySelectorAll('[id^="myModalEdit"] #quantity');
+
+    // Remove existing event listeners
+    minusButtons.forEach(button => {
+        button.removeEventListener('click', onMinusButtonClick);
+    });
+    plusButtons.forEach(button => {
+        button.removeEventListener('click', onPlusButtonClick);
+    });
+
+    // Add new event listeners
+    minusButtons.forEach((button, index) => {
+        button.addEventListener('click', onMinusButtonClick);
+    });
+
+    plusButtons.forEach((button, index) => {
+        button.addEventListener('click', onPlusButtonClick);
+    });
+}
+
+function onMinusButtonClick(e) {
+    e.preventDefault();
+    console.log('Minus button clicked');
+    let container = e.target.closest('.modal-content');
+    let quantityInput = container.querySelector('[id^="quantity"]');
+    let quantity = parseInt(quantityInput.value);
+    if (quantity > 1) {
+        quantityInput.value = quantity - 1;
+    }
+}
+
+function onPlusButtonClick(e) {
+    e.preventDefault();
+    console.log('Plus button clicked');
+    let container = e.target.closest('.modal-content');
+    let quantityInput = container.querySelector('[id^="quantity"]');
+    let quantity = parseInt(quantityInput.value);
+    if (quantity < 12) {
+        quantityInput.value = quantity + 1;
+    }
+}
+
+
+// Event listener for Bootstrap modal shown event
+document.addEventListener('shown.bs.modal', function (event) {
+
+    if (event.target.id.startsWith('myModalEdit')) {
+
+        addQuantityListeners();
+    }
+});
+
+
+
+  // Convert cart data from JSON string to JavaScript array
+  console.log(document.getElementById('cartItems').value)
+let cartItems = JSON.parse(document.getElementById('cartItems').value);
+
+// Function to calculate total price
+function calculateTotalPrice() {
+    let totalPrice = 0;
+    cartItems.forEach(item => {
+        totalPrice += item.productId.price * item.quantity;
+    });
+    return totalPrice.toFixed(2);
+}
+
+// Update total price input value when the page is loaded
+document.addEventListener('DOMContentLoaded', function () {
+    const totalPriceInput = document.getElementById('totalPriceInput');
+    const totalPriceText = document.getElementById('totalPriceText')
+    if (totalPriceInput) {
+        totalPriceInput.value = calculateTotalPrice();
+        totalPriceText.innerHTML = calculateTotalPrice();
+        
+    }
+});
+
+
+  </script>
+  
+
+
+<%- include('userFooter') %>
+
+
+
+

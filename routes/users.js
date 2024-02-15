@@ -23,11 +23,13 @@ router.post('/reset_password',userController.newPassword)
 
 
 //-------------------Product Management---------------------------
+
 router.get('/all_products',userController.listProducts)
 router.get('/product',userController.productDetails)
 
 
 //-------------------User Account Management---------------------------
+
 router.get('/profile',sessionCheck.userActivity,userController.getProfile)
 router.post('/change_userName',sessionCheck.userActivity,userController.changeUserName)
 router.post('/add_address',sessionCheck.userActivity,userController.addAddress)
@@ -35,6 +37,22 @@ router.post('/change_password',sessionCheck.userActivity,userController.changePa
 router.get('/delete_address/:addressId',sessionCheck.userActivity,userController.deleteAddress)
 router.post('/edit_address/:addressId',sessionCheck.userActivity,userController.editAddress)
 router.get('/resetMessage',sessionCheck.userActivity,userController.resetMessage)
+router.get('/my_order',sessionCheck.userActivity,userController.myOrder)
+
+
+//-------------------User Cart Management---------------------------
+
+router.get('/cart',sessionCheck.userActivity,userController.viewCart)
+router.post('/cart',sessionCheck.userActivity,userController.addToCart)
+router.get('/remove_cart_products',sessionCheck.userActivity,userController.removeCartProducts)
+router.post('/edit_cart',sessionCheck.userActivity,userController.editCart)
+
+//-------------------Checkout page Management---------------------------
+
+router.get('/checkout',userController.getCheckoutPage)
+
+
+
 
 
 

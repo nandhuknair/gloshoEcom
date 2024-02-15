@@ -1,0 +1,296 @@
+<%- include('userAfterLogin') %>
+
+
+
+<div class="container mt-5">
+
+   
+
+<div class="row">
+    <div class="col-md-4 order-md-2 mb-4">
+      <h4 class="d-flex justify-content-between align-items-center mb-3">
+        <span class="text-muted">Your cart</span>
+        <!-- <span class="badge badge-secondary badge-pill">3</span> -->
+      </h4>
+      <ul class="list-group mb-3">
+        <li class="list-group-item d-flex justify-content-between lh-condensed">
+        <% skillset.forEach((val)=>{%>
+        <div>
+        <h6 class="my-0">Product name</h6>
+        <small class="text-muted">Brief description</small>
+        </div>
+        <span class="text-muted">$12</span>
+
+          <% }) %>
+
+
+
+        </li>
+        <li class="list-group-item d-flex justify-content-between lh-condensed">
+          <div>
+            <h6 class="my-0">Second product</h6>
+            <small class="text-muted">Brief description</small>
+          </div>
+          <span class="text-muted">$8</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between lh-condensed">
+          <div>
+            <h6 class="my-0">Third item</h6>
+            <small class="text-muted">Brief description</small>
+          </div>
+          <span class="text-muted">$5</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between bg-light">
+          <div class="text-success">
+            <h6 class="my-0">Promo code</h6>
+            <small>EXAMPLECODE</small>
+          </div>
+          <span class="text-success">-$5</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+          <span>Total (USD)</span>
+          <strong>$20</strong>
+        </li>
+      </ul>
+
+      <form class="card p-2">
+        <div class="input-group">
+          <input type="text" class="form-control" placeholder="Promo code">
+          <div class="input-group-append">
+            <button type="submit" class="btn btn-secondary">Redeem</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+
+
+
+    <div class="col-md-8 order-md-1">
+      <h4 class="mb-3">Billing address</h4>
+      <div class="addrss-container container mt-4" style="justify-content: start;">
+        <% user.address.forEach((data,index)=>{ %>
+         <div class="border py-4 px-4" >
+           <ul>
+            <li><p><%= data.address %> </p></li> 
+             <p><%= data.city %> </p>
+             <p><%= data.state %> </p>
+             <p><%= data.pincode %> </p>
+       </ul>
+       <div class="d-flex justify-content-end">
+
+        <a href="" data-bs-toggle="modal" data-bs-target="#myModalEdit2<%= index %>"><i class="fa-solid fa-user-pen"></i></a>
+        <a href="" data-bs-toggle="modal" data-bs-target="#exampleModal2"><i class="fa-solid fa-trash ms-3"></i> </a> 
+
+                        
+<!-- Modal -->
+<div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="background-color: rgba(0, 0, 0, 0.534);">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="head_text" id="exampleModalLabel">ARE YOU SURE</h5>
+        <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+      <p class="para_text">Permenently Delete The Address ⚠️</p>  
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">NO</button>
+       <a href="/delete_address/<%= data._id %>"><button type="button" class="btn btn-primary">YES</button></a> 
+      </div>
+    </div>
+  </div>
+</div>
+      
+        <!-- Edit product modal window start  -->
+      
+        <div class="modal fade text-start" id="myModalEdit2<%= index %>" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="myModalLabel">Edit Address</h5>
+                <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form action="/edit_address/<%= data._id %>" method="post">
+                  <div class="mb-3">
+                    <label class="form-label" for="modalInputEmail1">Name</label>
+                    <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.name %>" name="userName"
+                      aria-describedby="emailHelp" required >
+                  </div>
+      
+                  <div class="mb-3">
+                    <label class="form-label" for="modalInputEmail1">Number</label>
+                    <input class="form-control" id="modalInputEmail1" type="number" value="<%= data.number %>" name="number"
+                      aria-describedby="emailHelp" required>
+                  </div>
+      
+                  <div class="mb-3">
+                    <label class="form-label" for="modalInputEmail1">Address</label>
+                    <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.address %>" name="address"
+                      aria-describedby="emailHelp" required>
+                  </div>
+      
+                  <div class="mb-3">
+                    <label class="form-label" for="modalInputEmail1">City</label>
+                    <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.city %>" name="city"
+                      aria-describedby="emailHelp" required>
+                  </div>
+      
+                  <div class="mb-3">
+                    <label class="form-label" for="modalInputEmail1">State</label>
+                    <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.state %>" name="state"
+                      aria-describedby="emailHelp" required>
+                  </div>
+      
+                  <div class="mb-3">
+                    <label class="form-label" for="modalInputEmail1">Pincode</label>
+                    <input class="form-control" id="modalInputEmail1" type="number" value="<%= data.pincode %>" name="pincode"
+                      aria-describedby="emailHelp" required>
+                  </div>
+      
+                  <div class="mb-3">
+                    <label class="form-label" for="modalInputEmail1">Landmark</label>
+                    <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.landmark %>" name="landmark" 
+                    aria-describedby="emailHelp" required>
+                      
+                  </div>
+       
+               
+                  
+                  <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                    <button class="btn btn-primary" type="submit">Save & Edit</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End Modal for Adding Address -->
+      
+       </div>
+        </div>
+        <% }) %>
+       </div> 
+
+    </div>
+
+
+
+    
+  </div>
+  <div class="col-md-8 order-md-1">
+    <h4 class="mb-3">Shipping address</h4>
+    <div class="addrss-container container mt-4" style="justify-content: start;">
+      <% user.address.forEach((data,index)=>{ %>
+       <div class="border py-4 px-4" >
+         <ul>
+          <li><p><%= data.address %> </p></li> 
+           <p><%= data.city %> </p>
+           <p><%= data.state %> </p>
+           <p><%= data.pincode %> </p>
+     </ul>
+     <div class="d-flex justify-content-end">
+
+      <a href="" data-bs-toggle="modal" data-bs-target="#myModalEdit2<%= index %>"><i class="fa-solid fa-user-pen"></i></a>
+      <a href="" data-bs-toggle="modal" data-bs-target="#exampleModal2"><i class="fa-solid fa-trash ms-3"></i> </a> 
+
+                      
+<!-- Modal -->
+<div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="background-color: rgba(0, 0, 0, 0.534);">
+<div class="modal-dialog" role="document">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="head_text" id="exampleModalLabel">ARE YOU SURE</h5>
+      <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+    <p class="para_text">Permenently Delete The Address ⚠️</p>  
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">NO</button>
+     <a href="/delete_address/<%= data._id %>"><button type="button" class="btn btn-primary">YES</button></a> 
+    </div>
+  </div>
+</div>
+</div>
+    
+      <!-- Edit product modal window start  -->
+    
+      <div class="modal fade text-start" id="myModalEdit2<%= index %>" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="myModalLabel">Edit Address</h5>
+              <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form action="/edit_address/<%= data._id %>" method="post">
+                <div class="mb-3">
+                  <label class="form-label" for="modalInputEmail1">Name</label>
+                  <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.name %>" name="userName"
+                    aria-describedby="emailHelp" required >
+                </div>
+    
+                <div class="mb-3">
+                  <label class="form-label" for="modalInputEmail1">Number</label>
+                  <input class="form-control" id="modalInputEmail1" type="number" value="<%= data.number %>" name="number"
+                    aria-describedby="emailHelp" required>
+                </div>
+    
+                <div class="mb-3">
+                  <label class="form-label" for="modalInputEmail1">Address</label>
+                  <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.address %>" name="address"
+                    aria-describedby="emailHelp" required>
+                </div>
+    
+                <div class="mb-3">
+                  <label class="form-label" for="modalInputEmail1">City</label>
+                  <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.city %>" name="city"
+                    aria-describedby="emailHelp" required>
+                </div>
+    
+                <div class="mb-3">
+                  <label class="form-label" for="modalInputEmail1">State</label>
+                  <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.state %>" name="state"
+                    aria-describedby="emailHelp" required>
+                </div>
+    
+                <div class="mb-3">
+                  <label class="form-label" for="modalInputEmail1">Pincode</label>
+                  <input class="form-control" id="modalInputEmail1" type="number" value="<%= data.pincode %>" name="pincode"
+                    aria-describedby="emailHelp" required>
+                </div>
+    
+                <div class="mb-3">
+                  <label class="form-label" for="modalInputEmail1">Landmark</label>
+                  <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.landmark %>" name="landmark" 
+                  aria-describedby="emailHelp" required>
+                    
+                </div>
+     
+             
+                
+                <div class="modal-footer">
+                  <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                  <button class="btn btn-primary" type="submit">Save & Edit</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End Modal for Adding Address -->
+    
+     </div>
+      </div>
+      <% }) %>
+     </div> 
+
+  </div>
+</div>
+
+
+
+<%- include('userFooter') %>

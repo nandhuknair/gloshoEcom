@@ -6,7 +6,7 @@ let confirmPasswordError = document.getElementById('error-confirmPassword');
 
 function validateName() {
   var name = document.getElementById("name").value;
-  var disallowedChars = /[.,\/#!$%\^&\*;:{}=\-_`~()"@'|\\]/; 
+  var disallowedChars = /[.,\/#!$%\^&\*;:{}=\-_`~())"@'|\\]/; 
   if (name.trim().length === 0) {
     nameError.innerHTML = '<span style="color: red;">Name is required</span>';
     return false;
