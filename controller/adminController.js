@@ -329,7 +329,6 @@ exports.unlistCategory = async (req,res)=> {
 
 
   //--------------------product management------------------------
-let message = false
 
 
 exports.getProducts = async (req, res) => {

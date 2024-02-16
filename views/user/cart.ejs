@@ -11,12 +11,18 @@
             
         </div>
         <% if (stockLimitError) { %>
-            <div class="container-fluid d-flex justify-content-end "><p class="limit_msg me-4"><%= stockLimitError %></p></div>
+
+          <div id="stockLimit" class="show toast bottom-2end-2  position-fixed border-0" style=" background-color: crimson; right: 10px; top: 100px; max-width: 400px;" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="2000">
+            <div class="d-flex justify-content-between align-items-center">
+                <div id="tosterbody" style="letter-spacing: 1px;" class="toast-body"> 
+                    <p style="color: white; margin-bottom: 0;"><%= stockLimitError %></p>
+                </div>
+            </div>
+        </div>
+
             <% } %>
 
-            <% if (quantityLimitError) { %>
-                <div class="container-fluid d-flex justify-content-end "><p class="limit_msg me-4"><%= quantityLimitError %></p></div>
-                <% } %>
+          
         
 
         <% if (cartItem.length === 0) { %>
@@ -143,6 +149,14 @@
 
 <script>
  // Function to add event listeners to plus and minus buttons
+
+const stockLimit = document.getElementById('stockLimit')
+ setTimeout(() => {
+                stockLimit.classList.remove('show');
+                }, 
+                3500);
+
+
 function addQuantityListeners() {
     let minusButtons = document.querySelectorAll('[id^="myModalEdit"] #minusBtn');
     let plusButtons = document.querySelectorAll('[id^="myModalEdit"] #plusBtn');
@@ -201,7 +215,7 @@ document.addEventListener('shown.bs.modal', function (event) {
 
 
   // Convert cart data from JSON string to JavaScript array
-  console.log(document.getElementById('cartItems').value)
+console.log(document.getElementById('cartItems').value)
 let cartItems = JSON.parse(document.getElementById('cartItems').value);
 
 // Function to calculate total price

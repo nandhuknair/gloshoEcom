@@ -4,8 +4,7 @@ const nodemailer = require("nodemailer");
 const Product = require("../model/productModel");
 const Category = require("../model/categoryModel");
 const Cart = require("../model/cartModel");
-let checkoutAccess = false
-
+const Order = require("../model/orderModel")
 //----------get home paage----------
 
 exports.getHome = async function (req, res) {
@@ -526,32 +525,31 @@ exports.resetMessage = async (req, res) => {
   }
 };
 
-exports.myOrder = async (req, res) => {
-  try {
-    res.render("user/myOrder");
-  } catch (error) {
-    console.log(error);
-  }
-};
 
 // --------------------------------Cart Management ----------------------------------
 
 
 exports.addToCart = async (req, res) => {
   try {
+    req.session.stockLimitError = null;
     console.log('Entered to post of cart');
     const { quantity, productId } = req.body;
     console.log(req.body);
     const userId = req.session.userLoggedIn
     const product = await Product.findById(productId);
     const existingCartItem = await Cart.findOne({ userId: userId, productId: productId });
- 
-
     if (existingCartItem) {
       
       res.redirect('/cart')
   
     } else {
+      
+      if (parseInt(quantity) > product.stock) {
+        req.session.stockLimitError = 'Requested quantity exceeds available stock';
+        res.redirect('/cart');
+        return;
+      }
+
       const totalPrice = product.price * parseInt(quantity);
       const cartItem = new Cart({
         userId: req.session.userLoggedIn,
@@ -570,33 +568,42 @@ exports.addToCart = async (req, res) => {
 
 
 
-
 exports.viewCart = async (req, res) => {
   try {
     console.log('Entered to get cart page');
     const userId = req.session.userLoggedIn;
-    const cartItem = await Cart.find({ userId: userId }).populate("productId");
-    if (!cartItem) {
-      res.redirect('/login');
-      return; 
-    }
+    let cartItem = await Cart.find({ userId: userId }).populate("productId");
+
+    // Check if any products in the cart have a quantity greater than the available stock
+    cartItem = await Promise.all(cartItem.map(async (item) => {
+      const product = await Product.findById(item.productId);
+      if (!product || product.stock <= 0 || item.quantity > product.stock) {
+        // Remove the product from the cart if it's no longer available
+        await Cart.findByIdAndDelete(item._id);
+        return null; // Return null to filter out this item later
+      }
+      return item; // Return the item if it's still available
+    }));
+
+    // Filter out null values (removed items) from the cart items array
+    cartItem = cartItem.filter(item => item !== null);
 
     let totalPrice = 0;
     cartItem.forEach((item) => {
       totalPrice += item.totalPrice; 
     });
 
-    const { quantityLimitError, stockLimitError } = req.session;
-    req.session.quantityLimitError = null;
-    req.session.stockLimitError = null;
+    const { stockLimitError } = req.session;
+  
     const cartItemJSON = JSON.stringify(cartItem);
 
-    res.render('user/cart', { cartItem, totalPrice, quantityLimitError, stockLimitError , cartItemJSON: cartItemJSON });
+    res.render('user/cart', { cartItem, totalPrice, stockLimitError , cartItemJSON: cartItemJSON });
 
   } catch (error) {
     console.log(error);
   }
 };
+
 
 
 
@@ -612,12 +619,17 @@ exports.removeCartProducts = async (req,res)=> {
 
 exports.editCart = async (req, res) => {
   try {
+    req.session.stockLimitError = null;
     const { cartItemId } = req.query;
     const { quantity } = req.body;
     
     const cartItem = await Cart.findById(cartItemId).populate("productId");
     const product = cartItem.productId; 
-    
+    if (parseInt(quantity) > product.stock) {
+      req.session.stockLimitError = 'Requested quantity exceeds available stock';
+      res.redirect('/cart');
+      return;
+    }
     const newTotalPrice = product.price * parseInt(quantity);
 
     await Cart.findByIdAndUpdate(
@@ -672,15 +684,23 @@ exports.productDetails = async (req, res) => {
 
 exports.getCheckoutPage = async (req, res) => {
   try {
-
-    if(req.session.userLoggedIn){
-    let totalPrice = 0; 
     const userId = req.session.userLoggedIn
-    const user = await User.findOne({_id:userId})
     const cartItems = await Cart.find({ userId: userId }).populate("productId");
+    
+    console.log(cartItems.length)
+    if(req.session.userLoggedIn && cartItems.length > 0){
+    let totalPrice = 0; 
+    const user = await User.findOne({_id:userId})
     cartItems.forEach(item => {
-        totalPrice += item.productId.price * item.quantity;
+      totalPrice += item.productId.price * item.quantity;
+      const product = item.productId
+      if (product.stock <= 0 || item.quantity > product.stock) {
+          res.redirect('/cart')
+      }
     });
+
+
+    
 
     res.render("user/checkout",{user:user, cartItems:cartItems , totalPrice});  
     }else{
@@ -695,48 +715,89 @@ exports.getCheckoutPage = async (req, res) => {
 
 
 exports.confirmOrder = async function confirmOrder(req, res) {
-  const { selectedaddressIndex, selectedpayment, cartdocs, totalPrice } = req.body;
+  const { selectedaddress, selectedpayment, cartdocs, totalPrice } = req.body;
+  console.log(selectedaddress)
 
-  try {
-      // Get the user's address based on the selected index
-      const userdata = await User.findById(req.session.user);
-      const selectedAddress = userdata.address[selectedaddressIndex];
-
-      // Process each cart item and create ordered items array
+  try { 
+    const userData = await User.findById(req.session.userLoggedIn);
+    console.log(userData)
+    const address = userData.address[selectedaddress] 
+    console.log('Address is last',address)
       const orderedItems = [];
-      for (const cartItem of cartdocs) {
+      if (selectedpayment === 'COD') {
+        for (const cartItem of cartdocs) {
           const { productId, quantity } = cartItem;
 
-          // Create ordered item object
-          const orderedItem = {
-              product: productId,
-              price: cartItem.price, // Assuming price is already calculated
-              deliveryTime: 3, // Example delivery time, you may adjust as needed
-          };
+          
+          const product = await Product.findById(productId);
 
-          // Push ordered item to the orderedItems array
-          orderedItems.push(orderedItem);
+          if (!product || cartItem.quantity > product.stock) {
+            throw new Error(`Product stock limit exceeded for item ${cartItem.productId}`);
+          }
+
+          let currentPrice = product.price * quantity
+          console.log(currentPrice)
+          
+          orderedItems.push({
+              product: product._id,
+              quantity:quantity,
+              price: currentPrice,
+                
+          });
+            product.stock -= quantity;
+            await product.save();
+
+
+    
+          await Cart.findByIdAndDelete(cartItem._id);
       }
 
-      // Create an order document
+
+   
       const order = new Order({
-          userId: req.session.user,
+          userId: req.session.userLoggedIn,
           items: orderedItems,
-          start_date: Date.now(),
           totalAmount: totalPrice,
-          address: selectedAddress,
+          address:address,
           paymentType: selectedpayment,
       });
 
-      // Save the order document
-      await order.save();
+   await order.save();
 
-      // Send success response
-      res.status(200).json({ message: 'Order confirmed successfully' });
+ res.status(200).json({ message: 'Order confirmed successfully' });
+}
+else{
+  res.send('Working for this')
+}
+     
   } catch (error) {
-      // Handle errors
+  
       console.error('Error confirming order:', error);
       res.status(500).json({ error: 'Internal server error' });
   }
 };
 
+
+exports.myOrder = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const perPage = 5; // Number of orders per page
+    const skip = (page - 1) * perPage; // Calculate the number of orders to skip
+
+    const orderCount = await Order.countDocuments();
+    const totalPages = Math.ceil(orderCount / perPage);
+
+    const orders = await Order.find({ userId: req.session.userLoggedIn })
+    .populate({
+      path: 'items.product',
+      populate: { path: 'category', model: 'Category' }
+    })
+    .skip(skip)
+    .limit(perPage);
+
+    res.render("user/myOrder",{orderDetails:orders ,totalPages,
+      currentPage: page});
+  } catch (error) {
+    console.log(error);
+  }
+};

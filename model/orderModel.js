@@ -10,42 +10,34 @@ const orderSchema=new mongoose.Schema({
                 type:mongoose.Schema.Types.ObjectId,
                 ref:"Product"
             },
-            price:{
+            quantity:{
                 type:Number,
                 require:true
             },
-            deliveryTime:{
-                type:Number,
-                required:true
+            price: {
+              type:Number,
+              require:true
             },
-            status_date: {
-              type: Date,
-              default:Date.now()
-            },
-            orderStatus: {
-              type:String,
-              default:"placed"
-            },
-            reason: {
-              type: String
-            }
         }
     ],
-    start_date:{
-        type:Date,
-        default:Date.now()
-    },
+    orderStatus: {
+        type:String,
+        default:"Placed"
+      },
     totalAmount:{
         type:Number,
     },
    
     address: {
-      type: Array,
+      type: Object,
     },
     paymentType: {
       type: String,
     }
 
-})
+}
+,{timestamps:true}
+
+)
 
 module.exports = mongoose.model("Order",orderSchema)

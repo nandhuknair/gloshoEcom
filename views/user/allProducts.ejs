@@ -19,7 +19,7 @@
             <div class="row">
                     <% products.forEach((data,index) => { %>
                     <!-- Single Product -->
-                    <div class="col-md-6 col-lg-4 col-xl-3 mb-4">
+                    <div class="col-md-6 col-lg-4 col-xl-3 mb-4 <% if (data.stock === 0) { %>out-of-stock<% } %>">
                             <div id="product-1" class="single-product">
                                     <div class="part-1" style="background: url('/assets/uploads/<%= data.image[data.image.length-1] %>'); background-size: cover;
                                         transition: all 0.3s;
@@ -50,7 +50,11 @@
                                             <h4 class="product-price" style="color: #FF871D;">$<%= data.price %></h4>
                                     </div>
                            
-                   </div> </div>
+                   </div> 
+                   <% if (data.stock === 0) { %>
+                        <div style="color:crimson;" class="out-of-stock-label">OUT OF STOCK</div>
+                    <% } %>
+                </div>
 
            <!-- Modal -->
            
@@ -76,7 +80,7 @@
 </section>
 
 <script>
-   let cartBtns = document.querySelectorAll('.cart_button')
+        let cartBtns = document.querySelectorAll('.cart_button')
         cartBtns.forEach(cartBtn => {
 
                 cartBtn.addEventListener('click', () => {
@@ -90,11 +94,17 @@
                                         quantity: 1,
                                         productId: cartBtn.value
                                 })
+                        }).then(response => {
+                                if (response.ok) {
+                                        // Redirect to the cart page
+                                        window.location.href = '/cart'; // Change '/cart' to the appropriate URL
+                                } else {
+                                        window.location.href = '/cart';
+                                }
                         })
-                                .catch(error => console.log(error))
-                })
-        })
-
+                                .catch(error => console.error(error));
+                });
+        });
 
 </script>
 <%- include('userFooter') %>

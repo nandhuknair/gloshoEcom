@@ -186,21 +186,39 @@
                 </div> 
                 <div class="modal-footer"> 
                   <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button> 
-                  <button type="button" id="confirmorder" onclick="confirmorder()"  data-bs-dismiss="modal" class="btn  btn-success">Submit</button> 
+                  <button type="button" data-bs-toggle="modal" data-bs-target="#placedOrder" id="confirmorder" onclick="confirmorder()"  data-bs-dismiss="modal" class="btn  btn-success">Submit</button> 
+                
                  
                 </div> 
               </div> 
             </div> 
           </div> 
           <!--order confirm end -->
+            <button data-bs-toggle="modal" data-bs-target="#placedOrder" class="cart_button" value=""><i class="fas fa-shopping-cart"></i></button>
+
+          <div class="fade modal" id="placedOrder" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                <div class="modal-header justify-content-center">
+                    
+                  <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body align-items-center d-flex flex-column">
+                    <i class="fa-solid fa-circle-check orderSucessTick"></i>
+                <p class="para_text text-center mt-4">Order Successfully Placed </p>  
+                <p class="head_text" style="letter-spacing: 1px;">THANKYOU</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
 
           <!-- ----Toaster----- -->
-          <div id="toaster" class="toast bottom-2end-2 p-3 position-fixed border-0 bg-danger text-light" style="right: 10px; bottom: 10px; max-width: 300px;" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="2000">
+          <div id="toaster" class="toast bottom-2end-2  position-fixed border-0" style=" background-color: crimson; right: 10px; bottom: 10px; max-width: 400px;" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="2000">
             <div class="d-flex justify-content-between align-items-center">
                 <div id="tosterbody" style="letter-spacing: 1px;" class="toast-body"> 
-                    <strong>Select The Payment Method And Delivery Address To Continue</strong> 
+                    <p style="color: white; margin-bottom: 0;">Select The Payment Method And Delivery Address To Continue</p>
                 </div>
-                <button type="button" class="btn-close btn-close-light" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
         </div>
 <!-- -----------Toaster End---------- -->
@@ -223,7 +241,7 @@ function submitorder(){
         toaster.classList.add('show');
         setTimeout(() => {
                 toaster.classList.remove('show');
-                }, 2000);
+                }, 2200);
     }else{ 
         const orderconfirm = new bootstrap.Modal(document.getElementById('orderconfirm'))  
         orderconfirm.show();  
@@ -252,12 +270,15 @@ function confirmorder(){
     .then(response => {
         if (!response.ok) {
             throw new Error('Failed to confirm order');
+            window.location.href ='/cart'
         }
         return response.json();
     })
     .then(data => {
         console.log('Order confirmed successfully:', data);
-        // Optionally, perform actions after confirming the order
+        setTimeout(() => {
+            window.location.href ='/my_order'
+        }, 2600);
     })
     .catch(error => {
         console.error('Error confirming order:', error);

@@ -701,10 +701,19 @@ hr{
   letter-spacing: 2px;
 }
 
+.out-of-stock {
+  opacity: 0.5; /* Reduced opacity for out-of-stock products */
+}
 
+#placedOrder{
+  background-color: #ffffff12;
 
+}
 
-
+.orderSucessTick{
+  font-size: 100px;
+  color: #28AF5B;
+}
 
 
 
