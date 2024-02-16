@@ -4,6 +4,7 @@ const nodemailer = require("nodemailer");
 const Product = require("../model/productModel");
 const Category = require("../model/categoryModel");
 const Cart = require("../model/cartModel");
+let checkoutAccess = false
 
 //----------get home paage----------
 
@@ -470,7 +471,6 @@ exports.editAddress = async (req, res) => {
 
     if (addressIndex === -1) {
       console.log("Address index not found:", addressId);
-
       editAddressError = true;
       res.redirect("/profile");
     } else {
@@ -548,9 +548,7 @@ exports.addToCart = async (req, res) => {
  
 
     if (existingCartItem) {
-      existingCartItem.quantity += parseInt(quantity);
-      existingCartItem.totalPrice += (product.price * parseInt(quantity));
-      await existingCartItem.save();
+      
       res.redirect('/cart')
   
     } else {
@@ -674,12 +672,71 @@ exports.productDetails = async (req, res) => {
 
 exports.getCheckoutPage = async (req, res) => {
   try {
+
+    if(req.session.userLoggedIn){
+    let totalPrice = 0; 
     const userId = req.session.userLoggedIn
     const user = await User.findOne({_id:userId})
-    const cartItems = await Cart.find({userId:userId})
-    console.log(user)
-    res.render("user/checkout",{user:user, cartItems:cartItems});                                                                                                                                                                                                                                          
+    const cartItems = await Cart.find({ userId: userId }).populate("productId");
+    cartItems.forEach(item => {
+        totalPrice += item.productId.price * item.quantity;
+    });
+
+    res.render("user/checkout",{user:user, cartItems:cartItems , totalPrice});  
+    }else{
+      res.redirect('/login')
+    }
+                                                                                                                                                                                                                                            
   } catch (error) {
     console.log(error);
   }
 };
+
+
+
+exports.confirmOrder = async function confirmOrder(req, res) {
+  const { selectedaddressIndex, selectedpayment, cartdocs, totalPrice } = req.body;
+
+  try {
+      // Get the user's address based on the selected index
+      const userdata = await User.findById(req.session.user);
+      const selectedAddress = userdata.address[selectedaddressIndex];
+
+      // Process each cart item and create ordered items array
+      const orderedItems = [];
+      for (const cartItem of cartdocs) {
+          const { productId, quantity } = cartItem;
+
+          // Create ordered item object
+          const orderedItem = {
+              product: productId,
+              price: cartItem.price, // Assuming price is already calculated
+              deliveryTime: 3, // Example delivery time, you may adjust as needed
+          };
+
+          // Push ordered item to the orderedItems array
+          orderedItems.push(orderedItem);
+      }
+
+      // Create an order document
+      const order = new Order({
+          userId: req.session.user,
+          items: orderedItems,
+          start_date: Date.now(),
+          totalAmount: totalPrice,
+          address: selectedAddress,
+          paymentType: selectedpayment,
+      });
+
+      // Save the order document
+      await order.save();
+
+      // Send success response
+      res.status(200).json({ message: 'Order confirmed successfully' });
+  } catch (error) {
+      // Handle errors
+      console.error('Error confirming order:', error);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+};
+

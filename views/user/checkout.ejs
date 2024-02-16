@@ -1,296 +1,269 @@
 <%- include('userAfterLogin') %>
 
-
-
-<div class="container mt-5">
-
-   
-
-<div class="row">
-    <div class="col-md-4 order-md-2 mb-4">
-      <h4 class="d-flex justify-content-between align-items-center mb-3">
-        <span class="text-muted">Your cart</span>
-        <!-- <span class="badge badge-secondary badge-pill">3</span> -->
-      </h4>
-      <ul class="list-group mb-3">
-        <li class="list-group-item d-flex justify-content-between lh-condensed">
-        <% skillset.forEach((val)=>{%>
-        <div>
-        <h6 class="my-0">Product name</h6>
-        <small class="text-muted">Brief description</small>
-        </div>
-        <span class="text-muted">$12</span>
-
-          <% }) %>
-
-
-
-        </li>
-        <li class="list-group-item d-flex justify-content-between lh-condensed">
-          <div>
-            <h6 class="my-0">Second product</h6>
-            <small class="text-muted">Brief description</small>
-          </div>
-          <span class="text-muted">$8</span>
-        </li>
-        <li class="list-group-item d-flex justify-content-between lh-condensed">
-          <div>
-            <h6 class="my-0">Third item</h6>
-            <small class="text-muted">Brief description</small>
-          </div>
-          <span class="text-muted">$5</span>
-        </li>
-        <li class="list-group-item d-flex justify-content-between bg-light">
-          <div class="text-success">
-            <h6 class="my-0">Promo code</h6>
-            <small>EXAMPLECODE</small>
-          </div>
-          <span class="text-success">-$5</span>
-        </li>
-        <li class="list-group-item d-flex justify-content-between">
-          <span>Total (USD)</span>
-          <strong>$20</strong>
-        </li>
-      </ul>
-
-      <form class="card p-2">
-        <div class="input-group">
-          <input type="text" class="form-control" placeholder="Promo code">
-          <div class="input-group-append">
-            <button type="submit" class="btn btn-secondary">Redeem</button>
-          </div>
-        </div>
-      </form>
-    </div>
-
-
-
-
-    <div class="col-md-8 order-md-1">
-      <h4 class="mb-3">Billing address</h4>
-      <div class="addrss-container container mt-4" style="justify-content: start;">
-        <% user.address.forEach((data,index)=>{ %>
-         <div class="border py-4 px-4" >
-           <ul>
-            <li><p><%= data.address %> </p></li> 
-             <p><%= data.city %> </p>
-             <p><%= data.state %> </p>
-             <p><%= data.pincode %> </p>
-       </ul>
-       <div class="d-flex justify-content-end">
-
-        <a href="" data-bs-toggle="modal" data-bs-target="#myModalEdit2<%= index %>"><i class="fa-solid fa-user-pen"></i></a>
-        <a href="" data-bs-toggle="modal" data-bs-target="#exampleModal2"><i class="fa-solid fa-trash ms-3"></i> </a> 
-
+<div class="main-container">
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-8 order-md-1 mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="mb-3" style="color: rgb(57, 57, 57);">DELIVERY ADDRESS</h4>
+                </div>
+                <div id="shipAddress">
+                    <% user.address.forEach((item,index)=>{ %>
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <label class="form-check">
+                                <input class="form-check-input" type="radio" name="deliveryAddress" value="<%= index %>" required>
+                                <div class="address-details">
+                                    <p><%= item.address %></p>
+                                    <p><%= item.city %>, <%= item.state %>, <%= item.pincode %></p>
+                                    <p><%= item.number %></p>
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#myModalEdit2<%= index %>"><i class=" fa-solid fa-user-pen float-end"></i></a>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                      <!-- Edit product modal window start  -->
+        
+          <div class="modal fade text-start" id="myModalEdit2<%= index %>" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="myModalLabel">Edit Address</h5>
+                  <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <form action="/edit_address/<%= item._id %>" method="post">
+                    <div class="mb-3">
+                      <label class="form-label" for="modalInputEmail1">Name</label>
+                      <input class="form-control" id="modalInputEmail1" type="text" value="<%= item.name %>" name="userName"
+                        aria-describedby="emailHelp" required >
+                    </div>
+        
+                    <div class="mb-3">
+                      <label class="form-label" for="modalInputEmail1">Number</label>
+                      <input class="form-control" id="modalInputEmail1" type="number" value="<%= item.number %>" name="number"
+                        aria-describedby="emailHelp" required>
+                    </div>
+        
+                    <div class="mb-3">
+                      <label class="form-label" for="modalInputEmail1">Address</label>
+                      <input class="form-control" id="modalInputEmail1" type="text" value="<%= item.address %>" name="address"
+                        aria-describedby="emailHelp" required>
+                    </div>
+        
+                    <div class="mb-3">
+                      <label class="form-label" for="modalInputEmail1">City</label>
+                      <input class="form-control" id="modalInputEmail1" type="text" value="<%= item.city %>" name="city"
+                        aria-describedby="emailHelp" required>
+                    </div>
+        
+                    <div class="mb-3">
+                      <label class="form-label" for="modalInputEmail1">State</label>
+                      <input class="form-control" id="modalInputEmail1" type="text" value="<%= item.state %>" name="state"
+                        aria-describedby="emailHelp" required>
+                    </div>
+        
+                    <div class="mb-3">
+                      <label class="form-label" for="modalInputEmail1">Pincode</label>
+                      <input class="form-control" id="modalInputEmail1" type="number" value="<%= item.pincode %>" name="pincode"
+                        aria-describedby="emailHelp" required>
+                    </div>
+        
+                    <div class="mb-3">
+                      <label class="form-label" for="modalInputEmail1">Landmark</label>
+                      <input class="form-control" id="modalInputEmail1" type="text" value="<%= item.landmark %>" name="landmark" 
+                      aria-describedby="emailHelp" required>
                         
-<!-- Modal -->
-<div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="background-color: rgba(0, 0, 0, 0.534);">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="head_text" id="exampleModalLabel">ARE YOU SURE</h5>
-        <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-      <p class="para_text">Permenently Delete The Address ⚠️</p>  
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">NO</button>
-       <a href="/delete_address/<%= data._id %>"><button type="button" class="btn btn-primary">YES</button></a> 
-      </div>
-    </div>
-  </div>
-</div>
-      
-        <!-- Edit product modal window start  -->
-      
-        <div class="modal fade text-start" id="myModalEdit2<%= index %>" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="myModalLabel">Edit Address</h5>
-                <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                <form action="/edit_address/<%= data._id %>" method="post">
-                  <div class="mb-3">
-                    <label class="form-label" for="modalInputEmail1">Name</label>
-                    <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.name %>" name="userName"
-                      aria-describedby="emailHelp" required >
-                  </div>
-      
-                  <div class="mb-3">
-                    <label class="form-label" for="modalInputEmail1">Number</label>
-                    <input class="form-control" id="modalInputEmail1" type="number" value="<%= data.number %>" name="number"
-                      aria-describedby="emailHelp" required>
-                  </div>
-      
-                  <div class="mb-3">
-                    <label class="form-label" for="modalInputEmail1">Address</label>
-                    <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.address %>" name="address"
-                      aria-describedby="emailHelp" required>
-                  </div>
-      
-                  <div class="mb-3">
-                    <label class="form-label" for="modalInputEmail1">City</label>
-                    <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.city %>" name="city"
-                      aria-describedby="emailHelp" required>
-                  </div>
-      
-                  <div class="mb-3">
-                    <label class="form-label" for="modalInputEmail1">State</label>
-                    <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.state %>" name="state"
-                      aria-describedby="emailHelp" required>
-                  </div>
-      
-                  <div class="mb-3">
-                    <label class="form-label" for="modalInputEmail1">Pincode</label>
-                    <input class="form-control" id="modalInputEmail1" type="number" value="<%= data.pincode %>" name="pincode"
-                      aria-describedby="emailHelp" required>
-                  </div>
-      
-                  <div class="mb-3">
-                    <label class="form-label" for="modalInputEmail1">Landmark</label>
-                    <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.landmark %>" name="landmark" 
-                    aria-describedby="emailHelp" required>
-                      
-                  </div>
-       
-               
-                  
-                  <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
-                    <button class="btn btn-primary" type="submit">Save & Edit</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- End Modal for Adding Address -->
-      
-       </div>
-        </div>
-        <% }) %>
-       </div> 
-
-    </div>
-
-
-
-    
-  </div>
-  <div class="col-md-8 order-md-1">
-    <h4 class="mb-3">Shipping address</h4>
-    <div class="addrss-container container mt-4" style="justify-content: start;">
-      <% user.address.forEach((data,index)=>{ %>
-       <div class="border py-4 px-4" >
-         <ul>
-          <li><p><%= data.address %> </p></li> 
-           <p><%= data.city %> </p>
-           <p><%= data.state %> </p>
-           <p><%= data.pincode %> </p>
-     </ul>
-     <div class="d-flex justify-content-end">
-
-      <a href="" data-bs-toggle="modal" data-bs-target="#myModalEdit2<%= index %>"><i class="fa-solid fa-user-pen"></i></a>
-      <a href="" data-bs-toggle="modal" data-bs-target="#exampleModal2"><i class="fa-solid fa-trash ms-3"></i> </a> 
-
-                      
-<!-- Modal -->
-<div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="background-color: rgba(0, 0, 0, 0.534);">
-<div class="modal-dialog" role="document">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="head_text" id="exampleModalLabel">ARE YOU SURE</h5>
-      <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-    </div>
-    <div class="modal-body">
-    <p class="para_text">Permenently Delete The Address ⚠️</p>  
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">NO</button>
-     <a href="/delete_address/<%= data._id %>"><button type="button" class="btn btn-primary">YES</button></a> 
-    </div>
-  </div>
-</div>
-</div>
-    
-      <!-- Edit product modal window start  -->
-    
-      <div class="modal fade text-start" id="myModalEdit2<%= index %>" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="myModalLabel">Edit Address</h5>
-              <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <form action="/edit_address/<%= data._id %>" method="post">
-                <div class="mb-3">
-                  <label class="form-label" for="modalInputEmail1">Name</label>
-                  <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.name %>" name="userName"
-                    aria-describedby="emailHelp" required >
-                </div>
-    
-                <div class="mb-3">
-                  <label class="form-label" for="modalInputEmail1">Number</label>
-                  <input class="form-control" id="modalInputEmail1" type="number" value="<%= data.number %>" name="number"
-                    aria-describedby="emailHelp" required>
-                </div>
-    
-                <div class="mb-3">
-                  <label class="form-label" for="modalInputEmail1">Address</label>
-                  <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.address %>" name="address"
-                    aria-describedby="emailHelp" required>
-                </div>
-    
-                <div class="mb-3">
-                  <label class="form-label" for="modalInputEmail1">City</label>
-                  <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.city %>" name="city"
-                    aria-describedby="emailHelp" required>
-                </div>
-    
-                <div class="mb-3">
-                  <label class="form-label" for="modalInputEmail1">State</label>
-                  <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.state %>" name="state"
-                    aria-describedby="emailHelp" required>
-                </div>
-    
-                <div class="mb-3">
-                  <label class="form-label" for="modalInputEmail1">Pincode</label>
-                  <input class="form-control" id="modalInputEmail1" type="number" value="<%= data.pincode %>" name="pincode"
-                    aria-describedby="emailHelp" required>
-                </div>
-    
-                <div class="mb-3">
-                  <label class="form-label" for="modalInputEmail1">Landmark</label>
-                  <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.landmark %>" name="landmark" 
-                  aria-describedby="emailHelp" required>
+                    </div>
+         
+                 
                     
+                    <div class="modal-footer">
+                      <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                      <button class="btn btn-primary" type="submit">Save & Edit</button>
+                    </div>
+                  </form>
                 </div>
-     
-             
-                
-                <div class="modal-footer">
-                  <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
-                  <button class="btn btn-primary" type="submit">Save & Edit</button>
-                </div>
-              </form>
+              </div>
             </div>
           </div>
+          <!-- End Modal for Adding Address -->
+                    <% }) %>
+                </div>
+            </div>
+
+            <div class="col-md-4 order-md-2 mb-4">
+                <!-- Your cart content goes here -->
+                <h4 class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted">Your cart</span>
+                    <!-- <span class="badge badge-secondary badge-pill">3</span> -->
+                </h4>
+                <ul class="list-group mb-3">
+                    <% cartItems.forEach((item,index)=>{%>
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <img src="/assets/uploads/<%= item.productId.image[item.productId.image.length-1] %>" alt="<%= item.productId.productName %>"  height="100%" width="17%">
+                        <div>
+                            <h6 class="my-0"><%= item.productId.productName %></h6>
+                            <div class="d-flex">
+                                <small class="text-muted"><%= item.quantity %> X &nbsp;&nbsp;</small>
+                                <p> $<%= item.productId.price %></p>
+                            </div>
+                        </div>
+                        <span style="color: #FF871D;">$<%= item.totalPrice %></span>
+                    </li>
+                   
+                    <% }) %>
+                </ul>
+                <div class="card p-2">
+                    <div class="d-flex justify-content-between"><p>Subtotal</p><p id="subTotal"><%= totalPrice %></p></div>
+                    <div class="d-flex justify-content-between"><p>Shipping</p><p>Free</p></div>
+                    <a href="">Click here for Coupon << </a>
+                    <div class="d-flex justify-content-between align-items-center"><p class="mt-3">Enter Coupon Code</p><input type="text" width="40px"></div>
+
+                </div>
+                <div class="d-flex justify-content-end mt-3"><button onclick="submitorder()" class="product_cart">PROCEED TO CHECKOUT</button></div>
+                
+            </div>
         </div>
-      </div>
-      <!-- End Modal for Adding Address -->
-    
-     </div>
-      </div>
-      <% }) %>
-     </div> 
 
-  </div>
+        <div class="feed-item-list"> 
+
+            <div> 
+                <h4 class="mb-3 mt-5" style="color: rgb(57, 57, 57);">PAYMENT METHOD</h4> 
+            
+
+                <div class="row"> 
+                    <div class="col-lg-3 col-sm-6"> 
+                        <div class="border p-4"> 
+                            <label class="card-radio-label"> 
+                                <input type="radio" name="pay-method" id="pay-methodoption1" value="card" class="card-radio-input"> 
+                                <div class="card-radio  py-3 text-center"> 
+                                    <i class="fa-brands fa-cc-mastercard mb-3 fa-2x me-4"></i>
+                                    CARD
+                                </div> 
+                            </label> 
+                      </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6"> 
+                        <div class="border p-4"> 
+                            <label class="card-radio-label"> 
+                                <input type="radio" name="pay-method" id="pay-methodoption2" value="wallet" class="card-radio-input"> 
+                                <div class="card-radio  py-3 text-center"> 
+                                    <i class="fa-solid fa-wallet mb-3 fa-2x me-4"></i>
+                                    WALLET
+                                </div> 
+                            </label> 
+                        </div> 
+                    </div> 
+
+                    <div class="col-lg-3 col-sm-6"> 
+                        <div class="border p-4"> 
+                            <label class="card-radio-label"> 
+                                <input type="radio" name="pay-method" id="pay-methodoption3" value="COD" class="card-radio-input" > 
+
+                                <div class="card-radio  py-3 text-center"> 
+                                    <i class="fa-solid fa-hand-holding-dollar mb-3 fa-2x me-4"></i>
+                                   CASH ON DELIVERY
+                                </div> 
+                            </label> 
+                        </div> 
+                    </div> 
+                     
+                </div> 
+            </div> 
+        </div> 
+
+           <!-- checker confirm message --> 
+           <div class="modal fade" id="orderconfirm" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"> 
+            <div class="modal-dialog modal-dialog-centered" role="document"> 
+              <div class="modal-content"> 
+                <div class="modal-header"> 
+                  <h5 class="modal-title font-weight-normal" id="exampleModalLabel">Please confirm</h5> 
+                  <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close"> </button> 
+                </div> 
+                <div class="modal-body"> 
+                  <p class="" id="">Are you sure want to order the product? </p> 
+                </div> 
+                <div class="modal-footer"> 
+                  <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button> 
+                  <button type="button" id="confirmorder" onclick="confirmorder()"  data-bs-dismiss="modal" class="btn  btn-success">Submit</button> 
+                 
+                </div> 
+              </div> 
+            </div> 
+          </div> 
+          <!--order confirm end -->
+
+          <!-- ----Toaster----- -->
+          <div id="toaster" class="toast bottom-2end-2 p-3 position-fixed border-0 bg-danger text-light" style="right: 10px; bottom: 10px; max-width: 300px;" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="2000">
+            <div class="d-flex justify-content-between align-items-center">
+                <div id="tosterbody" style="letter-spacing: 1px;" class="toast-body"> 
+                    <strong>Select The Payment Method And Delivery Address To Continue</strong> 
+                </div>
+                <button type="button" class="btn-close btn-close-light" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+<!-- -----------Toaster End---------- -->
+<input type="hidden" name="cartdocs" id="cartdocs" value="<%= JSON.stringify(cartItems) %>"  > 
+<input type="hidden" name="totalPrice" id="totalPrice" value="<%= totalPrice %>"  > 
+    </div>
 </div>
-
-
 
 <%- include('userFooter') %>
+
+<script>
+
+function submitorder(){ 
+    const selectedaddress = document.querySelector('input[name="deliveryAddress"]:checked'); 
+    const selectedpayment = document.querySelector('input[name="pay-method"]:checked'); 
+    console.log('clicked submitorder')
+    if(!selectedaddress || !selectedpayment){ 
+        console.log('Entered to not selected')
+        const toaster = document.getElementById("toaster");
+        toaster.classList.add('show');
+        setTimeout(() => {
+                toaster.classList.remove('show');
+                }, 2000);
+    }else{ 
+        const orderconfirm = new bootstrap.Modal(document.getElementById('orderconfirm'))  
+        orderconfirm.show();  
+    } 
+} 
+
+ 
+function confirmorder(){ 
+    const selectedaddress = document.querySelector('input[name="deliveryAddress"]:checked').value; 
+    const selectedpayment = document.querySelector('input[name="pay-method"]:checked').value; 
+    const cartdocs = JSON.parse(document.getElementById('cartdocs').value); // Parse the JSON string
+    const totalPrice = document.getElementById('totalPrice').value;
+    
+    fetch('/confirmorder', { 
+        method: 'POST', 
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+            selectedaddress: selectedaddress, 
+            selectedpayment: selectedpayment,
+            cartdocs: cartdocs, 
+            totalPrice: totalPrice
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to confirm order');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Order confirmed successfully:', data);
+        // Optionally, perform actions after confirming the order
+    })
+    .catch(error => {
+        console.error('Error confirming order:', error);
+        // Handle errors
+    });
+}
+
+
+</script>

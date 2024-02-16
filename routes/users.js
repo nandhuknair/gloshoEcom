@@ -50,7 +50,7 @@ router.post('/edit_cart',sessionCheck.userActivity,userController.editCart)
 //-------------------Checkout page Management---------------------------
 
 router.get('/checkout',userController.getCheckoutPage)
-
+router.post('/confirmOrder',userController.confirmOrder)
 
 
 

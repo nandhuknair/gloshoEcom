@@ -684,7 +684,22 @@ hr{
 }
 
 
-
+.pointer{
+  cursor:pointer;
+  transition: 0.5s ease;
+}
+.pointer:hover{
+  color: #28AF5B;
+}
+.add_address{
+  background-color: #232527;
+  border: none;
+  outline: none;
+  padding: 0.5% 2%;
+  color: #FFEDE1;
+  font-weight: 600;
+  letter-spacing: 2px;
+}
 
 
 
