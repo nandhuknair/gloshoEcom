@@ -1,0 +1,135 @@
+
+
+
+
+<%- include('adminHeader') %>
+
+<div class="container">
+    <div class="main-container" style="flex-direction: column;min-height: fit-content;">
+        <div class="container">
+            <h3 class="heading mt-4" style="margin-bottom: 0;">MY ORDER</h3>
+    
+            <div class="table-responsive mt-5">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">No</th>
+                            <th scope="col">Product Name</th>
+                            <th scope="col">Username</th>
+                            <th scope="col">Address</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Payment</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+    
+                    <tbody>
+                      <% let itemNumber = 1; %>
+                        <% orderDetails.forEach((order, orderIndex) => { %>
+                            <% order.items.forEach((item, itemIndex) => { %>
+                               
+                                <tr>
+                                      <td><%= itemNumber %></td> 
+                                    <td><%= item.product.productName %></td>
+                                    <td><%= order.userId.userName %></td>
+                                    <td><%= order.address.address %> <br> <%= order.address.landmark %> <br> <%= order.address.number %> </td>
+                                    <td><%= item.quantity %></td>
+                                    <td><%= item.price %></td>
+                                    <td><%= order.paymentType %></td>
+                                   <td> 
+                                    <% if (item.orderStatus === "CancelledByAdmin") { %>
+                                      <p style="color: rgb(235, 46, 46);">Cancelled By Admin</p>
+                                  <% } else if (item.orderStatus === "Cancelled By User") { %>
+                                      <p style="color: rgb(235, 46, 46);">Cancelled By User</p>
+                                  <% } else { %>
+                                      <%= item.orderStatus %>
+                                  <% } %>
+                                    </td>
+                                
+                                     <td>
+
+                                      <% if (item.orderStatus === "CancelledByAdmin" || item.orderStatus === "Delivered" || item.orderStatus === "Cancelled By User" || item.orderStatus === "Returned") { %>
+                                        
+                                      <% } else { %>
+                                        <button class="btn btn-primary edit-btn" type="button" data-bs-toggle="modal" data-bs-target="#editStatus<%= orderIndex %>-<%= itemIndex %>" data-product-id="<%= item.product._id %>" data-order-status="<%= item.orderStatus %>">Edit</button>
+                                      <% } %>
+   
+                                    </td>
+                                </tr>
+                               
+
+    <div class="modal fade text-start" id="editStatus<%= orderIndex %>-<%= itemIndex %>" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="myModalLabel">Add Products</h5>
+          <button class="btn-close btn-close-white" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="/update_orderStatus" method="post">
+        <input type="hidden" name="orderId" value="<%= order._id %>" id="orderId">
+        <input type="hidden" name="productId" value="<%= item.product._id %>">
+      <div class="mb-3">
+              <label class="form-label" for="modalInputEmail1">Edit Order Status</label>
+              <select class="form-select" id="categories" name="orderStatus" aria-describedby="emailHelp">
+                <option value="Delivered">Delivered</option>
+                <option value="Shipped">Shipped</option>
+                <option value="CancelledByAdmin">Cancel</option>
+            </select>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+              <button class="btn btn-primary" type="submit">Add</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+<% itemNumber++; %>  
+                            <% }) %>
+                        <% }) %>
+                        
+        
+                </tbody>
+                      
+                    
+                </table>
+            </div>
+
+
+            <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <% if (currentPage > 1) { %>
+                    <li class="page-item"><a class="page-link" href="/admin_orders?page=<%= currentPage - 1 %>">Previous</a></li>
+                <% } %>
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                    <li class="page-item <%= currentPage === i ? 'active' : '' %>"><a class="page-link" href="/admin_orders?page=<%= i %>"><%= i %></a></li>
+                <% } %>
+                <% if (currentPage < totalPages) { %>
+                    <li class="page-item"><a class="page-link" href="/admin_orders?page=<%= currentPage + 1 %>">Next</a></li>
+                <% } %>
+            </ul>
+        </nav>
+    
+        </div>
+    </div>
+</div>
+
+
+<!-- <script>
+    let orderId = document.getElementById('orderId')
+    console.log(orderId.value)
+</script> -->
+
+<%- include('adminFooter') %>
+
+
+
+
+

@@ -1,0 +1,112 @@
+<%- include('userAfterLogin') %>
+<div class="main-container">
+<div class="container-fluid">
+
+    <div class="container">
+     
+        <div class="d-inline-flex align-items-center mt-3">
+            <a href="/my_order" class="mb-3">MY ORDER</a>
+            <i class="fa-solid fa-chevron-right me-2 ms-2 mb-3"></i>
+            <p class="span mb-3">
+                DETAILS
+            </p>
+        </div>
+     
+      <!-- Main content -->
+      <div class="row mt-3">
+        <div class="col-lg-8">
+          <!-- Details -->
+            
+            <div class="col-md-12">
+                <div class="card flex-md-row mb-4 box-shadow h-md-250">
+                    <img class="card-img-left img-fluid" src="/assets/uploads/<%= product.image[product.image.length-1] %>" width="30%">
+                    <div class="card-body d-flex flex-column align-items-start">
+                       <a href="/product?id=<%= product._id %>"> <strong class="d-inline-block mb-2 " style="color: #ffa04c;"><%= product.productName %>j</strong></a>
+                        <p class="mb-0">Order Place On</p>
+                        <div class="mb-2 text-muted"><%= formattedDate %></div>
+                        <p class="card-text mb-0">Estimate Delivery</p>
+                        <p class="mb-0">Within 8 days</p>
+                        <p class="mt-2 mb-0">Quantity : <%= item.quantity %></p>
+                        <p class="">$ <%= item.price %></p>
+                        <p>Order Status  <span class="badge bg-warning rounded-pill"><%= item.orderStatus %></span></p>
+
+                    </div>
+                </div>
+              </div>
+           
+          <!-- Payment -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-lg-6">
+                  <h3 class="h6">Payment Method</h3>
+                  <p><%= orderDetails.paymentType %> <br>
+                    <%= orderDetails.items.length-1 %> products ordered along with this So, <br>
+                  Total: $<%= orderDetails.totalAmount %></p>
+                </div>
+                <div class="col-lg-6">
+                  <h3 class="h6">Billing address</h3>
+                  <address>
+                    <strong><%= orderDetails.address.name %></strong><br>
+                    <%= orderDetails.address.address %>, <%= orderDetails.address.state %><br>
+                    <%= orderDetails.address.city %>, <%= orderDetails.address.pincode %><br>
+                    Phone: <%= orderDetails.address.number %>
+                  </address>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <!-- Customer Notes -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h3 class="h6">Product Description</h3>
+              <p><%= product.description %></p>
+            </div>
+          </div>
+          <div class="card mb-4">
+            <!-- Shipping information -->
+            <div class="card-body">
+              <h3 class="h6">Shipping Information</h3>
+              <strong>Order ID</strong>
+              <a href="#" target="_blank"><%= orderDetails._id %></a>
+              <hr>
+              <h3 class="h6">Address</h3>
+              <address>
+                <strong><%= orderDetails.address.name %></strong><br>
+                <%= orderDetails.address.address %>, <%= orderDetails.address.state %><br>
+                <%= orderDetails.address.city %>, <%= orderDetails.address.pincode %><br>
+                Phone: <%= orderDetails.address.number %>
+              </address>
+            </div>
+          </div>
+        </div>
+      </div>
+     
+    </div>
+      </div></div>
+      <table class="table table-borderless">
+        <tbody>
+  
+    
+<script>
+  function formatOrderDate(dateString) {
+  const options = { 
+    weekday: 'short', 
+    month: 'short', 
+    day: 'numeric', 
+    year: 'numeric', 
+    hour: 'numeric', 
+    minute: 'numeric', 
+    second: 'numeric', 
+    timeZoneName: 'short' 
+  };
+  
+  const formattedDate = new Date(dateString).toLocaleString('en-US', options);
+  return formattedDate;
+}
+
+</script>
+
+<%- include('userFooter') %>

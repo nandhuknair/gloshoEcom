@@ -35,12 +35,20 @@ router.get('/admin_list_product',session.adminActivity,adminController.listProdu
 router.get('/admin_unlist_product',session.adminActivity,adminController.unListProduct)
 
 
+router.get('/admin_orders',session.adminActivity,adminController.orderDetails)
+router.post('/update_orderStatus',session.adminActivity,adminController.updateOrderStatus)
 
 
 
 
 
-// admin_add_product
+
+
+
+
+
+
+
 
 
 

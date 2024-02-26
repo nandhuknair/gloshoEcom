@@ -18,12 +18,12 @@ const orderSchema=new mongoose.Schema({
               type:Number,
               require:true
             },
+            orderStatus: {
+              type:String,
+              default:"Placed"
+            },
         }
     ],
-    orderStatus: {
-        type:String,
-        default:"Placed"
-      },
     totalAmount:{
         type:Number,
     },

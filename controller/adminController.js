@@ -5,6 +5,7 @@ const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt')
 const path = require('path')
 const multer = require('multer')
+const Order = require("../model/orderModel")
 const mongoose = require('mongoose')
 
 
@@ -278,13 +279,29 @@ exports.resetPassword = async(req,res)=> {
    //--------------------edit and add category------------------------
 
  exports.editCategory = async (req,res)=> {
-  const {oldCategory} = req.query 
-  const {category} = req.body
-  await Category.findOneAndUpdate({category:oldCategory},{$set:{category:category}})
-  res.redirect('/admin_category')
+try {
+  const { oldCategory } = req.query;
+  const { category } = req.body;
+  const categoryExist = await Category.findOne({category:category})
+  if(categoryExist){
+    return res.redirect('/admin_category')
 
- }
- exports.addCategory = async (req,res)=> {
+  }else{
+    await Category.findOneAndUpdate(
+    { category: oldCategory },
+    { $set: { category: category } },
+    { new: true }
+  );
+  
+  res.redirect('/admin_category')
+  }
+
+} catch (error) {
+  console.log(error)
+} }
+
+
+exports.addCategory = async (req,res)=> {
   try {
      const { category } = req.body;
      const categoryExist = await Category.findOne({ category: category });
@@ -357,25 +374,28 @@ exports.addProducts = async function (req, res, next) {
   try {
     console.log('Entered to the add product page');
     const arrImages = req.files.map((value) => value.filename);
-    console.log(arrImages)
-    req.body.images = arrImages;
+    console.log(arrImages); // Ensure you see all filenames here
 
+    if (req.body.price <= 0) {
+      return res.redirect('/admin_products');
+    }
+  
+    
     const newProduct = new Product({
-      productName:req.body.productName,
-      image:req.body.images,
-      price:req.body.price,
-      size:req.body.size,
+      productName: req.body.productName,
+      image: arrImages, // Use arrImages directly here
+      price: req.body.price,
+      size: req.body.size,
       category: req.body.category,
-      collection:req.body.collection,
-      description:req.body.description,
-      stock:req.body.stock,
-    }) 
+      collection: req.body.collection,
+      description: req.body.description,
+      stock: req.body.stock,
+    });
 
-   const saved =  await newProduct.save()
-
-    res.redirect('/admin_products')
+    const saved = await newProduct.save();
+    res.redirect('/admin_products');
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 };
 
@@ -385,7 +405,12 @@ exports.editProducts = async function (req, res, next) {
   try {
     const { id } = req.query;
 
-    // Check which fields are present in the request body
+    if(req.body.price <= 0 ){
+      return res.redirect('/admin_products')
+ 
+     }
+
+   
     const updateFields = {};
 
     if (req.body.productName) {
@@ -449,3 +474,79 @@ exports.unListProduct = async (req,res)=> {
     console.log(error)
   }
 }
+
+
+// --------------------------------------------------Order Management--------------------------------------------------------------
+
+exports.orderDetails = async (req, res) => {
+  try {
+
+      const page = parseInt(req.query.page) || 1; // Default to page 1 if no page parameter is provided
+      const perPage = 3; // Number of products per page
+      const skip = (page - 1) * perPage; // Calculate the number of products to skip
+
+      const orderCount = await Order.countDocuments();
+      const totalPages = Math.ceil(orderCount/perPage)
+
+    const orders = await Order.find({})
+      .populate('userId')
+      .populate({
+        path: 'items.product',
+        populate: { path: 'category', model: 'Category' }
+      })
+     .skip(skip)
+    .limit(perPage);
+
+    res.render("admin/adminOrderManagement", { orderDetails: orders, totalPages, currentPage: page});
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+
+
+exports.updateOrderStatus = async (req, res) => {
+  try {
+    const { orderId, productId, orderStatus } = req.body;
+
+    console.log("orderId:", orderId);
+    console.log("productId:", productId);
+
+    const order = await Order.findById(orderId);
+    console.log("order:", order);
+
+    if (!order) {
+      return res.status(404).send("Order not found");
+    }
+
+    const itemIndex = order.items.findIndex(item => item.product.toString() === productId);
+    console.log("itemIndex:", itemIndex);
+
+    if (itemIndex === -1) {
+      return res.status(404).send("Item not found in the order");
+    }
+
+    if (orderStatus === 'CancelledByAdmin') {
+      const product = await Product.findById(order.items[itemIndex].product);
+      if (!product) {
+        return res.status(404).send("Product not found");
+      }
+      product.stock += order.items[itemIndex].quantity;
+      await product.save();
+    }
+
+    order.items[itemIndex].orderStatus = orderStatus;
+    await order.save();
+
+    res.redirect('/admin_orders');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+
+
+
+

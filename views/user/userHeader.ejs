@@ -11,7 +11,7 @@
     integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
   <link rel="stylesheet" href="/stylesheets/style.css">
 
 
@@ -40,8 +40,10 @@
       <div class="dropdown">
 
         <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-          <li><a class="dropdown-item" href="#">WOMEN</a></li>
-          <li><a class="dropdown-item" href="#">MEN</a></li>
+          <li><a class="dropdown-item" href="/women_collections">WOMEN</a></li>
+          <li><a class="dropdown-item" href="/men_collections">MEN</a></li>
+          <li><a class="dropdown-item" href="/all_products">ALL</a></li>
+
         
         </ul>
       </div>
@@ -59,11 +61,31 @@
 
   <div class="drop__menu pt-3 pb-3" id="drop__menu">
     <div class="dorp__hover"><a class="" href="/">HOME</a></div>
-    <div class="dorp__hover"><a class="" href="#">MEN</a></div>
-    <div class="dorp__hover"><a class="" href="#">WOMEN</a></div>
+    <div class="dorp__hover"><a class="" href="/men_collections">MEN</a></div>
+    <div class="dorp__hover"><a class="" href="/women_collections">WOMEN</a></div>
+    <div class="dorp__hover"><a class="" href="/all_products">ALL</a></div>
     <div class="dorp__hover"><a class="" href="#">ABOUT </a></div>
     <div class="dorp__hover"><a class="" href="#">CONTACT</a></div>
   </div>
+
+<button id="scrollTopBtn" onclick="topFunction()"><i class="fa-solid fa-2x scrollTopFa fa-circle-chevron-up"></i></button>
+<script>
+
+let myBtn = document.getElementById('scrollTopBtn')
+window.onscroll = function() {scrollFunction()};
+function scrollFunction() {
+if (document.body.scrollTop > 400 || document.documentElement.scrollTop > 400) {
+  myBtn.style.display = "block";
+} else {
+  myBtn.style.display = "none";
+}
+}
+
+function topFunction(){
+document.body.scrollTop = 0;
+document.documentElement.scrollTop = 0;
+}
+</script>
 
   <script src="/javascripts/spinner.js"></script>
   <script src="javascripts/zoomslider.js"></script>

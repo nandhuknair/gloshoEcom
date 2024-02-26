@@ -1,0 +1,154 @@
+<% if (userLoggedIn) { %>
+    <%- include('userAfterLogin') %>
+  <% } else { %>
+    <%- include('userHeader') %>
+<% } %>
+<div class="container-fluid px-4">
+<img src="images/images/banner-2.jpg" width="100%" alt="">
+</div> 
+<!-- <div class="container-fluid d-flex mt-4 justify-content-end">
+<form action="/search" method="get" class="border me-3 p-2">
+<input type="search" class="me-1 searchInput" placeholder="Search Products" name="searchItem" id="" required />
+<button style="border: none
+;outline: none;
+background-color: transparent;
+border-left: 0.5px solid rgba(0, 0, 0, 0.371);">
+<i class="fa-solid fa-magnifying-glass"></i></button>
+</form>
+</div> -->
+<section class="section-products">
+   
+<div class="container">
+        
+    <div class="col-md-8 col-lg-6">
+         
+              <h2 class="heading">WOMEN</h2>
+         
+          </div>
+
+   
+          <div class="row">
+                <% products.forEach((data,index) => { %>
+                <!-- Single Product -->
+                <div class="col-md-6 col-lg-4 col-xl-3 mb-4 <% if (data.stock <= 0) { %>out-of-stock<% } %>">
+                        <div id="product-1" class="single-product">
+                                <div class="part-1" style="background: url('/assets/uploads/<%= data.image[data.image.length-1] %>'); background-size: cover;
+                                    transition: all 0.3s;
+                                    background-position:center;">
+                                        <ul>
+
+                                             <li>
+
+                                                <% if (userLoggedIn) { %>
+                                                    <button data-bs-toggle="modal" data-bs-target="#exampleModalCart" class="cart_button" value="<%= data._id %>"><i class="fas fa-shopping-cart"></i></button>
+                                                    <% } else { %>
+                                                      <a href="/login"><i class="fas fa-shopping-cart"></i></a>
+                                               <% } %> 
+
+                                               <% if (userLoggedIn) { %>
+                                                    <button class="wishlist_button" value="<%= data._id %>"><i class="fas fa-heart"></i></button>
+                                                    <% } else { %>
+                                                      <a href="/login"><i class="fas fa-heart"></i></a>
+                                               <% } %> 
+                                                    
+                                                <li><a href="/product?id=<%= data._id %>"><i class="fas fa-expand"></i></a></li>
+                                        </ul>
+                                
+                                
+                                    </div>
+                                <div class="part-2">
+                                        <h3 class="product-title" style="letter-spacing: 1px;"><%= data.productName %></h3>
+                                     
+                                        <h4 class="product-price" style="color: #FF871D;">$<%= data.price %></h4>
+                                </div>
+                       
+               </div> 
+               <% if (data.stock <= 0) { %>
+                    <div style="color:crimson;" class="out-of-stock-label">OUT OF STOCK</div>
+                <% } %>
+            </div>
+
+       <!-- Modal For Add to cart -->
+       
+       <div class="modal fade" id="exampleModalCart" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <!-- <h5 class="head_text" id="exampleModalLabel">ARE YOU SURE</h5> -->
+                  <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                <p class="para_text text-center">Product Successfully Added To The Cart ✅ </p>  
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+                <% }); %>
+        </div>
+</div>
+</section>
+
+<script>
+
+//ADD TO CART
+    let cartBtns = document.querySelectorAll('.cart_button')
+    cartBtns.forEach(cartBtn => {
+
+            cartBtn.addEventListener('click', () => {
+                    console.log(cartBtn.value)
+                    fetch('/cart', {
+                            method: 'POST',
+                            headers: {
+                                    'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                    quantity: 1,
+                                    productId: cartBtn.value
+            })
+                    }).then(response => {
+                            if (response.ok) {
+                                    setTimeout(() => {
+                                            window.location.href = '/cart';
+                                    }, 1000);
+                            } else {
+                                    window.location.href = '/cart';
+                            }
+                    })
+                            .catch(error => console.log(error));
+            });
+    });
+                                    
+
+//ADD TO WISHLIST
+let wishBtns = document.querySelectorAll('.wishlist_button')
+wishBtns.forEach(wishBtn => {
+    wishBtn.addEventListener('click', () => {
+                    fetch('/wishlist', {
+                            method: 'POST',
+                            headers: {
+                                    'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                    productId: wishBtn.value
+            })
+                    }).then(response => {
+                            if (response.ok) {
+                             toastr.success('Successfully Added To Wishlist ', 'Welcome');
+                            }
+                            else if(response.status === 400){
+                                   response.json().then(data=> {
+                                    toastr.error(data.message,'Error')
+                                   })
+                            }
+                             else {
+                                    window.location.href = '/wishlist';
+                            }
+                    })
+                            .catch(error => console.log(error));
+            });
+    }); 
+
+</script>
+<%- include('userFooter') %>

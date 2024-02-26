@@ -1,0 +1,129 @@
+<%- include('userAfterLogin') %>
+
+    <div class="main-container" style="flex-direction: column;">
+        <div class="container-fluid">
+
+            <div class="d-inline-flex align-items-center mt-4 ms-3">
+                <a href="/all_products" class="">PRODUCTS</a>
+                <i class="fa-solid fa-chevron-right me-2 ms-2 "></i>
+                <p class="span mt-3">WISHLIST</a>
+            </div>
+            
+        </div>
+
+        <% if (wishlistItem.length === 0) { %>
+            <div class="container mt-4 text-center justify-content align-items-center">
+              <div class="row"><img src="/images/icon/empty-cart.svg"  height="400px" alt="cart-empty-svg"></div>
+                <div class="row"><h3  class="head_text">❤️ IS EMPTY</h3>
+                <p style="color: #23252777;">Looks like you haven't added anything to your wishlist yet</p>
+                <a href="/all_products"><button class="product_checkout">Continue Shopping</button></a>
+            </div>
+                    
+                
+          </div>  
+        <% } else { %>
+            
+          
+        
+        <% wishlistItem.forEach((item,index )=> { %>
+  
+        <div class="container border-bottom mt-4">
+            
+            <div class="row">
+                <div class="d-flex">
+                   <img src="/assets/uploads/<%= item.productId.image[item.productId.image.length-1] %>" alt="<%= item.productId.productName %>" height="100%" width="17%">
+                    <div class="d-flex flex-column ms-5 justify-content-center">
+                        <h3><a href="/product?id=<%= item.productId._id %>"><%= item.productId.productName %></a></h3>
+                         <p>Size:<%= item.productId.size %></p>
+                        <p>Collection: <%= item.productId.collection %></p>
+                        
+                        <a href="" data-bs-toggle="modal" data-bs-target="#exampleModal<%= index %>" class="d-flex align-items-center"><i class="fa-solid fa-trash"></i> <p class="mb-0 ms-2">Remove item</p></a> 
+
+                          
+                          <!-- Modal -->
+                          <div class="modal fade" id="exampleModal<%= index %>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 class="head_text" id="exampleModalLabel">ARE YOU SURE</h5>
+                                  <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                <p class="para_text">Remove This Product From The Wishlist ⚠️</p>  
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">NO</button>
+                                 <a href="/remove_wishlist_products?wishItemId=<%= item._id %>"><button type="button" class="btn btn-primary">YES</button></a> 
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+
+                        <button value="<%= item.productId._id %>" class="cart_btn d-flex align-items-center mt-3" style="border: none; outline: none; padding: 0; margin: 0; background-color: transparent;">
+                            <i class="fa-solid fa-cart-shopping" style="color: #FF871D;"></i> <p class="mb-0 ms-2">Add To Cart</p></button>
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end">
+                <div class="d-flex flex-column align-items-end ">
+                    <p class="mt-3">$<%= item.productId.price %></p>
+                </div>
+            </div>
+        </div>
+
+        <% }); %>
+        <% } %>
+        
+    </div>
+                       
+
+<script>
+//ADD TO CART
+let cartButtons = document.querySelectorAll('.cart_btn')
+        cartButtons.forEach(cartBtn => {
+
+                cartBtn.addEventListener('click', () => {
+                        console.log(cartBtn.value)
+                        fetch('/cart', {
+                                method: 'POST',
+                                headers: {
+                                        'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                        quantity: 1,
+                                        productId: cartBtn.value
+                })
+                        }).then(response => {
+                                if (response.ok) {
+                                    toastr.success('Successfully Added To Cart ', 'Welcome');
+                                }
+                                else if(response.status === 400){
+                                    response.json().then(data=> {
+                                        toastr.error(data.message,'Sorry')
+                                    })
+                                }
+                                else {
+                                        window.location.href = '/cart';
+                                }
+                        })
+                                .catch(error => console.log(error));
+                });
+        });
+              
+</script>
+                        
+        
+
+        
+
+
+
+
+
+<%- include('userFooter') %>
+
+
+
+

@@ -65,7 +65,9 @@
                                                 <%= product.productName %>
                                             </h2>
                                             <div class="d-flex justify-content-end ">
-                                                <div class="heart"><i class="fa-solid fa-heart"></i></div>
+                                                <div class="heart"><button class="p-0 m-0" id="wishlist_button" value="<%= product._id %>"
+                                                     style="border: none; outline: none; background-color: transparent;">
+                                                    <i class="fa-solid fa-heart"></i></button></div>
                                             </div>
                                             <p class="product_price">$ <%= product.price %> USD</p>
                                             <h4 class="product_category">
@@ -96,8 +98,15 @@
                                                      
                                                    
                                                 </form>
+                                                <form action="/checkout" method="post" >
+                                                    
+                                                    <input type="hidden" value="singleProduct" name="type">
+                                                    <input type="hidden" name="productId" value="<%= product._id %>">
+                                                
+                                                  
+                                                   <button type="submit" class="mt-4 product_checkout">BUY IT NOW</button>
+                                                  </form>
                                             
-                                                <!-- <a href="/checkout?id=<%= product._id %>"><button type="submit" class="mt-4 product_checkout">BUY IT NOW</button></a> -->
                                         </div>
 
                                     </div>
@@ -124,5 +133,39 @@
                                 </div>
 </div>
 
-                            <%- include('userFooter') %>
+
+<script>
+    //ADD TO WISHLIST
+    let wishBtn = document.getElementById('wishlist_button')
+    wishBtn.addEventListener('click',()=> {
+        fetch('/wishlist',{
+            method:'POST',
+            headers:{
+                'Content-Type': 'application/json'
+            },
+            body:JSON.stringify({
+                productId:wishBtn.value
+            })
+        })
+        .then(response=> {
+            if (response.ok) {
+                toastr.success('Successfully Added To Wishlist ', 'Welcome');
+                
+            }
+            else if(response.status === 400){
+                response.json().then(data=>{
+                    toastr.error(data.message,'Sorry')
+                })
+            }
+            else{
+                window.location.href = '/wishlist';
+            }
+        })
+        .catch(error=>console.log(error));
+    })
+
+
+</script>
+
+ <%- include('userFooter') %>
 

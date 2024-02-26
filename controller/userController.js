@@ -5,10 +5,18 @@ const Product = require("../model/productModel");
 const Category = require("../model/categoryModel");
 const Cart = require("../model/cartModel");
 const Order = require("../model/orderModel")
+const moment = require("moment")
+const Wishlist = require('../model/wishlistModel')
+
+
+
 //----------get home paage----------
 
 exports.getHome = async function (req, res) {
-  res.render("user/index", { userLoggedIn: req.session.userLoggedIn });
+
+  const products = await Product.find({}).limit(8)
+
+  res.render("user/index", { userLoggedIn: req.session.userLoggedIn ,products});
   console.log(req.session.userLoggedIn);
 };
 
@@ -359,6 +367,7 @@ exports.getProfile = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
+    return res.redirect('/error');
   }
 };
 
@@ -385,6 +394,7 @@ exports.changeUserName = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
+    return res.redirect('/error');
   }
 };
 
@@ -418,6 +428,7 @@ exports.addAddress = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
+    return res.redirect('/error');
   }
 };
 
@@ -451,6 +462,7 @@ exports.changePassword = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
+    return res.redirect('/error');
   }
 };
 
@@ -488,6 +500,7 @@ exports.editAddress = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
+    return res.redirect('/error');
   }
 };
 
@@ -522,6 +535,7 @@ exports.resetMessage = async (req, res) => {
     res.redirect("/profile");
   } catch (error) {
     console.log(error);
+    return res.redirect('/error');
   }
 };
 
@@ -539,11 +553,8 @@ exports.addToCart = async (req, res) => {
     const product = await Product.findById(productId);
     const existingCartItem = await Cart.findOne({ userId: userId, productId: productId });
     if (existingCartItem) {
-      
-      res.redirect('/cart')
-  
+      res.status(400).json({message:"Already In Cart"})
     } else {
-      
       if (parseInt(quantity) > product.stock) {
         req.session.stockLimitError = 'Requested quantity exceeds available stock';
         res.redirect('/cart');
@@ -558,11 +569,13 @@ exports.addToCart = async (req, res) => {
         totalPrice: totalPrice,
       });
       await cartItem.save();
+      res.redirect('/cart');
     }
 
-    res.redirect('/cart');
+    
   } catch (error) {
     console.log(error);
+    return res.redirect('/error');
   }
 };
 
@@ -574,18 +587,16 @@ exports.viewCart = async (req, res) => {
     const userId = req.session.userLoggedIn;
     let cartItem = await Cart.find({ userId: userId }).populate("productId");
 
-    // Check if any products in the cart have a quantity greater than the available stock
     cartItem = await Promise.all(cartItem.map(async (item) => {
       const product = await Product.findById(item.productId);
       if (!product || product.stock <= 0 || item.quantity > product.stock) {
-        // Remove the product from the cart if it's no longer available
+        
         await Cart.findByIdAndDelete(item._id);
-        return null; // Return null to filter out this item later
+        return null; 
       }
-      return item; // Return the item if it's still available
+      return item; 
     }));
 
-    // Filter out null values (removed items) from the cart items array
     cartItem = cartItem.filter(item => item !== null);
 
     let totalPrice = 0;
@@ -601,10 +612,21 @@ exports.viewCart = async (req, res) => {
 
   } catch (error) {
     console.log(error);
+    return res.redirect('/error');
   }
 };
 
 
+exports.cartCount = async (req,res)=> {
+  try {
+    const userId = req.session.userLoggedIn;
+    const cartItemCount = await Cart.countDocuments({ userId: userId });
+    res.json({ cartItemCount });
+  } catch (error) {
+    console.error('Error fetching cart item count:', error);
+    return res.redirect('/error');
+  }
+}
 
 
 exports.removeCartProducts = async (req,res)=> {
@@ -614,6 +636,7 @@ exports.removeCartProducts = async (req,res)=> {
     res.redirect('/cart')
 } catch (error) {
     console.log(error);
+    return res.redirect('/error');
   }
 }
 
@@ -641,6 +664,7 @@ exports.editCart = async (req, res) => {
     res.redirect("/cart");
   } catch (error) {
     console.log(error);
+    return res.redirect('/error');
   }
 };
 
@@ -649,11 +673,39 @@ exports.editCart = async (req, res) => {
 
 exports.listProducts = async (req, res) => {
   try {
-    const products = await Product.find({ isAvailable: true });
+    let products
+    if(req.query.sortBy){
+      switch (req.query.sortBy) {
+        case 'priceLowToHigh':
+          products = await Product.find({ isAvailable: true }).sort({ price: 1 });
+          break;
+
+        case 'priceHighToLow':
+        products = await Product.find({ isAvailable: true }).sort({ price: -1 });
+        break;
+
+        case 'A-Z':
+        products = await Product.find({ isAvailable: true }).sort({ productName: 1 });
+        break;
+
+        case 'Z-A':
+        products = await Product.find({ isAvailable: true }).sort({ productName: -1 });
+        break;
+      
+        default:
+          products = await Product.find({ isAvailable: true });
+          break;
+      }
+    }else{
+      products = await Product.find({ isAvailable: true });
+    }
+    
+    const categories = await Category.find({active:true})
     let userLoggedIn = req.session.userLoggedIn;
-    res.render("user/allProducts", { products, userLoggedIn });
+    res.render("user/allProducts", { products, userLoggedIn, categories });
   } catch (error) {
     console.log(error);
+    return res.redirect('/error');
   }
 };
 
@@ -661,6 +713,10 @@ exports.productDetails = async (req, res) => {
   try {
     const { id } = req.query;
     const product = await Product.findById({ _id: id });
+    if (!product) {
+      return res.redirect('/error');
+    }
+
     const category = await Category.findById(product.category);
     let userLoggedIn = req.session.userLoggedIn;
 
@@ -674,6 +730,7 @@ exports.productDetails = async (req, res) => {
       
   } catch (error) {
     console.log(error);
+    return res.redirect('/error');
   }
 };
 
@@ -686,8 +743,8 @@ exports.getCheckoutPage = async (req, res) => {
   try {
     const userId = req.session.userLoggedIn
     const cartItems = await Cart.find({ userId: userId }).populate("productId");
-    
-    console.log(cartItems.length)
+    const {type} = req.body
+    const singleProduct = await Product.findById(req.body.productId)
     if(req.session.userLoggedIn && cartItems.length > 0){
     let totalPrice = 0; 
     const user = await User.findOne({_id:userId})
@@ -698,37 +755,36 @@ exports.getCheckoutPage = async (req, res) => {
           res.redirect('/cart')
       }
     });
-
-
-    
-
-    res.render("user/checkout",{user:user, cartItems:cartItems , totalPrice});  
+    res.render("user/checkout",{
+      user: user,
+      cartItems: cartItems,
+      totalPrice,
+      type: type,
+      product: singleProduct,
+    });  
     }else{
       res.redirect('/login')
     }
                                                                                                                                                                                                                                             
   } catch (error) {
     console.log(error);
+    return res.redirect('/error');
   }
 };
 
-
-
 exports.confirmOrder = async function confirmOrder(req, res) {
   const { selectedaddress, selectedpayment, cartdocs, totalPrice } = req.body;
-  console.log(selectedaddress)
+  console.log(cartdocs)
 
   try { 
     const userData = await User.findById(req.session.userLoggedIn);
     console.log(userData)
     const address = userData.address[selectedaddress] 
-    console.log('Address is last',address)
+
       const orderedItems = [];
       if (selectedpayment === 'COD') {
         for (const cartItem of cartdocs) {
           const { productId, quantity } = cartItem;
-
-          
           const product = await Product.findById(productId);
 
           if (!product || cartItem.quantity > product.stock) {
@@ -746,14 +802,9 @@ exports.confirmOrder = async function confirmOrder(req, res) {
           });
             product.stock -= quantity;
             await product.save();
-
-
-    
-          await Cart.findByIdAndDelete(cartItem._id);
+            await Cart.findByIdAndDelete(cartItem._id);
       }
-
-
-   
+     
       const order = new Order({
           userId: req.session.userLoggedIn,
           items: orderedItems,
@@ -773,31 +824,290 @@ else{
   } catch (error) {
   
       console.error('Error confirming order:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      return res.redirect('/error');
   }
 };
+
 
 
 exports.myOrder = async (req, res) => {
   try {
+    const ITEMS_PER_PAGE = 5;
     const page = parseInt(req.query.page) || 1;
-    const perPage = 5; // Number of orders per page
-    const skip = (page - 1) * perPage; // Calculate the number of orders to skip
 
-    const orderCount = await Order.countDocuments();
-    const totalPages = Math.ceil(orderCount / perPage);
+    const totalOrders = await Order.countDocuments({ userId: req.session.userLoggedIn });
+
+    const totalPages = Math.ceil(totalOrders / ITEMS_PER_PAGE);
+
+    const skip = (page - 1) * ITEMS_PER_PAGE;
 
     const orders = await Order.find({ userId: req.session.userLoggedIn })
-    .populate({
-      path: 'items.product',
-      populate: { path: 'category', model: 'Category' }
-    })
-    .skip(skip)
-    .limit(perPage);
+      .populate({
+        path: 'items.product',
+        populate: { path: 'category', model: 'Category' }
+      })
+      .sort({ createdAt: -1 }) 
+      .skip(skip)
+      .limit(ITEMS_PER_PAGE);
 
-    res.render("user/myOrder",{orderDetails:orders ,totalPages,
-      currentPage: page});
+    res.render("user/myOrder", { orderDetails: orders, totalPages, currentPage: page });
   } catch (error) {
     console.log(error);
+    return res.redirect('/error');
   }
 };
+
+
+
+exports.myOrderDetails = async (req,res)=> {
+  try {
+    const orderId = req.query.orderId
+    const productId = req.query.productId
+    const orderDetails = await Order.findById(orderId)
+    const item = orderDetails.items.find(item => item.product.toString() === productId);
+    const product = await Product.findById(productId);
+    const formattedDate = moment(orderDetails.createdAt).format('ddd, MMM DD YYYY, hh:mm A');
+
+    res.render('user/myOrderDetail',{ orderDetails: orderDetails , item: item, product:product ,formattedDate:formattedDate})
+  } catch (error) {
+    console.log(error)
+    return res.redirect('/error');
+  }
+}
+   
+
+exports.cancelOrder = async (req,res)=>{
+  try {
+    const {orderId , productId} = req.body
+    const order = await Order.findById(orderId)
+    if(!order){
+      return res.status(404).send("Order not found");
+    }
+
+      const item = order.items.find(item => item.product.toString() === productId) 
+    if(!item){
+      return res.status(404).send("Item not found in the order")
+    }
+
+    item.orderStatus = "Cancelled By User";
+    await order.save();
+
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).send("Product not found");
+    }
+    product.stock += item.quantity;
+    await product.save();
+
+    res.redirect('/my_order');
+
+  } catch (error) {
+    console.error('Error Cancellign order:', error);
+     return res.status(500).redirect('/error');
+  }
+}
+
+
+
+exports.returnItem = async(req,res)=> {
+  try {
+    const { orderId, productId } = req.body;
+
+    
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).send("Order not found");
+    }
+
+    const item = order.items.find(item => item.product.toString() === productId);
+    if (!item) {
+      return res.status(404).send("Item not found in the order");
+    }
+
+    item.orderStatus = "Returned";
+    await order.save();
+
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).send("Product not found");
+    }
+    product.stock += item.quantity;
+    await product.save();
+
+    res.redirect('/my_order');
+  } catch (error) {
+    console.error(error);
+    return res.status(500).redirect('/error');
+
+  }
+}; 
+
+
+exports.addAddressFromCheckout = async(req,res)=> {
+  try {
+    const { name, number, address, city, state, pincode, landmark } = req.body;
+
+    const user = await User.findById(req.session.userLoggedIn);
+    if (user.address.length >= 5) {
+      
+       res.redirect("/checkout");
+    } else {
+      const newAddress = {
+        name,
+        number,
+        address,
+        city,
+        state,
+        pincode,
+        landmark,
+      };
+      user.address.push(newAddress);
+
+      await user.save();
+     
+      res.redirect("/checkout");
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).redirect('/error');
+
+  }
+}
+
+
+// ----------------------------------------Sort management------------------------------------------------
+ 
+
+exports.searchAction = async (req, res) => {
+  const userLoggedIn = req.session.userLoggedIn
+  const searchItem = req.query.searchItem.trim(); // Extract searchItem and trim spaces
+ 
+  try {
+    const products = await Product.find({
+      $or: [
+        { productName: { $regex: new RegExp(searchItem, 'i') } }, // Search in product name
+        { 'category.category': { $regex: new RegExp(searchItem, 'i') } } // Search in category
+      ]
+    });
+       
+    console.log(products)
+    const categories = await Category.find({active:true})
+    res.render('user/allProducts', { products , userLoggedIn:userLoggedIn ,categories});
+  } catch (error) {
+    console.error(error);
+    return res.status(500).redirect('/error');
+
+  }
+};
+
+exports.womenCollection = async(req,res)=> {
+  try {
+  const userLoggedIn = req.session.userLoggedIn
+  const collectionName = "Women"
+  const products = await Product.find({collection:collectionName})
+  res.render('user/womenProducts',{products,userLoggedIn:userLoggedIn})
+
+  } catch (error) {
+    return res.status(500).redirect('/error');
+
+  }
+}
+
+exports.menCollection = async(req,res)=> {
+  try {
+  const userLoggedIn = req.session.userLoggedIn
+  const collectionName = "Men"
+  const products = await Product.find({collection:collectionName})
+
+    res.render('user/menProducts',{products,userLoggedIn:userLoggedIn})
+  } catch (error) {
+    return res.status(500).redirect('/error');
+
+  }
+}
+
+
+
+exports.getProductsByCategory = async (req, res) => {
+  try {
+    const userLoggedIn = req.session.userLoggedIn;
+    const { categoryId } = req.query;
+    console.log(categoryId)
+
+    let products;
+    if (categoryId) {
+      products = await Product.find({ category: categoryId , isAvailable:true});
+      console.log(products)
+    } else {
+      products = await Product.find({isAvailable:true});
+    }
+
+    const categories = await Category.find({active:true})
+    res.render('user/allProducts', { products, userLoggedIn: userLoggedIn ,categories });
+  } catch (error) {
+    console.error('Error:', error);
+    return res.status(500).redirect('/error');
+
+  }
+};
+
+
+// ----------------------------------------Whish list Management------------------------------------------------
+
+exports.getWishlist = async (req,res)=> {
+  try {
+    const userId = req.session.userLoggedIn
+    const wishlistItem = await Wishlist.find({ userId: userId }).populate("productId");
+    res.render('user/wishlist',{wishlistItem})
+
+  } catch (error) {
+    console.log(error)
+    return res.status(500).redirect('/error');
+  }
+}
+
+exports.addToWishlist = async (req,res)=>{
+  try {
+    const {productId}= req.body
+    const existingItem = await Wishlist.findOne({userId:req.session.userLoggedIn,productId})
+    if(existingItem){
+      res.status(400).json({message:'Item already added to the wishlist'})
+    }else{
+      const wishlistItem = new Wishlist({
+      userId:req.session.userLoggedIn,
+      productId:productId
+    })
+
+    await wishlistItem.save()
+    res.redirect('/wishlist')
+    }
+    
+    
+  } catch (error) {
+    console.error('Error:', error);
+    return res.status(500).redirect('/error');
+    
+  }
+}
+
+exports.removeWishItem = async (req,res)=> {
+  try {
+    const wishItemId = req.query.wishItemId
+    await Wishlist.findByIdAndDelete(wishItemId)
+    res.redirect('/wishlist')
+  } catch (error) {
+    console.error('Error:', error);
+    return res.status(500).redirect('/error');
+  }
+}
+
+exports.wishlistCount = async (req,res)=> {
+  try {
+    const userId = req.session.userLoggedIn;
+    const wishItemCount = await Wishlist.countDocuments({ userId: userId });
+    res.json({ wishItemCount });
+  } catch (error) {
+    console.error('Error fetching wishlist item count:', error);
+    return res.redirect('/error');
+  }
+}
