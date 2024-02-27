@@ -54,6 +54,7 @@ router.get('/cart/count',userController.cartCount)
 router.post('/checkout',sessionCheck.userActivity,userController.getCheckoutPage)
 router.post('/confirmOrder',sessionCheck.userActivity,userController.confirmOrder)
 router.post('/add_address_checkout',sessionCheck.userActivity,userController.addAddressFromCheckout)
+// router.post('/confirmOrder',sessionCheck.userActivity,userController.confirmOrder)
   
 
 //-------------------Order Management---------------------------

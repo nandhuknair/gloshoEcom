@@ -22,7 +22,7 @@ app.use((req, res, next) => {
 
 app.use(
   session({
-    secret: "mysecreqwe",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
   })   

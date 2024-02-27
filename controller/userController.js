@@ -772,7 +772,15 @@ exports.getCheckoutPage = async (req, res) => {
   }
 };
 
-exports.confirmOrder = async function confirmOrder(req, res) {
+
+const Razorpay = require('razorpay');
+const razorpay = new Razorpay({
+    key_id: process.env.KEY_ID,
+    key_secret: process.env.KEY_SECRET,
+});
+
+
+exports.confirmOrder = async(req, res) =>{
   const { selectedaddress, selectedpayment, cartdocs, totalPrice } = req.body;
   console.log(cartdocs)
 
@@ -780,45 +788,62 @@ exports.confirmOrder = async function confirmOrder(req, res) {
     const userData = await User.findById(req.session.userLoggedIn);
     console.log(userData)
     const address = userData.address[selectedaddress] 
+    const orderedItems = [];
+    async function placeOrder() {
+      for (const cartItem of cartdocs) {
+        const { productId, quantity } = cartItem;
+        const product = await Product.findById(productId);
+  
+        if (!product || cartItem.quantity > product.stock) {
+          throw new Error(`Product stock limit exceeded for item ${cartItem.productId}`);
+        }
+  
+        let currentPrice = product.price * quantity
+        console.log(currentPrice)
+        
+        orderedItems.push({
+            product: product._id,
+            quantity:quantity,
+            price: currentPrice,
+              
+        });
+          product.stock -= quantity;
+          await product.save();
+          await Cart.findByIdAndDelete(cartItem._id);
+    }
+   
+    const order = new Order({
+        userId: req.session.userLoggedIn,
+        items: orderedItems,
+        totalAmount: totalPrice,
+        address:address,
+        paymentType: selectedpayment,
+    });
+    await order.save();
+    }
+  
 
-      const orderedItems = [];
       if (selectedpayment === 'COD') {
-        for (const cartItem of cartdocs) {
-          const { productId, quantity } = cartItem;
-          const product = await Product.findById(productId);
-
-          if (!product || cartItem.quantity > product.stock) {
-            throw new Error(`Product stock limit exceeded for item ${cartItem.productId}`);
-          }
-
-          let currentPrice = product.price * quantity
-          console.log(currentPrice)
-          
-          orderedItems.push({
-              product: product._id,
-              quantity:quantity,
-              price: currentPrice,
-                
-          });
-            product.stock -= quantity;
-            await product.save();
-            await Cart.findByIdAndDelete(cartItem._id);
-      }
-     
-      const order = new Order({
-          userId: req.session.userLoggedIn,
-          items: orderedItems,
-          totalAmount: totalPrice,
-          address:address,
-          paymentType: selectedpayment,
-      });
-
-   await order.save();
-
- res.status(200).json({ message: 'Order confirmed successfully' });
+        placeOrder()
+        res.status(200).json({ message: 'Order confirmed successfully' });
 }
+
+
+else if(selectedpayment === 'RAZORPAY'){
+  const orderOptions = {
+    amount: totalPrice * 100, // Razorpay amount is in paisa (multiply by 100)
+    currency: 'INR',
+    receipt: 'order_receipt',
+    payment_capture: 1 // Automatically capture the payment
+};
+const razorpayOrder = await razorpay.orders.create(orderOptions);
+placeOrder()
+res.status(200).json({ razorpayOrderId: razorpayOrder.id });
+
+}
+
 else{
-  res.send('Working for this')
+  console.log('Broo i am working for this lol')
 }
      
   } catch (error) {
