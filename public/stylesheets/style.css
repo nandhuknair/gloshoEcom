@@ -29,6 +29,10 @@ p{
   color: #495057;
 }
 
+.head{
+  font-family: 'Jost', sans-serif;
+}
+
 /* spinner */
 .spinner-wrapper{
   background-color: #ffffff;

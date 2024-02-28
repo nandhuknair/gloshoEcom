@@ -38,6 +38,8 @@ router.post('/change_password',sessionCheck.userActivity,userController.changePa
 router.get('/delete_address/:addressId',sessionCheck.userActivity,userController.deleteAddress)
 router.post('/edit_address/:addressId',sessionCheck.userActivity,userController.editAddress)
 router.get('/resetMessage',sessionCheck.userActivity,userController.resetMessage)
+router.get('/wallet',sessionCheck.userActivity,userController.getWallet)
+router.get('/wallet_history',sessionCheck.userActivity,userController.getWalletHistory)
 
 
 
@@ -51,10 +53,10 @@ router.get('/cart/count',userController.cartCount)
 
 //-------------------Checkout page Management---------------------------
 
-router.post('/checkout',sessionCheck.userActivity,userController.getCheckoutPage)
+router.get('/checkout',sessionCheck.userActivity,userController.getCheckoutPage)
 router.post('/confirmOrder',sessionCheck.userActivity,userController.confirmOrder)
 router.post('/add_address_checkout',sessionCheck.userActivity,userController.addAddressFromCheckout)
-// router.post('/confirmOrder',sessionCheck.userActivity,userController.confirmOrder)
+router.post('/placeorderafterpayment',sessionCheck.userActivity,userController.placeOrder)
   
 
 //-------------------Order Management---------------------------
@@ -63,6 +65,8 @@ router.get('/my_order',sessionCheck.userActivity,userController.myOrder)
 router.get('/my_order_details',sessionCheck.userActivity,userController.myOrderDetails)
 router.post('/cancel_order',sessionCheck.userActivity,userController.cancelOrder)
 router.post('/return_order',sessionCheck.userActivity,userController.returnItem)
+router.get('/wallethistory',sessionCheck.userActivity,userController.getWalletHistory)
+
 
  
 //-------------------Search And Sort Management---------------------------

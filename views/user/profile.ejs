@@ -39,13 +39,13 @@
         </a>
       </li>
       <li class="my-2">
-        <a href="#" class="nav-link link-dark">
+        <a href="/wishlist" class="nav-link link-dark">
             <i class="fa-solid fa-hand-holding-heart  me-3"></i>
           My Wishlist
         </a>
       </li>
       <li class="my-2" id="walletItem" onclick="viewWalletPage()">
-        <a href="#" class="nav-link link-dark">
+        <a href="/wallet" class="nav-link link-dark">
             <i class="fa-solid fa-wallet me-3" ></i>
           Wallet
         </a>
@@ -482,14 +482,14 @@
 </div>
 
 <!-- ----------------------------wallet page ---------------------------------------- -->
-
+<!-- 
 <div class="col-lg-9 mt-5 ms-5" id="wallet">
   <div class="container txt-container" style="height: fit-content;">
   <h2 class="heading">WALLET</h2>
   <div class="container txt-container">
   </div>
 </div>
-</div>
+</div> -->
 
 
 <!-- ------------------------------Main container end---------------------------------------------- -->
@@ -508,7 +508,6 @@
   const userNamePage = document.getElementById('changeUsername');
   const changePasswordPage = document.getElementById('changePassword');
   const manageAddressPage = document.getElementById('manageAddress');
-  const walletPage = document.getElementById('wallet');
   const profileDetailPage = document.getElementById('profileDetail');
 
 
@@ -518,7 +517,6 @@
     myOrderPage.style.display = 'none';
     changePasswordPage.style.display = 'none';
     manageAddressPage.style.display = 'none';
-    walletPage.style.display = 'none';
     profileDetailPage.style.display = 'none';
 
 
@@ -534,7 +532,6 @@
     userNamePage.style.display = 'none';
     changePasswordPage.style.display = 'none';
     manageAddressPage.style.display = 'none';
-    walletPage.style.display = 'none';
     profileDetailPage.style.display = 'none';
 
 
@@ -550,7 +547,6 @@
     userNamePage.style.display = 'none';
     changePasswordPage.style.display = 'block';
     manageAddressPage.style.display = 'none';
-    walletPage.style.display = 'none';
     profileDetailPage.style.display = 'none';
     
     document.getElementById('myOrderItem').classList.remove('bg-clr');
@@ -566,7 +562,6 @@
     userNamePage.style.display = 'none';
     changePasswordPage.style.display = 'none';
     manageAddressPage.style.display = 'block';
-    walletPage.style.display = 'none';
     profileDetailPage.style.display = 'none';
 
 
@@ -582,7 +577,6 @@ function viewWalletPage() {
     userNamePage.style.display = 'none';
     changePasswordPage.style.display = 'none';
     manageAddressPage.style.display = 'none';
-    walletPage.style.display = 'block';
     profileDetailPage.style.display = 'none';
 
 

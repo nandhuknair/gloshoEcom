@@ -31,6 +31,21 @@ const addressSchema = new mongoose.Schema({
     }
 });
 
+const walletHistorySchema = new mongoose.Schema({
+    amount: {
+        type: Number,
+        default:0
+    },
+    type: {
+        type: String,
+        enum: ['credit', 'debit'],
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
+});
+
 
 const signupSchema = new mongoose.Schema({
     userName: {
@@ -61,7 +76,13 @@ const signupSchema = new mongoose.Schema({
     is_admin:{
         type:Number,
         default:0
+    },
+    walletAmount:{
+        type:Number,
+        default:0
     }
+    ,
+    wallet: [walletHistorySchema]
     
 });
 

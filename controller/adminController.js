@@ -6,7 +6,6 @@ const bcrypt = require('bcrypt')
 const path = require('path')
 const multer = require('multer')
 const Order = require("../model/orderModel")
-const mongoose = require('mongoose')
 
 
 const transporter = nodemailer.createTransport({
@@ -444,7 +443,7 @@ exports.editProducts = async function (req, res, next) {
 
     if (req.body.stock) {
       updateFields.stock = req.body.stock;
-    }
+    } 
 
     await Product.findOneAndUpdate({ _id: id }, { $set: updateFields });
 
@@ -514,30 +513,45 @@ exports.updateOrderStatus = async (req, res) => {
     console.log("productId:", productId);
 
     const order = await Order.findById(orderId);
-    console.log("order:", order);
+    const user = await User.findById(order.userId);
 
     if (!order) {
       return res.status(404).send("Order not found");
     }
 
-    const itemIndex = order.items.findIndex(item => item.product.toString() === productId);
-    console.log("itemIndex:", itemIndex);
-
-    if (itemIndex === -1) {
+   const item = order.items.find((item) => item.product.toString() === productId);
+    if (!item) {
       return res.status(404).send("Item not found in the order");
     }
 
+
     if (orderStatus === 'CancelledByAdmin') {
-      const product = await Product.findById(order.items[itemIndex].product);
+      if(order.paymentType === 'RAZORPAY'){
+      const product = await Product.findById(item.product);
       if (!product) {
         return res.status(404).send("Product not found");
       }
-      product.stock += order.items[itemIndex].quantity;
+      product.stock += item.quantity;
       await product.save();
-    }
+      const refundAmount = item.price * item.quantity
+      console.log(refundAmount);
+      const refundEntry = {
+      amount:refundAmount,
+      type:'credit',
+      createdAt:new Date()
+  }
+     user.wallet.push(refundEntry)
+     user.walletAmount += refundAmount
+     await user.save();
+     item.orderStatus = orderStatus;
+     await order.save();
 
-    order.items[itemIndex].orderStatus = orderStatus;
+      }
+      
+    }else{
+    item.orderStatus = orderStatus;
     await order.save();
+    }
 
     res.redirect('/admin_orders');
   } catch (error) {
@@ -545,6 +559,8 @@ exports.updateOrderStatus = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+   
+
 
 
 

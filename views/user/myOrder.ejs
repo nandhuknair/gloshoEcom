@@ -10,6 +10,18 @@
         </div>
 
     </div>
+
+    <% if (orderDetails.length === 0) { %>
+        <div class="container mt-4 text-center justify-content align-items-center">
+            <img src="/images/icon/no_order_found.png" class="img-fluid" width="300px" alt="cart-empty-svg">
+            <p style="color: #23252777;">Looks like you haven't purchased anything cart yet</p>
+            <a href="/all_products"><button class="product_checkout">Continue Shopping</button></a>
+        </div>
+                
+            
+      </div>  
+    <% } else { %>
+
     <div class="container">
         <h3 class="heading mt-4" style="margin-bottom: 0;">MY ORDER</h3>
 
@@ -20,6 +32,7 @@
                         <th scope="col">Name</th>
                         <th scope="col">Image</th>
                         <th scope="col">Price</th>
+                        <th scope="col">Payment</th>
                         <th scope="col">Category</th>
                         <th scope="col">Quantity</th>
                         <th scope="col">Status</th>
@@ -36,6 +49,7 @@
                         <td><%= item.product.productName %></td>
                         <td><img src="/assets/uploads/<%= item.product.image[item.product.image.length-1] %>" alt="<%= item.product.productName %>" width="60px"></td>
                         <td>$<%= item.price %></td>
+                        <td><%= order.paymentType %></td>
                         <td><%= item.product.category.category %></td>
                         <td><%= item.quantity %></td>
                         <td>
@@ -50,7 +64,8 @@
                         
                         </td>
                         <td>
-                          <% if (item.orderStatus === "Delivered") { %>
+
+                            <% if ((item.orderStatus === "Delivered" || item.orderStatus === "Shipped") && ((new Date() - new Date(order.createdAt)) / (1000 * 60 * 60 * 24)) <= 1) { %>
                             <form action="/return_order" method="post">
                                 <input type="hidden" name="orderId" value="<%= order._id %>">
                                 <input type="hidden" name="productId" value="<%= item.product._id %>">
@@ -84,18 +99,18 @@
             </ul>
         </nav>
     </div>
+    <% } %>
 </div>
 
 <script>
+
     function orderDetailShow(event){
         let orderId = event.target.closest('tr').querySelector('.orderId').value;
         let productId = event.target.closest('tr').querySelector('.productId').value;
         console.log('Order id is ', orderId);
         window.location.href = `/my_order_details?orderId=${orderId}&productId=${productId}`;
     }
+
 </script>
 
 <%- include('userFooter') %>
-
-  
-

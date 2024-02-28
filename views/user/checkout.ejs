@@ -247,7 +247,7 @@
                                     <div class="col-lg-3 col-sm-6"> 
                                         <div class="border p-4"> 
                                             <label class="card-radio-label"> 
-                                                <input type="radio" name="pay-method" id="pay-methodoption2" value="wallet" class="card-radio-input"> 
+                                                <input type="radio" name="pay-method" id="pay-methodoption2" value="WALLET" class="card-radio-input"> 
                                                 <div class="card-radio  py-3 text-center"> 
                                                     <i class="fa-solid fa-wallet mb-3 fa-2x me-4"></i>
                                                     WALLET
@@ -287,7 +287,7 @@
                                 <div class="modal-footer"> 
                                   <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button> 
                                   <!-- <button type="button" data-bs-toggle="modal" data-bs-target="#placedOrder" id="confirmorder" onclick="confirmorder()"  data-bs-dismiss="modal" class="btn  btn-success">Submit</button>  -->
-                                  <button type="button" id="confirmorder" onclick="confirmorder()" class="btn  btn-success">Submit</button> 
+                                  <button type="button" id="confirmorder" onclick="confirmorder()" data-bs-dismiss="modal" class="btn  btn-success">Submit</button> 
                                 
                                  
                                 </div> 
@@ -295,7 +295,7 @@
                             </div> 
                           </div> 
                           <!--order confirm end -->
-<!--                 
+                
                           <div class="fade modal" id="placedOrder" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content">
@@ -310,7 +310,7 @@
                                 </div>
                               </div>
                             </div>
-                          </div> -->
+                          </div>
                 
                 
                           <!-- ----Toaster----- -->
@@ -341,6 +341,7 @@
                 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
                 <script>
                 
+                const placedOrderModal = new bootstrap.Modal(document.getElementById('placedOrder'));
                 function submitorder(){ 
                     const selectedaddress = document.querySelector('input[name="deliveryAddress"]:checked'); 
                     const selectedpayment = document.querySelector('input[name="pay-method"]:checked'); 
@@ -357,14 +358,53 @@
                         orderconfirm.show();  
                     } 
                 } 
+
+
+    function placeOrderAfterPayment() {
+    const selectedaddress = document.querySelector('input[name="deliveryAddress"]:checked').value;
+    const selectedpayment = 'RAZORPAY'; 
+    const cartdocs = JSON.parse(document.getElementById('cartdocs').value);
+    const totalPrice = document.getElementById('totalPrice').value;
+
+    const requestBody = {
+        selectedaddress: selectedaddress,
+        selectedpayment: selectedpayment,
+        cartdocs: cartdocs,
+        totalPrice: totalPrice
+    };
+
+    fetch('/placeorderafterpayment', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        } 
+        else {
+            throw new Error('Failed to place order after payment');
+        }
+    })
+    .then(data => {
+        console.log('Order placed successfully:', data);
+        
+    })
+    .catch(error => {
+        console.error('Error placing order after payment:', error);
+    });
+}
+
+
                 
                  
-                function confirmorder(){ 
+function confirmorder(){ 
                     const selectedaddress = document.querySelector('input[name="deliveryAddress"]:checked').value; 
                     const selectedpayment = document.querySelector('input[name="pay-method"]:checked').value; 
-                    const cartdocs = JSON.parse(document.getElementById('cartdocs').value); // Parse the JSON string
-                    const totalPrice = document.getElementById('totalPrice').value;
-                    
+                    const cartdocs = JSON.parse(document.getElementById('cartdocs').value);
+                    const totalPrice = document.getElementById('totalPrice').value;       
                    if (selectedpayment === 'COD') {
                      fetch('/confirmorder', { 
                          method: 'POST', 
@@ -381,19 +421,24 @@
                      .then(response => {
                          if (!response.ok) {
                              throw new Error('Failed to confirm order');
-                             window.location.href ='/cart'
+                             toastr.error('Something went wrong ', 'Sorry');
+                             setTimeout(() => {
+                              window.location.href ='/cart'
+                             }, 1800);
+
                          }
                          return response.json();
                      })
                      .then(data => {
                          console.log('Order confirmed successfully:', data);
+                         placedOrderModal.show();
                          setTimeout(() => {
                              window.location.href ='/my_order'
                          }, 2600);
                      })
                      .catch(error => {
                          console.error('Error confirming order:', error);
-                         // Handle errors
+
                      });
                    }
                    else if (selectedpayment === 'RAZORPAY') {
@@ -409,42 +454,88 @@
                     totalPrice: totalPrice
                   })
                   })
-                  .then(response => response.json())
-                  .then(data=> {
-                    const options = {
-                    key: 'rzp_test_x2pOSwTq99SB6A',
-                    amount: data.razorpayOrderId.amount,
-                    currency: 'INR',
-                    name: 'Glosho',
-                    description: 'Payment for your order',
-                    order_id: data.razorpayOrderId,
-                    handler: function(response) {
-                        // Handle the successful payment response
-                        toastr.success('Successfully Placed The Order ', 'Welcome');
-                        console.log(response);
-                        // Redirect or show success message to user
-                       setTimeout(() => {
-                         window.location.href='/my_order';
-                       }, 2000);
-                    },
-                    prefill: {
-                        name: 'User Name',
-                        email: 'user@example.com',
-                        contact: '9999999999'
-                    },
-                    theme: {
-                        color: '#3399cc'
+                  .then(response=> {
+                    if (response.ok) {
+                      return response.json();
+                    }else{
+                      throw new Error('Failed to confirm order');
                     }
-                };
-                const rzp1 = new Razorpay(options);
-                rzp1.open();
+                  })
+                  .then(data =>{
+                    const option = {
+                      key: data.razorpayKey,
+                      amount: data.razorpayOrderId.amount,
+                      currency: 'INR',
+                      name: 'Glosho',
+                      image: '/images/images/pexels-snack-toronto-1630344.jpg',
+                      description: 'Payment for your order',
+                      order_id: data.razorpayOrderId,
+                      handler: function(response) {
+                        placeOrderAfterPayment()
+                        placedOrderModal.show();
+                        setTimeout(() => {
+                          window.location.href = '/my_order'
+                        }, 2600);
+                      },
+                      prefill: {
+                      name: 'User Name',
+                      email: 'user@example.com',
+                      contact: '9999999999'
+                      },
+                      theme: {
+                      color: '#3399cc'
+                      }
+            
+                    };
+                    const rzp1 = new Razorpay(option);
+                    rzp1.open();
+                    console.log(rzp1)
+})
+}
+                        else if(selectedpayment === 'WALLET'){
+                        fetch('/confirmOrder',{
+                        method:'POST',
+                        headers: {
+                        'Content-Type':'application/json'
+    },
+                        body: JSON.stringify({ 
+                             selectedaddress: selectedaddress, 
+                             selectedpayment: selectedpayment,
+                             cartdocs: cartdocs, 
+                             totalPrice: totalPrice
+                         })
+  })
+  
+  .then(response=> {
+    if(response.ok){
+      placedOrderModal.show();
+      console.log('Successfully placed the order')
+     setTimeout(() => {
+       window.location.href ='/my_order'
+     }, 1800);
+    }
+    else if (response.status === 400){
+      response.json().then(data => {
+      toastr.error(data.message,'Sorry')
+    })
+    }
+    else{
+      toastr.error('An error occurred while placing your order. Please try again later.','Sorry')
+    }
+    
+  })
+  
 
-                })
-                .catch(error => console.error('Error confirming order:', error));
-}}
+}
+
+}
+</script>
+
+<%- include('userFooter') %>
                 
+
+
+
+
                 
-                </script>
-                      
-                 <%- include('userFooter') %>
                 
