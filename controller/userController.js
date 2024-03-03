@@ -7,6 +7,8 @@ const Cart = require("../model/cartModel");
 const Order = require("../model/orderModel");
 const moment = require("moment");
 const Wishlist = require("../model/wishlistModel");
+const Offer = require("../model/offerModel")
+const Coupon = require("../model/couponModel")
 const Razorpay = require("razorpay");
 const razorpay = new Razorpay({
   key_id: process.env.KEY_ID,
@@ -744,12 +746,16 @@ exports.productDetails = async (req, res) => {
       productId: id,
     });
 
+    const productOffer = await Offer.findOne({product:id})
+    const categoryOffer = await Offer.findOne({category:product.category})
     if (existingCartItem) {
       res.render("user/productDetails", {
         product,
         userLoggedIn,
         category,
         isInCart: true,
+        productOffer,
+        categoryOffer
       });
     } else {
       res.render("user/productDetails", {
@@ -757,6 +763,8 @@ exports.productDetails = async (req, res) => {
         userLoggedIn,
         category,
         isInCart: false,
+        productOffer,
+        categoryOffer
       });
     }
   } catch (error) {
@@ -836,8 +844,10 @@ exports.confirmOrder = async (req, res) => {
         totalAmount: totalPrice,
         address: address,
         paymentType: selectedpayment,
+        couponApplied:req.session.couponApplied
       });
-      await order.save();
+     req.session.couponApplied = null
+     await order.save();
     }
 
     if (selectedpayment === "COD") {
@@ -925,7 +935,9 @@ exports.placeOrder = async (req, res) => {
       totalAmount: totalPrice,
       address: address,
       paymentType: selectedpayment,
+      couponApplied:req.session.couponApplied
     });
+    req.session.couponApplied = null
     await order.save();
     res.status(200).json({ message: 'Order placed successfully' });
   } catch (error) {
@@ -970,7 +982,7 @@ exports.myOrderDetails = async (req, res) => {
   try {
     const orderId = req.query.orderId;
     const productId = req.query.productId;
-    const orderDetails = await Order.findById(orderId);
+    const orderDetails = await Order.findById(orderId).populate('couponApplied');
     const item = orderDetails.items.find(
       (item) => item.product.toString() === productId
     );
@@ -1125,26 +1137,33 @@ exports.addAddressFromCheckout = async (req, res) => {
 
 exports.searchAction = async (req, res) => {
   const userLoggedIn = req.session.userLoggedIn;
-  const searchItem = req.query.searchItem.trim(); // Extract searchItem and trim spaces
+  const searchItem = req.query.searchItem;
+  if (!searchItem) {
+      return res.status(500).redirect("/error");
+  }
 
   try {
-    const products = await Product.find({
-      $or: [
-        { productName: { $regex: new RegExp(searchItem, "i") } }, // Search in product name
-        { "category.category": { $regex: new RegExp(searchItem, "i") } }, // Search in category
-      ],
-    });
+      const trimmedSearchItem = searchItem.trim();
+      if (!trimmedSearchItem) {
+          return res.status(500).redirect("/error");
+      }
 
-    console.log(products);
-    const categories = await Category.find({ active: true });
-    res.render("user/allProducts", {
-      products,
-      userLoggedIn: userLoggedIn,
-      categories,
-    });
+      const products = await Product.find({
+          $or: [
+              { productName: { $regex: new RegExp(trimmedSearchItem, "i") } }, // Search in product name
+              { "category.category": { $regex: new RegExp(trimmedSearchItem, "i") } }, // Search in category
+          ],
+      });
+
+      const categories = await Category.find({ active: true });
+      res.render("user/allProducts", {
+          products,
+          userLoggedIn: userLoggedIn,
+          categories,
+      });
   } catch (error) {
-    console.error(error);
-    return res.status(500).redirect("/error");
+      console.error(error);
+      return res.status(500).redirect("/error");
   }
 };
 
@@ -1260,3 +1279,34 @@ exports.wishlistCount = async (req, res) => {
     return res.redirect("/error");
   }
 };
+
+exports.checkCoupon = async (req,res)=> {
+  try {
+    const {couponCode , date , totalPrice} = req.body
+    const couponExist = await Coupon.findOne({couponCode:couponCode})
+    
+    if (!couponExist) {
+      console.log(couponExist.validity,"coupon date");
+      console.log(date,"User enter date")
+      return res.status(400).json({message:"Invalid coupon code"})
+    } 
+    
+    else {
+      if (new Date(date) > new Date(couponExist.validity)) {
+      return res.status(400).json({message:"Coupon Expired"})
+      }
+      if(totalPrice < couponExist.limit){
+        return res.status(400).json({message:`Purchase more than ${couponExist.limit}`})
+      }
+      req.session.couponApplied = couponExist._id
+      const discountedPrice = totalPrice - couponExist.discount
+      res.status(200).json({
+        message:"Coupon Applied",
+        discountedPrice:discountedPrice
+      })
+    }
+  } catch (error) {
+    console.error("Error while checking the coupon", error);
+    return res.redirect("/error");
+  }
+}

@@ -73,6 +73,15 @@ border-left: 0.5px solid rgba(0, 0, 0, 0.371);">
 <section class="section-products">
        
     <div class="container">
+        <% if (products.length <= 0 ) { %>
+                
+                <div class="d-felx text-center"><img src="/images/icon/no product found.jpg" class="img-fluid" width="390px" alt=""> 
+                        <p>SORRY NO PRODUCTS FOUND </p>
+                </div>
+               
+                <%} else { %>
+               
+               
             
         <div class="col-md-8 col-lg-6">
              
@@ -138,6 +147,7 @@ border-left: 0.5px solid rgba(0, 0, 0, 0.371);">
               </div>
  <% }); %>
             </div>
+            <% } %>
     </div>
 </section>
 

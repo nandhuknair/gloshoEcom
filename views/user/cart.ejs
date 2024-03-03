@@ -130,17 +130,17 @@
 
         
 <% }); %>
-<div class="container d-flex justify-content-end mt-3">
-<form action="/checkout" method="get" class="d-flex flex-column ">
-  <div class="d-flex align-items-center "><p class="">Shipping :&nbsp;&nbsp;</p> <p id="shipping">Free</p></div> 
- <div class="d-flex align-items-center "><p class="totalPrice">YOUR ORDER SUMMARY :&nbsp;&nbsp;</p> <p id="totalPriceText"></p></div> 
+<div class="container d-flex justify-content-end mt-3 ">
+<form action="/checkout" method="get" class="d-flex flex-column p-4 border">
+  <div class="d-flex align-items-center justify-content-between"><p class="">Shipping :&nbsp;&nbsp;</p> <p id="shipping">Free</p></div> 
+ <div class="d-flex align-items-center justify-content-between"><p class="totalPrice">YOUR ORDER SUMMARY :&nbsp;&nbsp;</p> <p id="totalPriceText"></p></div> 
 
  <input type="totalPrice" id="totalPriceInput" name="totalPrice" value="" hidden>
  <input type="text" id="cartItems" value="<%= cartItemJSON %>" hidden>
  <input type="hidden" value="multipleProduct" name="type">
 
  <% if (cartItem.length === 1){ %>
-  <button type="submit" class="product_checkout" style="width: fit-content;">BUY NOW</button>
+  <button type="submit" class="product_checkout " style="width: fit-content;">BUY NOW</button>
 <% } else{ %>
   <button type="submit" class="product_checkout" style="width: fit-content;">BUY ALL</button>
 <% } %>
@@ -253,7 +253,7 @@ document.addEventListener('shown.bs.modal', function (event) {
   // Convert cart data from JSON string to JavaScript array
 console.log(document.getElementById('cartItems').value)
 let cartItems = JSON.parse(document.getElementById('cartItems').value);
-
+console.log(cartItems)
 // Function to calculate total price
 function calculateTotalPrice() {
     let totalPrice = 0;
@@ -262,6 +262,7 @@ function calculateTotalPrice() {
     });
     return totalPrice.toFixed(2);
 }
+console.log(calculateTotalPrice())
 
 // Update total price input value when the page is loaded
 document.addEventListener('DOMContentLoaded', function () {

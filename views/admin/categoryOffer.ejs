@@ -1,0 +1,93 @@
+
+
+
+
+<%- include('adminHeader') %>
+
+<div class="container"">
+    <h3 class="heading mt-4 mb-4" style="letter-spacing: 1px;">ADD CATEGORY OFFERS</h3>
+
+    <div class="row d-flex justify-content-center align-items-center border-ligh" style="height: 60vh;">
+        <div class="col-md-6">
+            <div class="card" style="border: 1px solid #535353;">
+              <div class="card-body d-flex flex-column align-items-center">
+                    <input class=" mx-auto my-3 form-control" type="text" placeholder="Offer Name" name="name" id="name" required>
+                    <input class=" mx-auto my-3 form-control" type="number" placeholder="Offer Percentage" name="percentage" id="percentage" required>
+                    <select class=" mx-auto my-3 form-control" name="category" id="category">
+                        <%for(let i=0;i <data.length; i++){%>
+                            <option value=<%=data[i]._id%>><%=data[i].category%>
+                            </option>
+                            <%}%>
+                    </select>
+                    <button class="login mx-auto my-3 form-control bg-primary text-white" id="submitButton" type="submit">ADD</button>
+              </div>
+            </div>
+          </div>
+    </div>
+
+</div>
+<script>
+
+const submitButton = document.getElementById('submitButton')
+
+submitButton.addEventListener('click',(event)=>{
+  event.preventDefault();  
+  console.log('Button clicked for product offer submit')
+
+const offerName = document.getElementById('name').value
+const percentage = document.getElementById('percentage').value.toString()
+const categoryId = document.getElementById('category').value
+  console.log(offerName)
+  console.log(percentage)
+  console.log(categoryId)
+
+  
+  fetch('/add_category_offer',{
+    method:'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body:JSON.stringify({
+      name:offerName,
+      percentage:percentage,
+      category:categoryId
+     })
+  })
+  .then(response => {
+    if(response.ok){
+      return response.json()
+      .then(data=>{
+        toastr.success(data.message, 'Welcome');
+        setTimeout(() => {
+          window.location.href = '/admin_offers'
+        }, 2600);
+      })
+    }
+    else if (response.status === 400 || response.status === 404) {
+            return response.json()
+            .then(data => {
+                toastr.error(data.message, 'Error');
+            });
+        } else {
+            throw new Error('Network response was not ok');
+        }
+    })
+    .catch(error => {
+        console.log(error);
+        toastr.error(error.message, 'Error');
+    });
+});
+
+
+</script>
+
+<%- include('adminFooter') %>
+
+
+
+
+
+
+
+
+

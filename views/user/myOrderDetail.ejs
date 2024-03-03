@@ -21,7 +21,7 @@
                 <div class="card flex-md-row mb-4 box-shadow h-md-250">
                     <img class="card-img-left img-fluid" src="/assets/uploads/<%= product.image[product.image.length-1] %>" width="30%">
                     <div class="card-body d-flex flex-column align-items-start">
-                       <a href="/product?id=<%= product._id %>"> <strong class="d-inline-block mb-2 " style="color: #ffa04c;"><%= product.productName %>j</strong></a>
+                       <a href="/product?id=<%= product._id %>"> <strong class="d-inline-block mb-2 " style="color: #ffa04c;"><%= product.productName %></strong></a>
                         <p class="mb-0">Order Place On</p>
                         <div class="mb-2 text-muted"><%= formattedDate %></div>
                         <p class="card-text mb-0">Estimate Delivery</p>
@@ -30,9 +30,11 @@
                         <p class="">$ <%= item.price %></p>
                         <p>Order Status  <span class="badge bg-warning rounded-pill"><%= item.orderStatus %></span></p>
 
-                    </div>
+                    </div>  
                 </div>
               </div>
+              <br>
+              <strong>Grand Total : </strong>
            
           <!-- Payment -->
           <div class="card mb-4">
@@ -41,8 +43,16 @@
                 <div class="col-lg-6">
                   <h3 class="h6">Payment Method</h3>
                   <p><%= orderDetails.paymentType %> <br>
-                    <%= orderDetails.items.length-1 %> products ordered along with this So, <br>
-                  Total: $<%= orderDetails.totalAmount %></p>
+                    <%= orderDetails.items.length-1 %> products ordered along with this <br>
+                  </p>
+                  <% if (orderDetails.couponApplied) { %>
+                    <p>Coupon <%= orderDetails.couponApplied.couponName %> applied <br>
+                    Discount -$<%= orderDetails.couponApplied.discount %> <br>
+                   <p><strong style="font-size: 20px;">Total: $<%= orderDetails.totalAmount %></strong></p>
+                    <%} else { %>
+                    <p>No coupon applied <br>
+                    <strong style="font-size: 20px;">Total: $<%= orderDetails.totalAmount %></strong></p>
+                    <% } %>
                 </div>
                 <div class="col-lg-6">
                   <h3 class="h6">Billing address</h3>
@@ -89,24 +99,4 @@
       <table class="table table-borderless">
         <tbody>
   
-    
-<script>
-  function formatOrderDate(dateString) {
-  const options = { 
-    weekday: 'short', 
-    month: 'short', 
-    day: 'numeric', 
-    year: 'numeric', 
-    hour: 'numeric', 
-    minute: 'numeric', 
-    second: 'numeric', 
-    timeZoneName: 'short' 
-  };
-  
-  const formattedDate = new Date(dateString).toLocaleString('en-US', options);
-  return formattedDate;
-}
-
-</script>
-
 <%- include('userFooter') %>

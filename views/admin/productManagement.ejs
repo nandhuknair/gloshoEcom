@@ -4,7 +4,7 @@
 
   <h3 class="mt-5" style="letter-spacing: 1.5px;">PRODUCTS</h3>
 
-  <div class="card-body pt-0 text-end">
+  <div class="card-body p-0 text-end">
     <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#myModalAdd">ADD</button>
   </div>
   
@@ -200,10 +200,10 @@
     </div>
   </div>
 
-  <!-- Add Button for Adding Category -->
 
 
-  <!-- Modal for Adding Category -->
+
+  <!-- Modal for Adding Product -->
   <div class="modal fade text-start" id="myModalAdd" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -298,5 +298,68 @@
 </nav>
 
 </div>
+
+<script>
+document.getElementById('modalInputFile').addEventListener('change', function(event) {
+const previewContainer = document.getElementById('previewContainer');
+const files = event.target.files;
+
+previewContainer.innerHTML = ''; // Clear previous previews
+
+for (const file of files) {
+  const reader = new FileReader();
+
+  reader.onload = function(e) {
+    const imgElement = document.createElement('img');
+    imgElement.src = e.target.result;
+    imgElement.style.maxWidth = '110px';
+    imgElement.style.maxHeight = '110px';
+    imgElement.style.marginTop = '10px';
+    previewContainer.style.display = 'flex'
+
+    previewContainer.appendChild(imgElement);
+  };
+
+  reader.readAsDataURL(file);
+}
+});
+
+
+function truncateDescription(text, limit) {
+    return text.length > limit ? text.slice(0, limit) + '...' : text;
+  }
+
+document.addEventListener('DOMContentLoaded', function () {
+  const descriptionContainers = document.querySelectorAll('.description-container');
+
+  descriptionContainers.forEach(container => {
+    const truncatedDescription = container.querySelector('.truncated-description');
+    const fullDescription = container.querySelector('.full-description');
+    const readMoreBtn = container.querySelector('.read-more-btn');
+    const readLessBtn = container.querySelector('.read-less-btn');
+
+    readMoreBtn.addEventListener('click', function () {
+      truncatedDescription.style.display = 'none';
+      fullDescription.style.display = 'inline';
+      readMoreBtn.style.display = 'none';
+      readLessBtn.style.display = 'inline';
+    });
+
+    readLessBtn.addEventListener('click', function () {
+      truncatedDescription.style.display = 'inline';
+      fullDescription.style.display = 'none';
+      readMoreBtn.style.display = 'inline';
+      readLessBtn.style.display = 'none';
+    });
+  });
+});
+
+// Define the truncateDescription function
+function truncateDescription(text, limit) {
+  return text.length > limit ? text.slice(0, limit) + '...' : text;
+}
+
+
+</script>
 
 <%- include('adminFooter') %>

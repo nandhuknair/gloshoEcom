@@ -1,541 +1,670 @@
 <%- include('userAfterLogin') %>
 
-<div class="main-container">
+  <div class="main-container">
     <div class="container mt-5">
-        <div class="row">
-            <div class="col-md-8 order-md-1 mb-4">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h4 class="mb-3" style="color: rgb(57, 57, 57);">DELIVERY ADDRESS</h4>
+      <div class="row">
+        <div class="col-md-8 order-md-1 mb-4">
+          <div class="d-flex justify-content-between align-items-center">
+            <h4 class="mb-3" style="color: rgb(57, 57, 57);">DELIVERY ADDRESS</h4>
+          </div>
+
+
+
+          <div id="shipAddress">
+            <% if (user.address.length> 0) { %>
+              <% user.address.forEach((item,index)=>{ %>
+                <div class="card mb-3">
+                  <div class="card-body">
+                    <label class="form-check">
+                      <input class="form-check-input" type="radio" name="deliveryAddress" value="<%= index %>" required>
+                      <div class="address-details">
+                        <p>
+                          <%= item.address %>
+                        </p>
+                        <p>
+                          <%= item.city %>, <%= item.state %>, <%= item.pincode %>
+                        </p>
+                        <p>
+                          <%= item.number %>
+                        </p>
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#myModalEdit2<%= index %>"><i
+                            class=" fa-solid fa-user-pen float-end"></i></a>
+                      </div>
+                    </label>
+                  </div>
                 </div>
-               
-                      
-                
-                        <div id="shipAddress">     
-                                <% if (user.address.length > 0) { %>
-                                  <% user.address.forEach((item,index)=>{ %>
-                                    <div class="card mb-3">
-                                        <div class="card-body">
-                                            <label class="form-check">
-                                                <input class="form-check-input" type="radio" name="deliveryAddress" value="<%= index %>" required>
-                                                <div class="address-details">
-                                                    <p><%= item.address %></p>
-                                                    <p><%= item.city %>, <%= item.state %>, <%= item.pincode %></p>
-                                                    <p><%= item.number %></p>
-                                                    <a href="#" data-bs-toggle="modal" data-bs-target="#myModalEdit2<%= index %>"><i class=" fa-solid fa-user-pen float-end"></i></a>
-                                                </div>
-                                            </label>
-                                        </div>
-                                    </div>
-                                      <!-- Edit product modal window start  -->
-                        
-                          <div class="modal fade text-start" id="myModalEdit2<%= index %>" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                              <div class="modal-content">
-                                <div class="modal-header">
-                                  <h5 class="modal-title" id="myModalLabel">Edit Address</h5>
-                                  <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                  <form action="/edit_address/<%= item._id %>" method="post">
-                                    <div class="mb-3">
-                                      <label class="form-label" for="modalInputEmail1">Name</label>
-                                      <input class="form-control" id="modalInputEmail1" type="text" value="<%= item.name %>" name="userName"
-                                        aria-describedby="emailHelp" required >
-                                    </div>
-                        
-                                    <div class="mb-3">
-                                      <label class="form-label" for="modalInputEmail1">Number</label>
-                                      <input class="form-control" id="modalInputEmail1" type="number" value="<%= item.number %>" name="number"
-                                        aria-describedby="emailHelp" required>
-                                    </div>
-                        
-                                    <div class="mb-3">
-                                      <label class="form-label" for="modalInputEmail1">Address</label>
-                                      <input class="form-control" id="modalInputEmail1" type="text" value="<%= item.address %>" name="address"
-                                        aria-describedby="emailHelp" required>
-                                    </div>
-                        
-                                    <div class="mb-3">
-                                      <label class="form-label" for="modalInputEmail1">City</label>
-                                      <input class="form-control" id="modalInputEmail1" type="text" value="<%= item.city %>" name="city"
-                                        aria-describedby="emailHelp" required>
-                                    </div>
-                        
-                                    <div class="mb-3">
-                                      <label class="form-label" for="modalInputEmail1">State</label>
-                                      <input class="form-control" id="modalInputEmail1" type="text" value="<%= item.state %>" name="state"
-                                        aria-describedby="emailHelp" required>
-                                    </div>
-                        
-                                    <div class="mb-3">
-                                      <label class="form-label" for="modalInputEmail1">Pincode</label>
-                                      <input class="form-control" id="modalInputEmail1" type="number" value="<%= item.pincode %>" name="pincode"
-                                        aria-describedby="emailHelp" required>
-                                    </div>
-                        
-                                    <div class="mb-3">
-                                      <label class="form-label" for="modalInputEmail1">Landmark</label>
-                                      <input class="form-control" id="modalInputEmail1" type="text" value="<%= item.landmark %>" name="landmark" 
-                                      aria-describedby="emailHelp" required>
-                                        
-                                    </div>
-                         
-                                 
-                                    
-                                    <div class="modal-footer">
-                                      <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
-                                      <button class="btn btn-primary" type="submit">Save & Edit</button>
-                                    </div>
-                                  </form>
-                                </div>
-                              </div>
-                            </div>
+                <!-- Edit product modal window start  -->
+
+                <div class="modal fade text-start" id="myModalEdit2<%= index %>" tabindex="-1"
+                  aria-labelledby="myModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="myModalLabel">Edit Address</h5>
+                        <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal"
+                          aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <form action="/edit_address/<%= item._id %>" method="post">
+                          <div class="mb-3">
+                            <label class="form-label" for="modalInputEmail1">Name</label>
+                            <input class="form-control" id="modalInputEmail1" type="text" value="<%= item.name %>"
+                              name="userName" aria-describedby="emailHelp" required>
                           </div>
-                          <!-- End Modal for Adding Address -->
-                                    <% }) %>
-                                    <%} else { %>
-                                        <p>No address found</p>
-                                        <p style="color: crimson;">Add Address</p>
-                                    <% } %>
-                                </div>
 
-                                <% if (user.address.length >= 5) { %>      
-                                    <p style="color: crimson;">Adress Limit Exceeded You Can't Add Address Anymore</p>
-                                    <%} else { %>
-                            <button class="normalBtn mb-4 p-2" type="button" data-bs-toggle="modal" data-bs-target="#myModalAdd">ADD ADDRESS</button>
-                        <% } %>
+                          <div class="mb-3">
+                            <label class="form-label" for="modalInputEmail1">Number</label>
+                            <input class="form-control" id="modalInputEmail1" type="number" value="<%= item.number %>"
+                              name="number" aria-describedby="emailHelp" required>
+                          </div>
 
-         <!-- Add Address modal window start -->
-         <div class="modal fade text-start" id="myModalAdd" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="myModalLabel">Add Address</h5>
-                  <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                          <div class="mb-3">
+                            <label class="form-label" for="modalInputEmail1">Address</label>
+                            <input class="form-control" id="modalInputEmail1" type="text" value="<%= item.address %>"
+                              name="address" aria-describedby="emailHelp" required>
+                          </div>
+
+                          <div class="mb-3">
+                            <label class="form-label" for="modalInputEmail1">City</label>
+                            <input class="form-control" id="modalInputEmail1" type="text" value="<%= item.city %>"
+                              name="city" aria-describedby="emailHelp" required>
+                          </div>
+
+                          <div class="mb-3">
+                            <label class="form-label" for="modalInputEmail1">State</label>
+                            <input class="form-control" id="modalInputEmail1" type="text" value="<%= item.state %>"
+                              name="state" aria-describedby="emailHelp" required>
+                          </div>
+
+                          <div class="mb-3">
+                            <label class="form-label" for="modalInputEmail1">Pincode</label>
+                            <input class="form-control" id="modalInputEmail1" type="number" value="<%= item.pincode %>"
+                              name="pincode" aria-describedby="emailHelp" required>
+                          </div>
+
+                          <div class="mb-3">
+                            <label class="form-label" for="modalInputEmail1">Landmark</label>
+                            <input class="form-control" id="modalInputEmail1" type="text" value="<%= item.landmark %>"
+                              name="landmark" aria-describedby="emailHelp" required>
+
+                          </div>
+
+
+
+                          <div class="modal-footer">
+                            <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                            <button class="btn btn-primary" type="submit">Save & Edit</button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div class="modal-body">
-                  <form action="/add_address_checkout" method="post">
-                    <div class="mb-3">
-                      <label class="form-label" for="modalInputEmail1">Name</label>
-                      <input class="form-control" id="modalInputEmail1" type="text" name="name"
-                        aria-describedby="emailHelp" required>
+                <!-- End Modal for Adding Address -->
+                <% }) %>
+                  <%} else { %>
+                    <p>No address found</p>
+                    <p style="color: crimson;">Add Address</p>
+                    <% } %>
+          </div>
+
+          <% if (user.address.length>= 5) { %>
+            <p style="color: crimson;">Adress Limit Exceeded You Can't Add Address Anymore</p>
+            <%} else { %>
+              <button class="normalBtn mb-4 p-2" type="button" data-bs-toggle="modal" data-bs-target="#myModalAdd">ADD
+                ADDRESS</button>
+              <% } %>
+
+                <!-- Add Address modal window start -->
+                <div class="modal fade text-start" id="myModalAdd" tabindex="-1" aria-labelledby="myModalLabel"
+                  aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="myModalLabel">Add Address</h5>
+                        <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal"
+                          aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <form action="/add_address_checkout" method="post">
+                          <div class="mb-3">
+                            <label class="form-label" for="modalInputEmail1">Name</label>
+                            <input class="form-control" id="modalInputEmail1" type="text" name="name"
+                              aria-describedby="emailHelp" required>
+                          </div>
+
+                          <div class="mb-3">
+                            <label class="form-label" for="modalInputEmail1">Number</label>
+                            <input class="form-control" id="modalInputEmail1" type="number" name="number"
+                              aria-describedby="emailHelp" required>
+                          </div>
+
+                          <div class="mb-3">
+                            <label class="form-label" for="modalInputEmail1">Address</label>
+                            <input class="form-control" id="modalInputEmail1" type="text" name="address"
+                              aria-describedby="emailHelp" required>
+                          </div>
+
+                          <div class="mb-3">
+                            <label class="form-label" for="modalInputEmail1">City</label>
+                            <input class="form-control" id="modalInputEmail1" type="text" name="city"
+                              aria-describedby="emailHelp" required>
+                          </div>
+
+                          <div class="mb-3">
+                            <label class="form-label" for="modalInputEmail1">State</label>
+                            <input class="form-control" id="modalInputEmail1" type="text" name="state"
+                              aria-describedby="emailHelp" required>
+                          </div>
+
+                          <div class="mb-3">
+                            <label class="form-label" for="modalInputEmail1">Pincode</label>
+                            <input class="form-control" id="modalInputEmail1" type="number" name="pincode"
+                              aria-describedby="emailHelp" required>
+                          </div>
+
+                          <div class="mb-3">
+                            <label class="form-label" for="modalInputEmail1">Landmark</label>
+                            <input class="form-control" id="modalInputEmail1" type="text" name="landmark"
+                              aria-describedby="emailHelp" required>
+                          </div>
+
+
+
+                          <div class="modal-footer">
+                            <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                            <button class="btn btn-primary" type="submit">Add</button>
+                          </div>
+                        </form>
+                      </div>
                     </div>
-        
-                    <div class="mb-3">
-                      <label class="form-label" for="modalInputEmail1">Number</label>
-                      <input class="form-control" id="modalInputEmail1" type="number" name="number"
-                        aria-describedby="emailHelp" required>
-                    </div>
-        
-                    <div class="mb-3">
-                      <label class="form-label" for="modalInputEmail1">Address</label>
-                      <input class="form-control" id="modalInputEmail1" type="text" name="address"
-                        aria-describedby="emailHelp" required>
-                    </div>
-        
-                    <div class="mb-3">
-                      <label class="form-label" for="modalInputEmail1">City</label>
-                      <input class="form-control" id="modalInputEmail1" type="text" name="city"
-                        aria-describedby="emailHelp" required>
-                    </div>
-      
-                    <div class="mb-3">
-                      <label class="form-label" for="modalInputEmail1">State</label>
-                      <input class="form-control" id="modalInputEmail1" type="text" name="state"
-                        aria-describedby="emailHelp" required>
-                    </div>
-      
-                    <div class="mb-3">
-                      <label class="form-label" for="modalInputEmail1">Pincode</label>
-                      <input class="form-control" id="modalInputEmail1" type="number" name="pincode"
-                        aria-describedby="emailHelp" required>
-                    </div>
-      
-                    <div class="mb-3">
-                      <label class="form-label" for="modalInputEmail1">Landmark</label>
-                      <input class="form-control" id="modalInputEmail1" type="text" name="landmark"
-                        aria-describedby="emailHelp" required>
-                    </div>
-         
-                 
-                    
-                    <div class="modal-footer">
-                      <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
-                      <button class="btn btn-primary" type="submit">Add</button>
-                    </div>
-                  </form>
+                  </div>
                 </div>
+                <!-- End Modal for Adding Address -->
+
+
+        </div>
+        <div class="col-md-4 order-md-2 mb-4">
+          <!-- Your cart content goes here -->
+          <h4 class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-muted">Your cart</span>
+            <!-- <span class="badge badge-secondary badge-pill">3</span> -->
+          </h4>
+          <ul class="list-group mb-3">
+            <% if(type==='singleProduct' ){ %>
+              <li class="list-group-item d-flex justify-content-between lh-condensed">
+                <img src="/assets/uploads/<%= product.image[product.image.length-1] %>" alt="<%= product.productName %>"
+                  height="100%" width="17%">
+                <div>
+                  <h6 class="my-0 mt-3">
+                    <%= product.productName %>
+                  </h6>
+
+                </div>
+
+                <span class="mt-5" style="color: #FF871D;">$<%= product.price %></span>
+              </li>
+
+              <% } else{ %>
+
+                <% cartItems.forEach((item,index)=>{%>
+                  <li class="list-group-item d-flex justify-content-between lh-condensed">
+                    <img src="/assets/uploads/<%= item.productId.image[item.productId.image.length-1] %>"
+                      alt="<%= item.productId.productName %>" height="100%" width="17%">
+                    <div>
+                      <h6 class="my-0">
+                        <%= item.productId.productName %>
+                      </h6>
+                      <div class="d-flex">
+                        <small class="text-muted">
+                          <%= item.quantity %> X &nbsp;&nbsp;
+                        </small>
+                        <p> $<%= item.productId.price %>
+                        </p>
+                      </div>
+                    </div>
+                    <span style="color: #FF871D;">$<%= item.totalPrice %></span>
+                  </li>
+
+                  <% }) %>
+                    <% } %>
+          </ul>
+          <div class="card p-2">
+            <% if(type==='singleProduct' ){ %>
+              <div class="d-flex justify-content-between">
+                <p>Subtotal</p>
+                <p id="subTotal">
+                  <%= product.price %>
+                </p>
+              </div>
+
+              <% } else{ %>
+                <div class="d-flex justify-content-between">
+                  <p>Subtotal</p>
+                  <p id="subTotal">
+                    <%= totalPrice %>
+                  </p>
+                </div>
+
+                <% } %>
+                  <div class="d-flex justify-content-between">
+                    <p>Shipping</p>
+                    <p>Free</p>
+                  </div>
+                  <button type="button" data-bs-toggle="modal" data-bs-target="#couponModal" class="p-0 m-0"
+                    style="border: none; background-color: transparent; width: fit-content;">
+                    <p class="p-0 m-0" style="color: crimson;">Click here for Coupon<<</p>
+                  </button>
+                  <div class=" ">
+                    <p class="mt-3 mb-1">Enter Coupon Code</p>
+                    <input id="couponCode" onkeyup="couponCheck()" type="text" width="40px">
+                  </div>
+          </div>
+          <div class="d-flex justify-content-end mt-3"><button onclick="submitorder()" class="product_cart">PROCEED TO
+              CHECKOUT</button>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="feed-item-list">
+
+        <div>
+          <h4 class="mb-3 mt-5" style="color: rgb(57, 57, 57);">PAYMENT METHOD</h4>
+
+
+          <div class="row">
+            <div class="col-lg-3 col-sm-6">
+              <div class="border p-4">
+                <label class="card-radio-label">
+                  <input type="radio" name="pay-method" id="pay-methodoption1" value="RAZORPAY"
+                    class="card-radio-input">
+                  <div class="card-radio  py-3 text-center">
+                    <i class="fa-brands fa-cc-mastercard mb-3 fa-2x me-4"></i>
+                    CARD
+                  </div>
+                </label>
               </div>
             </div>
+            <div class="col-lg-3 col-sm-6">
+              <div class="border p-4">
+                <label class="card-radio-label">
+                  <input type="radio" name="pay-method" id="pay-methodoption2" value="WALLET" class="card-radio-input">
+                  <div class="card-radio  py-3 text-center">
+                    <i class="fa-solid fa-wallet mb-3 fa-2x me-4"></i>
+                    WALLET
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div class="col-lg-3 col-sm-6">
+              <div class="border p-4">
+                <label class="card-radio-label">
+                  <input type="radio" name="pay-method" id="pay-methodoption3" value="COD" class="card-radio-input">
+
+                  <div class="card-radio  py-3 text-center">
+                    <i class="fa-solid fa-hand-holding-dollar mb-3 fa-2x me-4"></i>
+                    CASH ON DELIVERY
+                  </div>
+                </label>
+              </div>
+            </div>
+
           </div>
-          <!-- End Modal for Adding Address -->
+        </div>
+      </div>
+
+      <!-- checker confirm message -->
+      <div class="modal fade" id="orderconfirm" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title font-weight-normal" id="exampleModalLabel">Please confirm</h5>
+              <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close"> </button>
+            </div>
+            <div class="modal-body">
+              <p class="" id="">Are you sure want to order the product? </p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
+
+              <button type="button" id="confirmorder" onclick="confirmorder()" data-bs-dismiss="modal"
+                class="btn  btn-success">Submit</button>
 
 
-                    </div>
-                            <div class="col-md-4 order-md-2 mb-4">
-                                <!-- Your cart content goes here -->
-                                <h4 class="d-flex justify-content-between align-items-center mb-3">
-                                    <span class="text-muted">Your cart</span>
-                                    <!-- <span class="badge badge-secondary badge-pill">3</span> -->
-                                </h4>
-                                <ul class="list-group mb-3">
-                                  <% if(type === 'singleProduct'){ %>
-                                    <li class="list-group-item d-flex justify-content-between lh-condensed">
-                                      <img src="/assets/uploads/<%= product.image[product.image.length-1] %>" alt="<%= product.productName %>"  height="100%" width="17%">
-                                      <div>
-                                          <h6 class="my-0 mt-3"><%= product.productName %></h6>
-                                          
-                                      </div>
-                                      
-                                      <span class="mt-5" style="color: #FF871D;">$<%= product.price %></span>
-                                  </li>
+            </div>
+          </div>
+        </div>
+      </div>
 
-                                  <% } else{ %>
-                                  
-                                    <% cartItems.forEach((item,index)=>{%>
-                                    <li class="list-group-item d-flex justify-content-between lh-condensed">
-                                        <img src="/assets/uploads/<%= item.productId.image[item.productId.image.length-1] %>" alt="<%= item.productId.productName %>"  height="100%" width="17%">
-                                        <div>
-                                            <h6 class="my-0"><%= item.productId.productName %></h6>
-                                            <div class="d-flex">
-                                                <small class="text-muted"><%= item.quantity %> X &nbsp;&nbsp;</small>
-                                                <p> $<%= item.productId.price %></p>
-                                            </div>
-                                        </div>
-                                        <span style="color: #FF871D;">$<%= item.totalPrice %></span>
-                                    </li>
-                                   
-                                    <% }) %>
-                                    <% } %>
-                                </ul>
-                                <div class="card p-2">
-                                  <% if(type === 'singleProduct'){ %>
-                                    <div class="d-flex justify-content-between"><p>Subtotal</p><p id="subTotal"><%= product.price %></p></div>
+      <!--Coupon Model -->
 
-                                  <% } else{ %>
-                                    <div class="d-flex justify-content-between"><p>Subtotal</p><p id="subTotal"><%= totalPrice %></p></div>
+      <div class="fade modal" id="couponModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header justify-content-center">
+              <p class="para_text text-center p-0 m-0">Coupons</p>
+              <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal"
+                aria-label="Close"></button>
+            </div>
+            <div class="modal-body align-items-center d-flex flex-column">
+              <!-- <i class="fa-solid fa-circle-check orderSucessTick"></i> -->
 
-                                  <% } %>
-                                    <div class="d-flex justify-content-between"><p>Shipping</p><p>Free</p></div>
-                                    <a href="">Click here for Coupon << </a>
-                                    <div class="d-flex justify-content-between align-items-center"><p class="mt-3">Enter Coupon Code</p><input type="text" width="40px"></div>
-                
-                                </div>
-                                <div class="d-flex justify-content-end mt-3"><button onclick="submitorder()" class="product_cart">PROCEED TO CHECKOUT</button></div>
-                                
-                            </div>
-                        </div>
-                
-                        <div class="feed-item-list"> 
-                
-                            <div> 
-                                <h4 class="mb-3 mt-5" style="color: rgb(57, 57, 57);">PAYMENT METHOD</h4> 
-                            
-                
-                                <div class="row"> 
-                                    <div class="col-lg-3 col-sm-6"> 
-                                        <div class="border p-4"> 
-                                            <label class="card-radio-label"> 
-                                                <input type="radio" name="pay-method" id="pay-methodoption1" value="RAZORPAY" class="card-radio-input"> 
-                                                <div class="card-radio  py-3 text-center"> 
-                                                    <i class="fa-brands fa-cc-mastercard mb-3 fa-2x me-4"></i>
-                                                    CARD
-                                                </div> 
-                                            </label> 
-                                      </div>
-                                    </div>
-                                    <div class="col-lg-3 col-sm-6"> 
-                                        <div class="border p-4"> 
-                                            <label class="card-radio-label"> 
-                                                <input type="radio" name="pay-method" id="pay-methodoption2" value="WALLET" class="card-radio-input"> 
-                                                <div class="card-radio  py-3 text-center"> 
-                                                    <i class="fa-solid fa-wallet mb-3 fa-2x me-4"></i>
-                                                    WALLET
-                                                </div> 
-                                            </label> 
-                                        </div> 
-                                    </div> 
-                
-                                    <div class="col-lg-3 col-sm-6"> 
-                                        <div class="border p-4"> 
-                                            <label class="card-radio-label"> 
-                                                <input type="radio" name="pay-method" id="pay-methodoption3" value="COD" class="card-radio-input" > 
-                
-                                                <div class="card-radio  py-3 text-center"> 
-                                                    <i class="fa-solid fa-hand-holding-dollar mb-3 fa-2x me-4"></i>
-                                                   CASH ON DELIVERY
-                                                </div> 
-                                            </label> 
-                                        </div> 
-                                    </div> 
-                                     
-                                </div> 
-                            </div> 
-                        </div> 
-                
-                           <!-- checker confirm message --> 
-                           <div class="modal fade" id="orderconfirm" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"> 
-                            <div class="modal-dialog modal-dialog-centered" role="document"> 
-                              <div class="modal-content"> 
-                                <div class="modal-header"> 
-                                  <h5 class="modal-title font-weight-normal" id="exampleModalLabel">Please confirm</h5> 
-                                  <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close"> </button> 
-                                </div> 
-                                <div class="modal-body"> 
-                                  <p class="" id="">Are you sure want to order the product? </p> 
-                                </div> 
-                                <div class="modal-footer"> 
-                                  <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button> 
-                                  <!-- <button type="button" data-bs-toggle="modal" data-bs-target="#placedOrder" id="confirmorder" onclick="confirmorder()"  data-bs-dismiss="modal" class="btn  btn-success">Submit</button>  -->
-                                  <button type="button" id="confirmorder" onclick="confirmorder()" data-bs-dismiss="modal" class="btn  btn-success">Submit</button> 
-                                
-                                 
-                                </div> 
-                              </div> 
-                            </div> 
-                          </div> 
-                          <!--order confirm end -->
-                
-                          <div class="fade modal" id="placedOrder" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                <div class="modal-header justify-content-center">
-                                    
-                                  <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body align-items-center d-flex flex-column">
-                                    <i class="fa-solid fa-circle-check orderSucessTick"></i>
-                                <p class="para_text text-center mt-4">Order Successfully Placed </p>  
-                                <p class="head_text" style="letter-spacing: 1px;">THANKYOU</p>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                
-                
-                          <!-- ----Toaster----- -->
-                          <div id="toaster" class="toast bottom-2end-2  position-fixed border-0" style=" background-color: crimson; right: 10px; bottom: 10px; max-width: 400px;" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="2000">
-                           
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div id="tosterbody" style="letter-spacing: 1px;" class="toast-body"> 
-                                    <p style="color: white; margin-bottom: 0;">Select The Payment Method And Delivery Address To Continue</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                          
-                <!-- -----------Toaster End---------- -->
-                <% if(type === 'singleProduct'){ %>
-                  <input type="hidden" name="cartdocs" id="cartdocs" value="<%= JSON.stringify(product) %>"> 
-                  <input type="hidden" name="totalPrice" id="totalPrice" value="<%= product.price %>"> 
-                <% } else{ %>
-                  <input type="hidden" name="cartdocs" id="cartdocs" value="<%= JSON.stringify(cartItems) %>">
-                  <input type="hidden" name="totalPrice" id="totalPrice" value="<%= totalPrice %>">  
-                <% } %>
-                
-                
-                    </div>
+              <p class="mb-0">copy the promo code</p>
+
+
+            </div>
+            <div class="m-3 mt-0 mb-4" style="border: 1px solid black;">
+
+              <div class="bg-dark text-white text-center p-1">
+                <h4 class="head p-0 m-0" style="letter-spacing: 1px;">SUMMER WOLF</h4>
+              </div>
+              <div class="coupon-content text-center p-3 border m-5 mt-4 mb-4">
+
+                <div class=" pt-2 pb-2 d-flex justify-content-center align-items-center">
+                  <p class="m-0 p-0">CODE : &nbsp;</p>
+                  <h3 style="color: #000000;">FELDEWQ</h3>
                 </div>
-                
-              
-                <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-                <script>
-                
-                const placedOrderModal = new bootstrap.Modal(document.getElementById('placedOrder'));
-                function submitorder(){ 
-                    const selectedaddress = document.querySelector('input[name="deliveryAddress"]:checked'); 
-                    const selectedpayment = document.querySelector('input[name="pay-method"]:checked'); 
-                    console.log('clicked submitorder')
-                    if(!selectedaddress || !selectedpayment){ 
-                        console.log('Entered to not selected')
-                        const toaster = document.getElementById("toaster");
-                        toaster.classList.add('show');
-                        setTimeout(() => {
-                                toaster.classList.remove('show');
-                                }, 2200);
-                    }else{ 
-                        const orderconfirm = new bootstrap.Modal(document.getElementById('orderconfirm'))  
-                        orderconfirm.show();  
-                    } 
-                } 
+                <p class="mt-3 mb-0">COUPON WORTH <strong>$100</strong> </p>
+                <p class="m-0">for minimum purchase <strong>$5000</strong></p>
+                <p class="m-0">Redeem Now</p>
+              </div>
+
+              <div class="bg-dark text-white text-center p-1">
+                <h6 class="head p-1 m-0" style="letter-spacing: 1px;">Expiry Date: Sat, 19 NOV 2024</h6>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+
+
+
+      <!--order confirm end -->
+      <div class="fade modal" id="placedOrder" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header justify-content-center">
+
+              <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal"
+                aria-label="Close"></button>
+            </div>
+            <div class="modal-body align-items-center d-flex flex-column">
+              <i class="fa-solid fa-circle-check orderSucessTick"></i>
+              <p class="para_text text-center mt-4">Order Successfully Placed </p>
+              <p class="head_text" style="letter-spacing: 1px;">THANKYOU</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ----Toaster----- -->
+      <div id="toaster" class="toast bottom-2end-2  position-fixed border-0"
+        style=" background-color: crimson; right: 10px; bottom: 10px; max-width: 400px;" role="alert"
+        aria-live="assertive" aria-atomic="true" data-bs-delay="2000">
+
+        <div class="d-flex justify-content-between align-items-center">
+          <div id="tosterbody" style="letter-spacing: 1px;" class="toast-body">
+            <p style="color: white; margin-bottom: 0;">Select The Payment Method And Delivery Address To Continue</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <!-- -----------Toaster End---------- -->
+    <% if(type==='singleProduct' ){ %>
+      <input type="hidden" name="cartdocs" id="cartdocs" value="<%= JSON.stringify(product) %>">
+      <input type="hidden" name="totalPrice" id="totalPrice" value="<%= product.price %>">
+      <% } else{ %>
+        <input type="hidden" name="cartdocs" id="cartdocs" value="<%= JSON.stringify(cartItems) %>">
+        <input type="hidden" name="totalPrice" id="totalPrice" value="<%= totalPrice %>">
+        <% } %>
+
+
+  </div>
+  </div>
+
+
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+
+    const placedOrderModal = new bootstrap.Modal(document.getElementById('placedOrder'));
+    function submitorder() {
+      const selectedaddress = document.querySelector('input[name="deliveryAddress"]:checked');
+      const selectedpayment = document.querySelector('input[name="pay-method"]:checked');
+      console.log('clicked submitorder')
+      if (!selectedaddress || !selectedpayment) {
+        console.log('Entered to not selected')
+        const toaster = document.getElementById("toaster");
+        toaster.classList.add('show');
+        setTimeout(() => {
+          toaster.classList.remove('show');
+        }, 2200);
+      } else {
+        const orderconfirm = new bootstrap.Modal(document.getElementById('orderconfirm'))
+        orderconfirm.show();
+      }
+    }
 
 
     function placeOrderAfterPayment() {
-    const selectedaddress = document.querySelector('input[name="deliveryAddress"]:checked').value;
-    const selectedpayment = 'RAZORPAY'; 
-    const cartdocs = JSON.parse(document.getElementById('cartdocs').value);
-    const totalPrice = document.getElementById('totalPrice').value;
+      const selectedaddress = document.querySelector('input[name="deliveryAddress"]:checked').value;
+      const selectedpayment = 'RAZORPAY';
+      const cartdocs = JSON.parse(document.getElementById('cartdocs').value);
+      const totalPrice = document.getElementById('totalPrice').value;
 
-    const requestBody = {
+      const requestBody = {
         selectedaddress: selectedaddress,
         selectedpayment: selectedpayment,
         cartdocs: cartdocs,
         totalPrice: totalPrice
-    };
+      };
 
-    fetch('/placeorderafterpayment', {
+      fetch('/placeorderafterpayment', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(requestBody)
-    })
-    .then(response => {
-        if (response.ok) {
+      })
+        .then(response => {
+          if (response.ok) {
             return response.json();
-        } 
-        else {
+          }
+          else {
             throw new Error('Failed to place order after payment');
+          }
+        })
+        .then(data => {
+          console.log('Order placed successfully:', data);
+
+        })
+        .catch(error => {
+          console.error('Error placing order after payment:', error);
+        });
+    }
+
+
+
+
+    function confirmorder() {
+      const selectedaddress = document.querySelector('input[name="deliveryAddress"]:checked').value;
+      const selectedpayment = document.querySelector('input[name="pay-method"]:checked').value;
+      const cartdocs = JSON.parse(document.getElementById('cartdocs').value);
+      const totalPrice = document.getElementById('totalPrice').value;
+      if (selectedpayment === 'COD') {
+        fetch('/confirmorder', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            selectedaddress: selectedaddress,
+            selectedpayment: selectedpayment,
+            cartdocs: cartdocs,
+            totalPrice: totalPrice
+          })
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Failed to confirm order');
+              toastr.error('Something went wrong ', 'Sorry');
+              setTimeout(() => {
+                window.location.href = '/cart'
+              }, 1800);
+
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log('Order confirmed successfully:', data);
+            placedOrderModal.show();
+            setTimeout(() => {
+              window.location.href = '/my_order'
+            }, 2600);
+          })
+          .catch(error => {
+            console.error('Error confirming order:', error);
+
+          });
+      }
+      else if (selectedpayment === 'RAZORPAY') {
+        fetch('/confirmOrder', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            selectedaddress: selectedaddress,
+            selectedpayment: selectedpayment,
+            cartdocs: cartdocs,
+            totalPrice: totalPrice
+          })
+        })
+          .then(response => {
+            if (response.ok) {
+              return response.json();
+            } else {
+              throw new Error('Failed to confirm order');
+            }
+          })
+          .then(data => {
+            const option = {
+              key: data.razorpayKey,
+              amount: data.razorpayOrderId.amount,
+              currency: 'INR',
+              name: 'Glosho',
+              image: '/images/images/pexels-snack-toronto-1630344.jpg',
+              description: 'Payment for your order',
+              order_id: data.razorpayOrderId,
+              handler: function (response) {
+                placeOrderAfterPayment()
+                placedOrderModal.show();
+                setTimeout(() => {
+                  window.location.href = '/my_order'
+                }, 2600);
+              },
+              prefill: {
+                name: 'User Name',
+                email: 'user@example.com',
+                contact: '9999999999'
+              },
+              theme: {
+                color: '#3399cc'
+              }
+
+            };
+            const rzp1 = new Razorpay(option);
+            rzp1.open();
+            console.log(rzp1)
+          })
+      }
+      else if (selectedpayment === 'WALLET') {
+        fetch('/confirmOrder', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            selectedaddress: selectedaddress,
+            selectedpayment: selectedpayment,
+            cartdocs: cartdocs,
+            totalPrice: totalPrice
+          })
+        })
+
+          .then(response => {
+            if (response.ok) {
+              placedOrderModal.show();
+              console.log('Successfully placed the order')
+              setTimeout(() => {
+                window.location.href = '/my_order'
+              }, 1800);
+            }
+            else if (response.status === 400) {
+              response.json().then(data => {
+                toastr.error(data.message, 'Sorry')
+              })
+            }
+            else {
+              toastr.error('An error occurred while placing your order. Please try again later.', 'Sorry')
+            }
+          })
         }
+      }
+
+//----------------coupon check -------------------
+
+function couponCheck(){
+  const couponCode = document.getElementById('couponCode').value
+
+  const totalPrice = document.getElementById('totalPrice').value
+  const date = new Date()
+  fetch('/check_coupon', {
+    method:'POST',
+    headers:{'Content-Type': 'application/json'},
+    body:JSON.stringify({
+      couponCode:couponCode,
+      date: date,
+      totalPrice:totalPrice
     })
-    .then(data => {
-        console.log('Order placed successfully:', data);
-        
-    })
-    .catch(error => {
-        console.error('Error placing order after payment:', error);
-    });
-}
-
-
-                
-                 
-function confirmorder(){ 
-                    const selectedaddress = document.querySelector('input[name="deliveryAddress"]:checked').value; 
-                    const selectedpayment = document.querySelector('input[name="pay-method"]:checked').value; 
-                    const cartdocs = JSON.parse(document.getElementById('cartdocs').value);
-                    const totalPrice = document.getElementById('totalPrice').value;       
-                   if (selectedpayment === 'COD') {
-                     fetch('/confirmorder', { 
-                         method: 'POST', 
-                         headers: {
-                             'Content-Type': 'application/json'
-                         },
-                         body: JSON.stringify({ 
-                             selectedaddress: selectedaddress, 
-                             selectedpayment: selectedpayment,
-                             cartdocs: cartdocs, 
-                             totalPrice: totalPrice
-                         })
-                     })
-                     .then(response => {
-                         if (!response.ok) {
-                             throw new Error('Failed to confirm order');
-                             toastr.error('Something went wrong ', 'Sorry');
-                             setTimeout(() => {
-                              window.location.href ='/cart'
-                             }, 1800);
-
-                         }
-                         return response.json();
-                     })
-                     .then(data => {
-                         console.log('Order confirmed successfully:', data);
-                         placedOrderModal.show();
-                         setTimeout(() => {
-                             window.location.href ='/my_order'
-                         }, 2600);
-                     })
-                     .catch(error => {
-                         console.error('Error confirming order:', error);
-
-                     });
-                   }
-                   else if (selectedpayment === 'RAZORPAY') {
-                    fetch('/confirmOrder', {
-                    method: 'POST',
-                    headers: {
-                    'Content-Type': 'application/json'
-                   },
-                    body: JSON.stringify({
-                    selectedaddress: selectedaddress,
-                    selectedpayment: selectedpayment,
-                    cartdocs: cartdocs,
-                    totalPrice: totalPrice
-                  })
-                  })
-                  .then(response=> {
-                    if (response.ok) {
-                      return response.json();
-                    }else{
-                      throw new Error('Failed to confirm order');
-                    }
-                  })
-                  .then(data =>{
-                    const option = {
-                      key: data.razorpayKey,
-                      amount: data.razorpayOrderId.amount,
-                      currency: 'INR',
-                      name: 'Glosho',
-                      image: '/images/images/pexels-snack-toronto-1630344.jpg',
-                      description: 'Payment for your order',
-                      order_id: data.razorpayOrderId,
-                      handler: function(response) {
-                        placeOrderAfterPayment()
-                        placedOrderModal.show();
-                        setTimeout(() => {
-                          window.location.href = '/my_order'
-                        }, 2600);
-                      },
-                      prefill: {
-                      name: 'User Name',
-                      email: 'user@example.com',
-                      contact: '9999999999'
-                      },
-                      theme: {
-                      color: '#3399cc'
-                      }
-            
-                    };
-                    const rzp1 = new Razorpay(option);
-                    rzp1.open();
-                    console.log(rzp1)
-})
-}
-                        else if(selectedpayment === 'WALLET'){
-                        fetch('/confirmOrder',{
-                        method:'POST',
-                        headers: {
-                        'Content-Type':'application/json'
-    },
-                        body: JSON.stringify({ 
-                             selectedaddress: selectedaddress, 
-                             selectedpayment: selectedpayment,
-                             cartdocs: cartdocs, 
-                             totalPrice: totalPrice
-                         })
   })
-  
-  .then(response=> {
+  .then(response => {
+    if(response.status === 400){
+      return response.json()
+      .then(data=> {
+        toastr.error(data.message, 'Sorry')
+      })
+    }
     if(response.ok){
-      placedOrderModal.show();
-      console.log('Successfully placed the order')
-     setTimeout(() => {
-       window.location.href ='/my_order'
-     }, 1800);
+      return response.json()
+      .then(data => {
+        toastr.success(data.message, 'Success')
+        const subTotal = document.getElementById('subTotal')
+        const totalPrice = document.getElementById('totalPrice')
+        console.log('First t price', totalPrice)
+        console.log(subTotal,'1')
+        subTotal.innerHTML = data.discountedPrice
+        console.log(subTotal,'2')
+        totalPrice.value = data.discountedPrice
+        console.log('2nd t price',totalPrice)
+      })
     }
-    else if (response.status === 400){
-      response.json().then(data => {
-      toastr.error(data.message,'Sorry')
-    })
-    }
-    else{
-      toastr.error('An error occurred while placing your order. Please try again later.','Sorry')
-    }
-    
   })
-  
-
 }
 
-}
+
+
+
 </script>
 
-<%- include('userFooter') %>
-                
-
-
-
-
-                
-                
+  <%- include('userFooter') %>

@@ -35,6 +35,12 @@ const productSchema = new mongoose.Schema({
     isAvailable:{
         type:Boolean,
         default:true
+    },
+    offerPrice:{
+        type:Number
+    },
+    percentage:{
+        type:Number
     }
     
 },{timestamps:true});

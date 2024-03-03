@@ -33,6 +33,10 @@ const orderSchema=new mongoose.Schema({
     },
     paymentType: {
       type: String,
+    },
+    couponApplied:{
+      type:mongoose.Schema.Types.ObjectId,
+      ref:"Coupon"
     }
 
 }

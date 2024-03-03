@@ -379,7 +379,6 @@ exports.addProducts = async function (req, res, next) {
       return res.redirect('/admin_products');
     }
   
-    
     const newProduct = new Product({
       productName: req.body.productName,
       image: arrImages, // Use arrImages directly here
@@ -481,7 +480,7 @@ exports.orderDetails = async (req, res) => {
   try {
 
       const page = parseInt(req.query.page) || 1; // Default to page 1 if no page parameter is provided
-      const perPage = 3; // Number of products per page
+      const perPage = 10; // Number of products per page
       const skip = (page - 1) * perPage; // Calculate the number of products to skip
 
       const orderCount = await Order.countDocuments();

@@ -1,0 +1,176 @@
+
+
+
+
+<%- include('adminHeader') %>
+
+<div class="container">
+    <h3 class="heading mt-4 mb-4" style="letter-spacing: 1px;">OFFERS</h3>
+    <div class="row mb-5" >
+        <div class="d-flex align-items-center justify-content-end">
+            <a href="/add_product_offer"><button class="btn-primary btn me-5">PRODUCT OFFER</button></a>
+
+           <a href="/add_category_offer"><button class="btn btn-primary">CATEGORY OFFER</button></a> 
+
+        </div>
+    </div>
+    
+        
+<!-- ----------------Product Offers-------------------------->
+      
+    <div class="table-responsive">
+        <h4>PRODUCT OFFERS</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Product</th>
+                    <th>Percentage</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Loop through offer data and populate table rows -->
+                <% offers.forEach(offer => { %>
+                    <% if (offer.product) { %>
+                <tr>
+                    <td><%= offer.name %></td>
+                    <td><%= offer.product.productName %></td>
+                    <td><%= offer.percentage %>%</td>
+                    <td>
+                       
+                        <!-- <button class="btn btn-primary btn-sm"><i class="fas fa-edit"></i> Edit</button> -->
+                        <button class="productDeleteBtn" value="<%= offer._id %>"
+                         style="background-color: transparent; border: none;"><i class="fas fa-trash"></i></button>
+
+                    </td>
+                </tr>
+                <% } %>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+
+
+    <!-- ----------------Category Offers-------------------------->
+      
+    <div class="table-responsive mt-4">
+        <h4>CATEGORY OFFERS</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Percentage</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Loop through offer data and populate table rows -->
+                <% offers.forEach(offer => { %>
+                    <% if (offer.category) { %>
+                <tr>
+                    <td><%= offer.name %></td>
+                    <td><%= offer.category.category %></td>
+                    <td><%= offer.percentage %>%</td>
+                    <td>
+                 
+                        <!-- <button class="btn btn-primary btn-sm"><i class="fas fa-edit"></i> Edit</button> -->
+                        <button  class="categoryDeleteBtn" value="<%= offer._id %>"
+                        style="background-color: transparent; border: none;"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+                <% } %>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+
+
+</div>  
+<script>
+
+const productDeleteBtns = document.querySelectorAll('.productDeleteBtn');
+const categoryDeleteBtns = document.querySelectorAll('.categoryDeleteBtn');
+
+productDeleteBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const offerId = btn.value; // Fetch offer ID from the clicked button
+        fetch('/admin_delete_product_offer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ offerId })
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json()
+                    .then(data => {
+                        toastr.success(data.message, 'Success');
+                        setTimeout(() => {
+                         window.location.href ='/admin_offers'
+                       }, 2500);
+                    });
+            } else if (response.status === 400 || response.status === 404) {
+                return response.json()
+                    .then(data => {
+                        toastr.error(data.message, 'Error');
+                    });
+            } else {
+                throw new Error('Network response was not ok');
+            }
+        })
+        .catch(error => {
+            console.log(error);
+        toastr.error('An error occurred while deleting the offer', 'Error');
+        });
+    });
+});
+
+categoryDeleteBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const offerId = btn.value; 
+        fetch('/admin_delete_category_offer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ offerId })
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json()
+                    .then(data => {
+                        toastr.success(data.message, 'Success');
+                       setTimeout(() => {
+                         window.location.href ='/admin_offers'
+                       }, 2500);
+                    });
+            } else if (response.status === 400 || response.status === 404) {
+                return response.json()
+                    .then(data => {
+                        toastr.error(data.message, 'Error');
+                    });
+            } else {
+                throw new Error('Network response was not ok');
+            }
+        })
+        .catch(error => {
+            console.log(error);
+          toastr.error('An error occurred while deleting the offer', 'Error');
+        });
+    });
+});
+
+
+</script>
+
+
+
+<%- include('adminFooter') %>
+
+
+
+
+

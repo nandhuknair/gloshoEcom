@@ -1,0 +1,356 @@
+<%- include('adminHeader') %>
+
+<div class="container">
+    <!-- Modal for Adding Coupon -->
+<div class="modal fade text-start" id="addCoupon" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="myModalLabel">Add Coupon</h5>
+            <button class="btn-close btn-close-white" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <div class="mb-3">
+                <label class="form-label" for="modalInputEmail1">Coupon Name</label>
+                <input class="form-control" id="couponName" type="text" name="couponName" aria-describedby="emailHelp">
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="modalInputEmail1">Coupon Code</label>
+                <input class="form-control" id="couponCode" type="text" name="couponCode" aria-describedby="emailHelp">
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="modalInputEmail1">Valid Till</label>
+                <input class="form-control" id="validity" type="date" name="validity" aria-describedby="emailHelp">
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="modalInputEmail1">Discount</label>
+                <input class="form-control" id="discount" type="Number" name="discount" aria-describedby="emailHelp">
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="modalInputEmail1">Limit</label>
+                <input class="form-control" id="limit" type="Number" name="limit" aria-describedby="emailHelp">
+              </div>
+
+              <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                <button class="btn btn-primary" id="submitCoupon" type="submit">Add Coupon</button>
+              </div>
+          </div>
+        </div>
+      </div>
+</div>
+<!-- End Modal for Adding coupon -->
+
+<h3 class="heading mt-4 mb-4" style="letter-spacing: 1px;">COUPONS</h3>
+    <% if (coupons.length <= 0) { %>
+    
+        <div class="row d-flex justify-content-center align-items-center border-ligh" style="height: 40vh;">
+            <div class="col-md-6">
+                <div class="card" style="border: 1px solid #535353;">
+                  <div class="card-body d-flex flex-column align-items-center text-center">
+                    
+                    <i class="fa-regular fa-4x fa-face-frown-open"></i>
+                    <h4 class="m-4">No coupon added yet. Please add coupon </h4>
+            <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#addCoupon">ADD</button>
+                  </div> 
+                </div>
+              </div>
+        </div>
+        
+
+        <%} else { %>
+            <div class="row mb-5" >
+                <div class="d-flex align-items-center justify-content-end">
+                    <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#addCoupon">ADD</button>
+                </div>
+            </div>
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Code</th>
+                    <th>Validity</th>
+                    <th>Discount</th>
+                    <th>Limit</th>
+                    <th>Status</th>
+                    <th>Action</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Loop through offer data and populate table rows -->
+                <% coupons.forEach((coupon,index) => { %>
+                    <% if (coupon.isActive) { %>
+                       <tr>
+                        <%} else { %>
+                        <tr style="background-color: rgba(255, 0, 0, 0.419);">
+                        <% } %>
+                    
+                        <td><%= coupon.couponName %></td>
+                        <td><%= coupon.couponCode %></td>
+                        <input type="hidden" value="<%= coupon.validity %>" class="couponValidity">
+                        <td class="couponValidDate"></td>
+                        <td><%= coupon.discount %></td>
+                        <td><%= coupon.limit %></td>
+                        <td><% if (coupon.isActive) { %>
+                            Active
+                            <%} else { %>
+                            Inactive
+                            <% } %></td>
+                        <td>
+                            <button class="couponEditBtn" type="button" data-bs-toggle="modal" data-bs-target="#editCoupon<%= index %>"
+                            value="<%= coupon._id %>"
+                            style="background-color: transparent; border: none;"><i class="fas fa-edit"></i></button>
+                            <% if (coupon.isActive) { %>
+                                <button class="couponDeleteBtn" value="<%= coupon._id %>" onclick="deactiveCoupon('<%= coupon._id %>')"
+                                style="background-color: transparent; border: none;"><i class="fa-regular fa-circle-xmark">
+                                </i></button>
+
+                                <%} else { %>
+                               
+                                <button class="couponDeleteBtn" value="<%= coupon._id %>" onclick="activateCoupon('<%= coupon._id %>')"
+                                style="background-color: transparent; border: none;"><i class="fa-solid fa-check">
+                                </i></button>
+
+                                <% } %>
+                        
+                            </td>
+                    </tr>
+
+    <!-- Modal for Editing Coupon -->
+    <div class="modal fade text-start" id="editCoupon<%= index %>" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="myModalLabel">Edit Coupon</h5>
+                <button class="btn-close btn-close-white" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <form action="/admin_edit_coupon" method="post">
+                  <div class="mb-3">
+                    <input type="hidden" name="couponId" value="<%= coupon._id %>">
+                    <label class="form-label" for="modalInputEmail1">Coupon Name</label>
+                    <input class="form-control" id="couponNameEdit" type="text" value="<%= coupon.couponName %>" name="couponName" required>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label" for="modalInputEmail1">Coupon Code</label>
+                    <input class="form-control" id="couponCodeEdit" type="text" value="<%= coupon.couponCode %>" name="couponCode" required>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label" for="modalInputEmail1">Valid Till</label>
+                    <input class="form-control" id="validityEdit" value="<%= coupon.validity %>" type="date" name="validity" required>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label" for="modalInputEmail1">Discount</label>
+                    <input class="form-control" id="discountEdit" type="Number" value="<%= coupon.discount %>" name="discount" required>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label" for="modalInputEmail1">Limit</label>
+                    <input class="form-control" id="limitEdit" type="Number" name="limit" value="<%= coupon.limit %>" required>
+                  </div>
+
+                  <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                    <button class="btn btn-primary" id="submitEditCoupon" type="submit">Save</button>
+                  </div>
+                </form>
+              </div>
+              
+            </div>
+          </div>
+    </div>
+    <!-- End Modal for Editing coupon -->
+
+
+                <% }) %>
+                
+
+                </tbody>
+            </table>
+        </div>
+        <% } %>
+</div>
+
+<script>
+
+//ADD COUPON    
+
+const submitButton = document.getElementById('submitCoupon')
+submitButton.addEventListener('click',(event)=>{
+    event.preventDefault()
+    const couponName = document.getElementById('couponName').value
+    const couponCode = document.getElementById('couponCode').value
+    const validity = document.getElementById('validity').value
+    const discount = parseInt(document.getElementById('discount').value)
+    const limit = parseInt(document.getElementById('limit').value)
+
+    fetch('/admin_add_coupon',{
+        method:'POST',
+        headers:{'Content-Type': 'application/json'},
+        body:JSON.stringify({
+            couponName:couponName,
+            couponCode:couponCode,
+            validity:validity,
+            discount:discount,
+            limit:limit
+        })
+    })
+    .then(response=> {
+        if(response.status === 400){
+            return response.json()
+            .then(data=> {
+                toastr.error(data.message, 'Error');
+
+            })
+        }
+        else if(response.ok){
+            return response.json()
+            .then(data=> {
+                toastr.success(data.message, 'Welcome');
+                setTimeout(() => {
+                    window.location.href = '/admin_coupon'
+                }, 2000); 
+            })
+        }
+        else{
+            throw new Error('Network response was not ok')
+        }
+    })
+    .catch(error=> {
+        console.log(error);
+        toastr.error(error.message, 'Error');
+    })
+})
+
+function deactiveCoupon(couponId){
+    console.log(couponId)
+    fetch('/admin_deactive_coupon',{
+        method:'POST',
+        headers:{'Content-Type': 'application/json'},
+        body:JSON.stringify({
+            couponId:couponId
+        })
+    })
+    .then(response=> {
+        if(response.ok){
+            return response.json()
+            .then(data => {
+                toastr.success(data.message, 'Sucessfully');
+                setTimeout(() => {
+                    window.location.href = '/admin_coupon'
+                }, 2000); 
+            })
+        }else{
+            return json()
+            .then(data=> {
+                toastr.error(data.message, 'Sorry');
+            })
+        }
+    })
+    .catch(error=> {
+        console.log(error)
+        toastr.error(error, 'Sorry');
+    })
+}
+
+function activateCoupon(couponId){
+    console.log(couponId)
+    fetch('/admin_activate_coupon',{
+        method:'POST',
+        headers:{'Content-Type': 'application/json'},
+        body:JSON.stringify({
+            couponId:couponId
+        })
+    })
+    .then(response=> {
+        if(response.ok){
+            return response.json()
+            .then(data => {
+                toastr.success(data.message, 'Sucessfully');
+                setTimeout(() => {
+                    window.location.href = '/admin_coupon'
+                }, 2000); 
+            })
+        }else{
+            return json()
+            .then(data=> {
+                toastr.error(data.message, 'Sorry');
+            })
+        }
+    })
+    .catch(error=> {
+        console.log(error)
+        toastr.error(error, 'Sorry');
+    })
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//COUPPON DATE 
+document.addEventListener('DOMContentLoaded', () => {
+    const couponValidityElements = document.querySelectorAll('.couponValidity');
+    const couponValidDateElements = document.querySelectorAll('.couponValidDate');
+
+    couponValidityElements.forEach((element, index) => {
+        const dateStr = element.value;
+        const date = new Date(dateStr);
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        const finalDate = date.toLocaleDateString('en-US', options);
+        couponValidDateElements[index].innerHTML = finalDate;
+    });
+});
+
+
+
+
+</script>
+
+ <%- include('adminFooter') %>
+
+                       
+
+    
+             
+
+
+
+
+
+
+
+
+
+

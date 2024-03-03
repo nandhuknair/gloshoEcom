@@ -83,6 +83,8 @@ router.post('/wishlist',sessionCheck.userActivity,userController.addToWishlist)
 router.get('/remove_wishlist_products',sessionCheck.userActivity,userController.removeWishItem)
 router.get('/wishlist/count',userController.wishlistCount)
 
+router.post('/check_coupon',sessionCheck.userActivity,userController.checkCoupon)
+
 
 
 

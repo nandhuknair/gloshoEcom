@@ -2,6 +2,8 @@ let express = require('express')
 let router = express.Router()
 let adminController = require('../controller/adminController')
 let session = require('../middleware/session')
+let offerController = require('../controller/offerController')
+
 
 router.get('/admin_login',session.adminSession,adminController.getLogin)
 router.get('/admin_panel',adminController.adminPanel)
@@ -37,6 +39,28 @@ router.get('/admin_unlist_product',session.adminActivity,adminController.unListP
 
 router.get('/admin_orders',session.adminActivity,adminController.orderDetails)
 router.post('/update_orderStatus',session.adminActivity,adminController.updateOrderStatus)
+
+router.get('/admin_offers',session.adminActivity,offerController.getOffer)
+router.get('/add_product_offer',session.adminActivity,offerController.getProductOffer)
+router.get('/add_category_offer',session.adminActivity,offerController.getCategoryOffer)
+router.post('/add_product_offer',session.adminActivity,offerController.addProductOffer)
+router.post('/add_category_offer',session.adminActivity,offerController.addCategoryOffer)
+
+router.post('/admin_delete_product_offer',session.adminActivity,offerController.deleteProductOffer)
+router.post('/admin_delete_category_offer',session.adminActivity,offerController.deleteCategoryOffer)
+
+router.get('/admin_coupon',session.adminActivity,offerController.getCoupon)
+router.post('/admin_add_coupon',session.adminActivity,offerController.addCoupon)
+router.post('/admin_edit_coupon',session.adminActivity,offerController.editCoupon)
+router.post('/admin_deactive_coupon',session.adminActivity,offerController.deactiveCoupon)
+router.post('/admin_activate_coupon',session.adminActivity,offerController.activateCoupon)
+
+
+
+
+
+
+
 
 
 
