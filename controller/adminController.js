@@ -8,6 +8,7 @@ const multer = require('multer')
 const Order = require("../model/orderModel")
 
 
+
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -559,6 +560,37 @@ exports.updateOrderStatus = async (req, res) => {
   }
 };
    
+
+exports.getSalesReport = async (req, res) => {
+  try {
+    const orders = await Order.find({}).sort({ createdAt: -1 }).populate('items.product').populate('userId');
+    if (!orders) {
+      throw new Error('Orders not found in database');
+    }
+
+    let totalAmount = 0;
+
+    const formattedOrders = orders.map(order => {
+      const formattedOrder = {
+        ...order.toObject(),
+        createdAt: order.createdAt.toLocaleString(),
+      };
+      
+      // Calculate total amount for the order
+      const orderTotal = order.items.reduce((total, item) => total + item.price, 0);
+      totalAmount += orderTotal;
+      formattedOrder.orderTotal = orderTotal;
+
+      return formattedOrder;
+    });
+
+    res.render('admin/salesReport', { order: formattedOrders, totalAmount });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
 
 
 

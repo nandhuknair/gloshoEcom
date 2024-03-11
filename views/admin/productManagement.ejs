@@ -113,19 +113,19 @@
                               <div class="mb-3">
                                 <label class="form-label" for="modalInputEmail1">Product Name</label>
                                 <input class="form-control" id="modalInputEmail1" type="text" name="productName"
-                                  aria-describedby="emailHelp" value="<%= data.productName %>" required>
+                                   value="<%= data.productName %>" required>
                               </div>
 
                               <div class="mb-3">
                                 <label class="form-label" for="modalInputEmail1">Price</label>
                                 <input class="form-control" id="modalInputEmail1" type="number" name="price"
-                                  aria-describedby="emailHelp" value="<%= data.price %>" required>
+                                 value="<%= data.price %>">
                               </div>
 
                               <div class="mb-3">
                                 <label class="form-label" for="modalInputSize<%= index %>">Size</label>
                                 <select class="form-select" id="modalInputSize<%= index %>" name="size"
-                                  aria-describedby="emailHelp">
+                                  >
                                   <option value="M" <%= data.size === 'M' ? 'selected' : '' %>>M</option>
                                   <option value="S" <%= data.size === 'S' ? 'selected' : '' %>>S</option>
                                   <option value="L" <%= data.size === 'L' ? 'selected' : '' %>>L</option>
@@ -145,7 +145,7 @@
                               <div class="mb-3">
                                 <label class="form-label" for="modalInputCollection<%= index %>">Collections</label>
                                 <select class="form-select" id="modalInputCollection<%= index %>" name="collection"
-                                  aria-describedby="emailHelp">
+                                  >
                                   <option value="Men" <%= data.collection === 'Men' ? 'selected' : '' %>>Men</option>
                                   <option value="Women" <%= data.collection === 'Women' ? 'selected' : '' %>>Women</option>
                                 </select>
@@ -154,14 +154,14 @@
                               <div class="mb-3">
                                 <label class="form-label" for="modalInputDescription<%= index %>">Description</label>
                                 <input class="form-control" id="modalInputDescription<%= index %>" type="text"
-                                  value="<%= data.description %>" name="description" aria-describedby="emailHelp"
+                                  value="<%= data.description %>" name="description" 
                                   required>
                               </div>
 
                               <div class="mb-3">
                                 <label class="form-label" for="modalInputEmail1">Stock </label>
                                 <input class="form-control" id="modalInputEmail1" type="number"
-                                  value="<%= data.stock %>" name="stock" aria-describedby="emailHelp"
+                                  value="<%= data.stock %>" name="stock" 
                                   required>
                               </div>
 
@@ -179,7 +179,7 @@
 
                                 <p style="color: red;">Can only add up to 12 images *</p>
                                 <input class="form-control" id="" type="file" name="images"
-                                  aria-describedby="emailHelp" multiple>
+                                   multiple>
                               </div>
 
                               <div class="modal-footer">
@@ -216,18 +216,18 @@
             <div class="mb-3">
               <label class="form-label" for="modalInputEmail1">Product Name</label>
               <input class="form-control" id="modalInputEmail1" type="text" name="productName"
-                aria-describedby="emailHelp" required>
+                 required>
             </div>
 
             <div class="mb-3">
               <label class="form-label" for="modalInputEmail1">Price</label>
               <input class="form-control" id="modalInputEmail1" type="number" name="price"
-                aria-describedby="emailHelp" required>
+                 required>
             </div>
 
             <div class="mb-3">
               <label class="form-label" for="modalInputEmail1">Size</label>
-              <select class="form-select" id="categories" name="size" aria-describedby="emailHelp">
+              <select class="form-select" id="categories" name="size" >
                 <option value="M">M</option>
                 <option value="S">S</option>
                 <option value="L">L</option>
@@ -236,7 +236,7 @@
 
             <div class="mb-3">
               <label class="form-label" for="modalInputEmail1">Categories</label>
-              <select class="form-select" id="categories" name="category" aria-describedby="emailHelp">
+              <select class="form-select" id="categories" name="category" >
                 <% categories.forEach(category => { %>
                   <option value="<%= category._id %>"><%= category.category %></option>
                 <% }); %>
@@ -244,7 +244,7 @@
  
          <div class="mb-3">
               <label class="form-label" for="modalInputEmail1">Collections</label>
-              <select class="form-select" id="categories" name="collection" aria-describedby="emailHelp">
+              <select class="form-select" id="categories" name="collection" >
                 <option value="Men">Men</option>
                 <option value="Women">Women</option>
        
@@ -254,13 +254,13 @@
             <div class="mb-3">
               <label class="form-label" for="modalInputEmail1">Description</label>
               <input class="form-control" id="modalInputEmail1" type="" name="description"
-                aria-describedby="emailHelp" required>
+                 required>
             </div>
 
             <div class="mb-3">
               <label class="form-label" for="modalInputEmail1">Stock </label>
               <input class="form-control" id="modalInputEmail1" type="number" name="stock"
-                aria-describedby="emailHelp" required>
+                 required>
             </div>
 
             <div class="mb-3">
@@ -268,7 +268,7 @@
               <p style="color: red;">Can only add up to 12 images *</p>
               
               <div id="previewContainer" class="row mb-4"></div>
-              <input class="form-control" id="modalInputFile" type="file" name="images" aria-describedby="emailHelp" multiple required>
+              <input class="form-control" id="modalInputFile" type="file" name="images"  multiple required>
             </div>
             
             <div class="modal-footer">

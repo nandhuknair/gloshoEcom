@@ -22,6 +22,22 @@ const orderSchema=new mongoose.Schema({
               type:String,
               default:"Placed"
             },
+            productOfferName:{
+              type:String,
+              default:null
+          },
+          categoryOfferName:{
+              type:String,
+              default:null
+          },
+          productOfferPrice:{
+              type:Number,
+              default:0
+          },
+          categoryOfferPrice:{
+              type:Number,
+              default:0
+          }
         }
     ],
     totalAmount:{

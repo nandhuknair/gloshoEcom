@@ -29,59 +29,30 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th scope="col">Name</th>
-                        <th scope="col">Image</th>
-                        <th scope="col">Price</th>
-                        <th scope="col">Payment</th>
-                        <th scope="col">Category</th>
-                        <th scope="col">Quantity</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Action</th>
+                        <th scope="col">Order Id</th>
+                        <th scope="col">Order Date</th>
+                        <th scope="col">Expected Delivery</th>
+                        <th scope="col">Payment Type</th>
+                        <th scope="col">Total</th>
+                        <th scope="col">Details</th>
+                        <th scope="col">Invoice</th>
                     </tr>
                 </thead>
 
-                <tbody style="cursor: grab;" onclick="orderDetailShow(event)">
-                  <% orderDetails.forEach((order, orderIndex) => { %> 
-                    <% order.items.forEach((item, itemIndex) => { %>
+                <tbody>
+                  <% orderDetails.forEach((order, orderIndex) => { %>
                     <tr>
                         <input type="hidden" value="<%= order._id %>" class="orderId">
-                        <input type="hidden" value="<%= item.product._id %>" class="productId">
-                        <td><%= item.product.productName %></td>
-                        <td><img src="/assets/uploads/<%= item.product.image[item.product.image.length-1] %>" alt="<%= item.product.productName %>" width="60px"></td>
-                        <td>$<%= item.price %></td>
+                        <td>#<%= order._id %></td>
+                        <td><%= order.orderPlacedDate %></td>
+                        <td><%= order.estimateDeliveryDate %></td>
                         <td><%= order.paymentType %></td>
-                        <td><%= item.product.category.category %></td>
-                        <td><%= item.quantity %></td>
-                        <td>
-                          <% if (item.orderStatus === "CancelledByAdmin") { %>
-                            <p style="color: rgb(235, 46, 46);">Cancelled By Admin</p>
-                        <% } else if (item.orderStatus === "Cancelled By User") { %>
-                            <p style="color: rgb(235, 46, 46);">Cancelled</p>
-                        <% } else { %>
-                            <%= item.orderStatus %>
-                        <% } %>
-
-                        
-                        </td>
-                        <td>
-
-                            <% if ((item.orderStatus === "Delivered" || item.orderStatus === "Shipped") && ((new Date() - new Date(order.createdAt)) / (1000 * 60 * 60 * 24)) <= 1) { %>
-                            <form action="/return_order" method="post">
-                                <input type="hidden" name="orderId" value="<%= order._id %>">
-                                <input type="hidden" name="productId" value="<%= item.product._id %>">
-                                <button type="submit" class="btn btn-danger">Return</button>
-                            </form>
-                        <% } else if (item.orderStatus !== "CancelledByAdmin" && item.orderStatus !== "Cancelled By User" && item.orderStatus !== "Returned") { %>
-                            <form action="/cancel_order" method="post">
-                                <input type="hidden" name="orderId" value="<%= order._id %>">
-                                <input type="hidden" name="productId" value="<%= item.product._id %>">
-                                <button type="submit" class="btn btn-danger">Cancel</button>
-                            </form>
-                        <% } %>
-                        </td>
+                        <td>$<%= order.totalAmount %></td>
+                        <td> <button onclick="orderDetailShow(event)"
+                        style="border: none; background-color: transparent;">
+                        View</button></td>
+                        <td><a href="/download_invoice/:<%= order._id %>">Download Invoice</a></td>
                     </tr> 
-                    <% }) %>
-              
                   <% }) %>
                 </tbody>
                 
@@ -101,14 +72,11 @@
     </div>
     <% } %>
 </div>
-
 <script>
 
     function orderDetailShow(event){
         let orderId = event.target.closest('tr').querySelector('.orderId').value;
-        let productId = event.target.closest('tr').querySelector('.productId').value;
-        console.log('Order id is ', orderId);
-        window.location.href = `/my_order_details?orderId=${orderId}&productId=${productId}`;
+        window.location.href = `/my_order_items?orderId=${orderId}`;
     }
 
 </script>

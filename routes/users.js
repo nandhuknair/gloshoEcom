@@ -62,11 +62,12 @@ router.post('/placeorderafterpayment',sessionCheck.userActivity,userController.p
 //-------------------Order Management---------------------------
 
 router.get('/my_order',sessionCheck.userActivity,userController.myOrder)
-router.get('/my_order_details',sessionCheck.userActivity,userController.myOrderDetails)
+router.get('/my_order_items',sessionCheck.userActivity,userController.myOrderItems)
+router.get('/my_order_details',sessionCheck.userActivity,userController.myOrderItemDetails)
 router.post('/cancel_order',sessionCheck.userActivity,userController.cancelOrder)
 router.post('/return_order',sessionCheck.userActivity,userController.returnItem)
 router.get('/wallethistory',sessionCheck.userActivity,userController.getWalletHistory)
-
+router.get('/download_invoice/:orderId',sessionCheck.userActivity,userController.downloadInvoice)
 
  
 //-------------------Search And Sort Management---------------------------

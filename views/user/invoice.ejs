@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invoice</title>
+</head>
+<body>
+  <h1>ORDER ID #<%= data.orderId %></h1>
+  <p>Order Date: <%= data.orderDate %></p>
+  <p>Payment Method: <%= data.paymentMethod %></p>
+  <p>Address: <%= data.address %></p>
+  <table>
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>Product Name</th>
+        <th>Quantity</th>
+        <th>Price</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% data.items.forEach(item => { %>
+        <tr>
+          <td><%= item.index %></td>
+          <td><%= item.productName %></td>
+          <td><%= item.quantity %></td>
+          <td>$<%= item.price %></td>
+          <td>$<%= item.total %></td>
+        </tr>
+      <% }) %>
+      <tr>
+        <td colspan="4">Sub total:</td>
+        <td>$<%= data.subTotal %></td>
+      </tr>
+      <tr>
+        
+      </tr>
+      <tr>
+        <td colspan="4">Total:</td>
+        <td>$<%= data.totalAmount %></td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>

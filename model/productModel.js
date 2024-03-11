@@ -36,11 +36,21 @@ const productSchema = new mongoose.Schema({
         type:Boolean,
         default:true
     },
-    offerPrice:{
-        type:Number
+    productOfferName:{
+        type:String,
+        default:null
     },
-    percentage:{
-        type:Number
+    categoryOfferName:{
+        type:String,
+        default:null
+    },
+    productOfferPrice:{
+        type:Number,
+        default:0
+    },
+    categoryOfferPrice:{
+        type:Number,
+        default:0
     }
     
 },{timestamps:true});

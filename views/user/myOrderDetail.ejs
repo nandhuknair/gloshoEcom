@@ -1,102 +1,107 @@
 <%- include('userAfterLogin') %>
-<div class="main-container">
-<div class="container-fluid">
+
+<div class="main-container" style="flex-direction: column;min-height: fit-content;">
+    <div class="container-fluid">
+
+        <div class="d-inline-flex align-items-center mt-4 ms-3">
+            <a href="/" class="">HOME</a>
+            <i class="fa-solid fa-chevron-right me-2 ms-2 "></i>
+            <a href="/profile" class="span">PROFILE</a>
+        </div>
+
+    </div>
+
+    <% if (orderDetails.length === 0) { %>
+        <div class="container mt-4 text-center justify-content align-items-center">
+            <img src="/images/icon/no_order_found.png" class="img-fluid" width="300px" alt="cart-empty-svg">
+            <p style="color: #23252777;">Looks like you haven't purchased anything cart yet</p>
+            <a href="/all_products"><button class="product_checkout">Continue Shopping</button></a>
+        </div>
+                
+            
+      </div>  
+    <% } else { %>
 
     <div class="container">
-     
-        <div class="d-inline-flex align-items-center mt-3">
-            <a href="/my_order" class="mb-3">MY ORDER</a>
-            <i class="fa-solid fa-chevron-right me-2 ms-2 mb-3"></i>
-            <p class="span mb-3">
-                DETAILS
-            </p>
-        </div>
-     
-      <!-- Main content -->
-      <div class="row mt-3">
-        <div class="col-lg-8">
-          <!-- Details -->
-            
-            <div class="col-md-12">
-                <div class="card flex-md-row mb-4 box-shadow h-md-250">
-                    <img class="card-img-left img-fluid" src="/assets/uploads/<%= product.image[product.image.length-1] %>" width="30%">
-                    <div class="card-body d-flex flex-column align-items-start">
-                       <a href="/product?id=<%= product._id %>"> <strong class="d-inline-block mb-2 " style="color: #ffa04c;"><%= product.productName %></strong></a>
-                        <p class="mb-0">Order Place On</p>
-                        <div class="mb-2 text-muted"><%= formattedDate %></div>
-                        <p class="card-text mb-0">Estimate Delivery</p>
-                        <p class="mb-0">Within 8 days</p>
-                        <p class="mt-2 mb-0">Quantity : <%= item.quantity %></p>
-                        <p class="">$ <%= item.price %></p>
-                        <p>Order Status  <span class="badge bg-warning rounded-pill"><%= item.orderStatus %></span></p>
+        <h3 class="heading mt-4" style="margin-bottom: 0;">MY ORDER</h3>
 
-                    </div>  
-                </div>
-              </div>
-              <br>
-              <strong>Grand Total : </strong>
-           
-          <!-- Payment -->
-          <div class="card mb-4">
-            <div class="card-body">
-              <div class="row">
-                <div class="col-lg-6">
-                  <h3 class="h6">Payment Method</h3>
-                  <p><%= orderDetails.paymentType %> <br>
-                    <%= orderDetails.items.length-1 %> products ordered along with this <br>
-                  </p>
-                  <% if (orderDetails.couponApplied) { %>
-                    <p>Coupon <%= orderDetails.couponApplied.couponName %> applied <br>
-                    Discount -$<%= orderDetails.couponApplied.discount %> <br>
-                   <p><strong style="font-size: 20px;">Total: $<%= orderDetails.totalAmount %></strong></p>
-                    <%} else { %>
-                    <p>No coupon applied <br>
-                    <strong style="font-size: 20px;">Total: $<%= orderDetails.totalAmount %></strong></p>
-                    <% } %>
-                </div>
-                <div class="col-lg-6">
-                  <h3 class="h6">Billing address</h3>
-                  <address>
-                    <strong><%= orderDetails.address.name %></strong><br>
-                    <%= orderDetails.address.address %>, <%= orderDetails.address.state %><br>
-                    <%= orderDetails.address.city %>, <%= orderDetails.address.pincode %><br>
-                    Phone: <%= orderDetails.address.number %>
-                  </address>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div class="table-responsive mt-5">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Image</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Payment</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody style="cursor: grab;" onclick="orderDetailShow(event)">
+                  <% orderDetails.forEach((order, orderIndex) => { %> 
+                    <% order.items.forEach((item, itemIndex) => { %>
+                    <tr>
+                        <input type="hidden" value="<%= order._id %>" class="orderId">
+                        <input type="hidden" value="<%= item.product._id %>" class="productId">
+                        <td><%= item.product.productName %></td>
+                        <td><img src="/assets/uploads/<%= item.product.image[item.product.image.length-1] %>" alt="<%= item.product.productName %>" width="60px"></td>
+                        <td>$<%= item.price %></td>
+                        <td><%= order.paymentType %></td>
+                        <td><%= item.product.category %></td>
+                        <td><%= item.quantity %></td>
+                        <td>
+                          <% if (item.orderStatus === "CancelledByAdmin") { %>
+                            <p style="color: rgb(235, 46, 46);">Cancelled By Admin</p>
+                        <% } else if (item.orderStatus === "Cancelled By User") { %>
+                            <p style="color: rgb(235, 46, 46);">Cancelled</p>
+                        <% } else { %>
+                            <%= item.orderStatus %>
+                        <% } %>
+
+                        
+                        </td>
+                        <td>
+
+                            <% if ((item.orderStatus === "Delivered" || item.orderStatus === "Shipped") && ((new Date() - new Date(order.createdAt)) / (1000 * 60 * 60 * 24)) <= 1) { %>
+                            <form action="/return_order" method="post">
+                                <input type="hidden" name="orderId" value="<%= order._id %>">
+                                <input type="hidden" name="productId" value="<%= item.product._id %>">
+                                <button type="submit" class="btn btn-danger">Return</button>
+                            </form>
+                        <% } else if (item.orderStatus !== "CancelledByAdmin" && item.orderStatus !== "Cancelled By User" && item.orderStatus !== "Returned") { %>
+                            <form action="/cancel_order" method="post">
+                                <input type="hidden" name="orderId" value="<%= order._id %>">
+                                <input type="hidden" name="productId" value="<%= item.product._id %>">
+                                <button type="submit" class="btn btn-danger">Cancel</button>
+                            </form>
+                        <% } %>
+                        </td>
+                    </tr> 
+                    <% }) %>
+              
+                  <% }) %>
+                </tbody>
+                
+            </table>
         </div>
-        <div class="col-lg-4">
-          <!-- Customer Notes -->
-          <div class="card mb-4">
-            <div class="card-body">
-              <h3 class="h6">Product Description</h3>
-              <p><%= product.description %></p>
-            </div>
-          </div>
-          <div class="card mb-4">
-            <!-- Shipping information -->
-            <div class="card-body">
-              <h3 class="h6">Shipping Information</h3>
-              <strong>Order ID</strong>
-              <a href="#" target="_blank"><%= orderDetails._id %></a>
-              <hr>
-              <h3 class="h6">Address</h3>
-              <address>
-                <strong><%= orderDetails.address.name %></strong><br>
-                <%= orderDetails.address.address %>, <%= orderDetails.address.state %><br>
-                <%= orderDetails.address.city %>, <%= orderDetails.address.pincode %><br>
-                Phone: <%= orderDetails.address.number %>
-              </address>
-            </div>
-          </div>
-        </div>
-      </div>
-     
+
+        
     </div>
-      </div></div>
-      <table class="table table-borderless">
-        <tbody>
-  
+    <% } %>
+</div>
+
+<script>
+
+    function orderDetailShow(event){
+        let orderId = event.target.closest('tr').querySelector('.orderId').value;
+        let productId = event.target.closest('tr').querySelector('.productId').value;
+        console.log('Order id is ', orderId);
+        window.location.href = `/my_order_details?orderId=${orderId}&productId=${productId}`;
+    }
+
+</script>
+
 <%- include('userFooter') %>

@@ -7,14 +7,14 @@ const Cart = require("../model/cartModel");
 const Order = require("../model/orderModel");
 const moment = require("moment");
 const Wishlist = require("../model/wishlistModel");
-const Offer = require("../model/offerModel")
-const Coupon = require("../model/couponModel")
+const Offer = require("../model/offerModel");
+const Coupon = require("../model/couponModel");
 const Razorpay = require("razorpay");
+const fs = require("fs");
 const razorpay = new Razorpay({
   key_id: process.env.KEY_ID,
   key_secret: process.env.KEY_SECRET,
 });
-
 
 //----------get home paage----------
 
@@ -377,7 +377,7 @@ exports.getWallet = async (req, res) => {
   try {
     const userId = req.session.userLoggedIn;
     const user = await User.findById(userId);
-    res.render("user/wallet", { userLoggedIn: userId , user });
+    res.render("user/wallet", { userLoggedIn: userId, user });
   } catch (error) {
     console.log(error);
   }
@@ -746,8 +746,8 @@ exports.productDetails = async (req, res) => {
       productId: id,
     });
 
-    const productOffer = await Offer.findOne({product:id})
-    const categoryOffer = await Offer.findOne({category:product.category})
+    const productOffer = await Offer.findOne({ product: id });
+    const categoryOffer = await Offer.findOne({ category: product.category });
     if (existingCartItem) {
       res.render("user/productDetails", {
         product,
@@ -755,7 +755,7 @@ exports.productDetails = async (req, res) => {
         category,
         isInCart: true,
         productOffer,
-        categoryOffer
+        categoryOffer,
       });
     } else {
       res.render("user/productDetails", {
@@ -764,7 +764,7 @@ exports.productDetails = async (req, res) => {
         category,
         isInCart: false,
         productOffer,
-        categoryOffer
+        categoryOffer,
       });
     }
   } catch (error) {
@@ -791,12 +791,18 @@ exports.getCheckoutPage = async (req, res) => {
           res.redirect("/cart");
         }
       });
+      const coupons = await Coupon.find({ isActive: true });
+      const formattedCoupons = coupons.map((coupon) => ({
+        ...coupon.toObject(),
+        validity: coupon.validity.toLocaleString(),
+      }));
       res.render("user/checkout", {
         user: user,
         cartItems: cartItems,
         totalPrice,
         type: type,
         product: singleProduct,
+        coupons: formattedCoupons,
       });
     } else {
       res.redirect("/login");
@@ -806,7 +812,6 @@ exports.getCheckoutPage = async (req, res) => {
     return res.redirect("/error");
   }
 };
-
 
 exports.confirmOrder = async (req, res) => {
   const { selectedaddress, selectedpayment, cartdocs, totalPrice } = req.body;
@@ -827,12 +832,34 @@ exports.confirmOrder = async (req, res) => {
           );
         }
         let currentPrice = product.price * quantity;
+        if (product.productOfferPrice > 0 && product.categoryOfferPrice > 0) {
+          orderedItems.push({
+            product: product._id,
+            quantity: quantity,
+            price: currentPrice,
+            productOfferPrice: product.productOfferPrice,
+            productOfferName: product.productOfferName,
+            categoryOfferPrice: product.categoryOfferPrice,
+            categoryOfferName: product.categoryOfferName,
+          });
+        } else if (product.productOfferPrice > 0) {
+          orderedItems.push({
+            product: product._id,
+            quantity: quantity,
+            price: currentPrice,
+            productOfferPrice: product.productOfferPrice,
+            productOfferName: product.productOfferName,
+          });
+        } else if (product.categoryOfferPrice > 0) {
+          orderedItems.push({
+            product: product._id,
+            quantity: quantity,
+            price: currentPrice,
+            categoryOfferPrice: product.categoryOfferPrice,
+            categoryOfferName: product.categoryOfferName,
+          });
+        }
 
-        orderedItems.push({
-          product: product._id,
-          quantity: quantity,
-          price: currentPrice,
-        });
         product.stock -= quantity;
         await product.save();
         await Cart.findByIdAndDelete(cartItem._id);
@@ -844,10 +871,10 @@ exports.confirmOrder = async (req, res) => {
         totalAmount: totalPrice,
         address: address,
         paymentType: selectedpayment,
-        couponApplied:req.session.couponApplied
+        couponApplied: req.session.couponApplied,
       });
-     req.session.couponApplied = null
-     await order.save();
+      req.session.appliedCoupons = [];
+      await order.save();
     }
 
     if (selectedpayment === "COD") {
@@ -861,7 +888,7 @@ exports.confirmOrder = async (req, res) => {
         payment_capture: 1, // Automatically capture the payment
       };
       const razorpayOrder = await razorpay.orders.create(orderOptions);
-      console.log('Starting to create an order')
+      console.log("Starting to create an order");
       if (!razorpayOrder) {
         res.status(400).json({
           message:
@@ -874,31 +901,32 @@ exports.confirmOrder = async (req, res) => {
           razorpayKey: process.env.KEY_ID,
         });
       }
-    } else if(selectedpayment === "WALLET") {
-      if(userData.walletAmount >= totalPrice){
-         await placeOrder();
-         const refundAmount = {
+    } else if (selectedpayment === "WALLET") {
+      if (userData.walletAmount >= totalPrice) {
+        await placeOrder();
+        const refundAmount = {
           amount: totalPrice,
-          type:'debit',
-          createdAt:new Date()
-         }
-         userData.wallet.push(refundAmount)
-         userData.walletAmount -= totalPrice
-         userData.save()
-         res.status(200).json({ message: "Order placed successfully!" });
-      }else{
-         res.status(400).json({ message: "Insufficient funds in wallet. Please add funds or try another Payment option" });
-
-
+          type: "debit",
+          createdAt: new Date(),
+        };
+        userData.wallet.push(refundAmount);
+        userData.walletAmount -= totalPrice;
+        userData.save();
+        res.status(200).json({ message: "Order placed successfully!" });
+      } else {
+        res
+          .status(400)
+          .json({
+            message:
+              "Insufficient funds in wallet. Please add funds or try another Payment option",
+          });
       }
-      
     }
   } catch (error) {
     console.error("Error confirming order:", error);
     return res.redirect("/error");
   }
 };
-
 
 exports.placeOrder = async (req, res) => {
   try {
@@ -935,19 +963,19 @@ exports.placeOrder = async (req, res) => {
       totalAmount: totalPrice,
       address: address,
       paymentType: selectedpayment,
-      couponApplied:req.session.couponApplied
+      couponApplied: req.session.couponApplied,
     });
-    req.session.couponApplied = null
+    req.session.appliedCoupons = [];
     await order.save();
-    res.status(200).json({ message: 'Order placed successfully' });
+    res.status(200).json({ message: "Order placed successfully" });
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 };
 
 exports.myOrder = async (req, res) => {
   try {
-    const ITEMS_PER_PAGE = 5;
+    const ITEMS_PER_PAGE = 10;
     const page = parseInt(req.query.page) || 1;
 
     const totalOrders = await Order.countDocuments({
@@ -959,16 +987,25 @@ exports.myOrder = async (req, res) => {
     const skip = (page - 1) * ITEMS_PER_PAGE;
 
     const orders = await Order.find({ userId: req.session.userLoggedIn })
-      .populate({
-        path: "items.product",
-        populate: { path: "category", model: "Category" },
-      })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(ITEMS_PER_PAGE);
 
+    const formattedOrders = orders.map((order) => {
+      const orderPlacedDate = moment(order.createdAt).format("ddd MMM DD YYYY");
+      const estimateDeliveryDate = moment(order.createdAt)
+        .add(7, "days")
+        .format("ddd MMM DD YYYY");
+
+      return {
+        ...order.toObject(),
+        orderPlacedDate,
+        estimateDeliveryDate,
+      };
+    });
+
     res.render("user/myOrder", {
-      orderDetails: orders,
+      orderDetails: formattedOrders,
       totalPages,
       currentPage: page,
     });
@@ -978,20 +1015,22 @@ exports.myOrder = async (req, res) => {
   }
 };
 
-exports.myOrderDetails = async (req, res) => {
+exports.myOrderItemDetails = async (req, res) => {
   try {
     const orderId = req.query.orderId;
     const productId = req.query.productId;
-    const orderDetails = await Order.findById(orderId).populate('couponApplied');
+    const orderDetails = await Order.findById(orderId).populate(
+      "couponApplied"
+    );
     const item = orderDetails.items.find(
       (item) => item.product.toString() === productId
     );
     const product = await Product.findById(productId);
     const formattedDate = moment(orderDetails.createdAt).format(
-      "ddd, MMM DD YYYY, hh:mm A"
+      "ddd MMM DD YYYY, hh:mm A"
     );
 
-    res.render("user/myOrderDetail", {
+    res.render("user/myOrderItemDetails", {
       orderDetails: orderDetails,
       item: item,
       product: product,
@@ -1003,36 +1042,351 @@ exports.myOrderDetails = async (req, res) => {
   }
 };
 
+exports.myOrderItems = async (req, res) => {
+  try {
+    const orderId = req.query.orderId;
+    const order = await Order.findById(orderId).populate("items.product");
+
+    if (!order) {
+      return res.status(404).send("Order not found");
+    }
+
+    res.render("user/myOrderDetail", { orderDetails: [order] });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).redirect("/error");
+  }
+};
+
+// Define a function to generate HTML content for the invoice
+function generateInvoiceHTML(
+  order,
+  customerName,
+  customerPhone,
+  customerEmail,
+  subtotal
+) {
+  // Get order details
+  const orderId = order._id;
+  const orderDate = new Date(order.createdAt).toLocaleDateString();
+  const paymentType = order.paymentType;
+  const addressObj = order.address;
+  const address = ` ${addressObj.address} ${addressObj.state} ${addressObj.pincode} ${addressObj.landmark}`;
+  // Initialize HTML content for products
+  let productHTML = "";
+
+  // Loop through each item in the order
+  order.items.forEach((item, index) => {
+    // Get product details
+    const productName = item.product.productName;
+    const productPrice = item.product.price;
+    const quantity = item.quantity;
+    const subtotal = productPrice * quantity;
+
+    // Add product details to HTML content
+    productHTML += `
+          <tr>
+              <td>${index + 1}</td>
+              <td>${productName}</td>
+              <td>${quantity}</td>
+              <td>$${productPrice.toFixed(2)}</td>
+              <td>$${subtotal.toFixed(2)}</td>
+          </tr>
+      `;
+  });
+
+  // Generate HTML content for the invoice
+  const html = `
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Invoice | Glosho</title>
+      <link rel="icon" href="/images/icon/title logo.png" type="image/icon type">
+      <link
+        rel="stylesheet"
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+        crossorigin="anonymous"/>
+  
+    </head>
+    <style>
+      body {
+        background: #eee;
+        margin-top: 20px;
+      }
+      .text-danger strong {
+        color: #9f181c;
+      }
+      .receipt-main {
+        background: #ffffff none repeat scroll 0 0;
+        border-bottom: 12px solid #333333;
+        border-top: 12px solid #9f181c;
+        margin-top: 50px;
+        margin-bottom: 50px;
+        padding: 40px 30px !important;
+        position: relative;
+        box-shadow: 0 1px 21px #acacac;
+        color: #333333;
+        font-family: open sans;
+      }
+      .receipt-main p {
+        color: #333333;
+        font-family: open sans;
+        line-height: 1.42857;
+      }
+      .receipt-footer h1 {
+        font-size: 15px;
+        font-weight: 400 !important;
+        margin: 0 !important;
+      }
+      .receipt-main::after {
+        background: #414143 none repeat scroll 0 0;
+        content: "";
+        height: 5px;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: -13px;
+      }
+      .receipt-main thead {
+        background: #414143 none repeat scroll 0 0;
+      }
+      .receipt-main thead th {
+        color: #fff;
+      }
+      .receipt-right h5 {
+        font-size: 16px;
+        font-weight: bold;
+        margin: 0 0 7px 0;
+      }
+      .receipt-right p {
+        font-size: 12px;
+        margin: 0px;
+      }
+      .receipt-right p i {
+        text-align: center;
+        width: 18px;
+      }
+      .receipt-main td {
+        padding: 9px 20px !important;
+      }
+      .receipt-main th {
+        padding: 13px 20px !important;
+      }
+      .receipt-main td {
+        font-size: 13px;
+        font-weight: initial !important;
+      }
+      .receipt-main td p:last-child {
+        margin: 0;
+        padding: 0;
+      }
+      .receipt-main td h2 {
+        font-size: 20px;
+        font-weight: 900;
+        margin: 0;
+        text-transform: uppercase;
+      }
+      .receipt-header-mid .receipt-left h1 {
+        font-weight: 100;
+        margin: 34px 0 0;
+        text-align: right;
+        text-transform: uppercase;
+      }
+      .receipt-header-mid {
+        margin: 24px 0;
+        overflow: hidden;
+      }
+  
+      #container {
+        background-color: #dcdcdc;
+      }
+    </style>
+    <body>
+      <div class="col-md-12">
+        <div class="row">
+          <div
+            class="receipt-main col-xs-10 col-sm-10 col-md-6 col-xs-offset-1 col-sm-offset-1 col-md-offset-3"
+          >
+            <div class="row">
+              <div class="receipt-header">
+                <div class="col-xs-6 col-sm-6 col-md-6">
+                  <div class="receipt-left">
+                      <h6>ORDER ID #${orderId}</h6>
+                  </div>
+                </div>
+                <div class="col-xs-6 col-sm-6 col-md-6 text-right">
+                  <div class="receipt-right">
+                    <h5 style="font-weight: 1000">
+                      <Span style="color: rgb(46, 202, 88)">Glosho</Span>
+                    </h5>
+                    <p>+91 1234567890<i class="fa fa-phone"></i></p>
+                    <p>gloshohandler@gmail.com<i class="fa fa-envelope-o"></i></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            <div class="row">
+              <div class="receipt-header receipt-header-mid">
+                <div class="col-xs-8 col-sm-8 col-md-8 text-left">
+                  <div class="receipt-right">
+                      <h5> ${customerName}</h5>
+                      <p><b>Mobile :</b> ${customerPhone}</p>
+                      <p><b>Email :</b> ${customerEmail}</p>
+                      
+                    <p>
+                      <b>Order Date :</b>${orderDate}
+                    </p>
+                    <p><b>Payment Method :</b>${paymentType}</p>
+                    <p><b>Address :</b>${address}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            <div>
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                  ${productHTML}
+                  
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="text-right col-md-9">
+                      <h4>Coupon discount:</h4>
+                      <h2><strong>Sub Total: </strong></h2>
+                    </td>
+                    <td class="text-left text-danger">
+                      <h4>$ 0</h4>
+                      <h2><strong>${subtotal.toFixed(2)}</strong></h2>
+                      
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+  
+            <div class="row">
+              <div class="receipt-header receipt-header-mid receipt-footer">
+                <div class="col-xs-8 col-sm-8 col-md-8 text-left">
+                  <div class="receipt-right">
+                    <p>
+                      <b>Date :</b>${orderDate}
+                    </p>
+                    <h5 style="color: rgb(140, 140, 140)">
+                      Thanks for shopping.!
+                    </h5>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <script>
+        window.onload = function () {
+            print();
+        };
+  
+        document.getElementById('downloadButton').addEventListener('click', function () {
+           
+            const pdf = new jsPDF();
+            
+            pdf.save('order_invoice.pdf');
+        });
+    </script>
+  
+    </body>
+  
+  </html>
+
+  `;
+  return html;
+}
+
+exports.downloadInvoice = async (req, res) => {
+  try {
+    let orderId = req.params.orderId;
+    // Remove any additional characters like ":" from orderId
+    orderId = orderId.replace(":", "");
+
+    const order = await Order.findById(orderId)
+      .populate("items.product")
+      .populate("userId");
+
+    // Replace placeholders with actual customer details
+    const customerName = order.userId.userName;
+    const customerPhone = order.userId.number;
+    const customerEmail = order.userId.email;
+    const subtotal = order.totalAmount;
+
+    // Generate the HTML content for the invoice
+    const invoiceHTML = generateInvoiceHTML(
+      order,
+      customerName,
+      customerPhone,
+      customerEmail,
+      subtotal
+    );
+
+    // Set headers to make the browser download the file
+    res.setHeader("Content-Type", "application/octet-stream");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="invoice_${orderId}.html"`
+    );
+    res.send(invoiceHTML);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
 exports.cancelOrder = async (req, res) => {
   try {
     const { orderId, productId } = req.body;
-    const user = await User.findById(req.session.userLoggedIn)
+    const user = await User.findById(req.session.userLoggedIn);
     const order = await Order.findById(orderId);
-    if(!order){
-      throw new Error('No Order Found')
+    if (!order) {
+      throw new Error("No Order Found");
     }
-    const item = order.items.find((item) => item.product.toString() === productId);
+    const item = order.items.find(
+      (item) => item.product.toString() === productId
+    );
     if (!item) {
       return res.status(404).send("Item not found in the order");
     }
 
-    if(order.paymentType === 'COD'){
+    if (order.paymentType === "COD") {
       await cancelProductOrder(order, item);
-    }
-    else if(order.paymentType === 'RAZORPAY' || order.paymentType === 'WALLET'){
+    } else if (
+      order.paymentType === "RAZORPAY" ||
+      order.paymentType === "WALLET"
+    ) {
       await cancelProductOrder(order, item);
       await addToWallet(user, item);
-    
     }
-    res.redirect('/my_order')
-
+    res.redirect("/my_order");
   } catch (error) {
     console.error("Error Cancellign order:", error);
     return res.status(500).redirect("/error");
   }
 };
-
-
 
 async function cancelProductOrder(order, item) {
   item.orderStatus = "Cancelled By User";
@@ -1047,18 +1401,17 @@ async function cancelProductOrder(order, item) {
 }
 
 async function addToWallet(user, item) {
-  const refundAmount = item.price * item.quantity
+  const refundAmount = item.price * item.quantity;
   console.log(refundAmount);
   const refundEntry = {
-    amount:refundAmount,
-    type:'credit',
-    createdAt:new Date()
-  }
-  user.wallet.push(refundEntry)
-  user.walletAmount += refundAmount
+    amount: refundAmount,
+    type: "credit",
+    createdAt: new Date(),
+  };
+  user.wallet.push(refundEntry);
+  user.walletAmount += refundAmount;
   await user.save();
 }
-
 
 exports.returnItem = async (req, res) => {
   try {
@@ -1095,12 +1448,12 @@ exports.returnItem = async (req, res) => {
 
 exports.getWalletHistory = async (req, res) => {
   try {
-      const userId = req.session.userLoggedIn;
-      const user = await User.findById(userId)
-      res.render('user/walletHistory', { user });
+    const userId = req.session.userLoggedIn;
+    const user = await User.findById(userId);
+    res.render("user/walletHistory", { user });
   } catch (error) {
-      console.error('Error fetching wallet history:', error);
-      return res.status(500).redirect('/error');
+    console.error("Error fetching wallet history:", error);
+    return res.status(500).redirect("/error");
   }
 };
 
@@ -1139,31 +1492,31 @@ exports.searchAction = async (req, res) => {
   const userLoggedIn = req.session.userLoggedIn;
   const searchItem = req.query.searchItem;
   if (!searchItem) {
-      return res.status(500).redirect("/error");
+    return res.status(500).redirect("/error");
   }
 
   try {
-      const trimmedSearchItem = searchItem.trim();
-      if (!trimmedSearchItem) {
-          return res.status(500).redirect("/error");
-      }
-
-      const products = await Product.find({
-          $or: [
-              { productName: { $regex: new RegExp(trimmedSearchItem, "i") } }, // Search in product name
-              { "category.category": { $regex: new RegExp(trimmedSearchItem, "i") } }, // Search in category
-          ],
-      });
-
-      const categories = await Category.find({ active: true });
-      res.render("user/allProducts", {
-          products,
-          userLoggedIn: userLoggedIn,
-          categories,
-      });
-  } catch (error) {
-      console.error(error);
+    const trimmedSearchItem = searchItem.trim();
+    if (!trimmedSearchItem) {
       return res.status(500).redirect("/error");
+    }
+
+    const products = await Product.find({
+      $or: [
+        { productName: { $regex: new RegExp(trimmedSearchItem, "i") } }, // Search in product name
+        { "category.category": { $regex: new RegExp(trimmedSearchItem, "i") } }, // Search in category
+      ],
+    });
+
+    const categories = await Category.find({ active: true });
+    res.render("user/allProducts", {
+      products,
+      userLoggedIn: userLoggedIn,
+      categories,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).redirect("/error");
   }
 };
 
@@ -1280,33 +1633,38 @@ exports.wishlistCount = async (req, res) => {
   }
 };
 
-exports.checkCoupon = async (req,res)=> {
+exports.checkCoupon = async (req, res) => {
   try {
-    const {couponCode , date , totalPrice} = req.body
-    const couponExist = await Coupon.findOne({couponCode:couponCode})
-    
+    const { couponCode, date, totalPrice } = req.body;
+    const couponExist = await Coupon.findOne({ couponCode: couponCode });
+
     if (!couponExist) {
-      console.log(couponExist.validity,"coupon date");
-      console.log(date,"User enter date")
-      return res.status(400).json({message:"Invalid coupon code"})
-    } 
-    
-    else {
+      console.log(date, "User enter date");
+      return res.status(400).json({ message: "Invalid coupon code" });
+    } else {
+      // Check if coupon has already been applied
+      const appliedCoupons = req.session.appliedCoupons || [];
+      if (appliedCoupons.includes(couponCode)) {
+        return res.status(400).json({ message: "Coupon already applied" });
+      }
+
       if (new Date(date) > new Date(couponExist.validity)) {
-      return res.status(400).json({message:"Coupon Expired"})
+        return res.status(400).json({ message: "Coupon Expired" });
       }
-      if(totalPrice < couponExist.limit){
-        return res.status(400).json({message:`Purchase more than ${couponExist.limit}`})
+      if (totalPrice < couponExist.limit) {
+        return res
+          .status(400)
+          .json({ message: `Purchase more than ${couponExist.limit}` });
       }
-      req.session.couponApplied = couponExist._id
-      const discountedPrice = totalPrice - couponExist.discount
+      req.session.appliedCoupons = [...appliedCoupons, couponCode];
+      const discountedPrice = totalPrice - couponExist.discount;
       res.status(200).json({
-        message:"Coupon Applied",
-        discountedPrice:discountedPrice
-      })
+        message: "Coupon Applied",
+        discountedPrice: discountedPrice,
+      });
     }
   } catch (error) {
     console.error("Error while checking the coupon", error);
     return res.redirect("/error");
   }
-}
+};

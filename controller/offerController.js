@@ -67,10 +67,10 @@ exports.addProductOffer = async (req,res)=> {
         existingProduct.percentage = percentage
         const originalPrice = existingProduct.price;
         const offerPrice = originalPrice - (originalPrice * (percentage / 100));
-        console.log('Offer price',offerPrice)
         existingProduct.offerPrice = offerPrice
         existingProduct.price = originalPrice - offerPrice
-        existingProduct.percentage = percentage
+        existingProduct.productOfferName = name
+        existingProduct.productOfferPrice = offerPrice
         await existingProduct.save()
         
         const newOffer = new Offer({
@@ -121,8 +121,8 @@ exports.addCategoryOffer = async (req,res)=> {
             const originalPrice = product.price;
             const offerPrice = originalPrice - (originalPrice * (percentage / 100));
             product.price = originalPrice - offerPrice;
-            product.offerPrice = offerPrice;
-            product.percentage = percentage;
+            product.categoryOfferName = name
+            product.categoryOfferPrice = offerPrice
             await product.save();
         }
         
@@ -155,10 +155,10 @@ exports.deleteProductOffer = async (req, res) => {
         }
 
         // Calculate the amount that needs to be added back to the original price
-        const originalPrice = product.price
-        product.percentage = 0 
-        product.price = originalPrice + product.offerPrice;
-        product.offerPrice = 0; // Reset offerPrice to 0
+        const originalPrice = product.price 
+        product.price = originalPrice + product.productOfferPrice;
+        product.productOfferPrice = 0
+        product.productOfferName = null
 
         await product.save();
         await Offer.findByIdAndDelete(offerId);
@@ -185,16 +185,13 @@ exports.deleteCategoryOffer = async (req,res)=>{
         }
 
         for (const product of products){
-         // Calculate the amount that needs to be added back to the original price
         const originalPrice = product.price
-        product.percentage = 0 
-        product.price = originalPrice + product.offerPrice;
-        product.offerPrice = 0; 
-        await product.save() //we saperately save the each product
-
+        product.price = originalPrice + product.categoryOfferPrice;
+        product.categoryOfferPrice = 0
+        product.categoryOfferName = null
+        await product.save() 
         }
 
-         
         await Offer.findByIdAndDelete(offerId)
         return res.status(200).json({ message: "Offer successfully deleted" });
 

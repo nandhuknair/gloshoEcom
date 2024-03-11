@@ -55,6 +55,11 @@ router.post('/admin_edit_coupon',session.adminActivity,offerController.editCoupo
 router.post('/admin_deactive_coupon',session.adminActivity,offerController.deactiveCoupon)
 router.post('/admin_activate_coupon',session.adminActivity,offerController.activateCoupon)
 
+router.get('/admin_salesreport',session.adminActivity,adminController.getSalesReport)
+
+
+
+
 
 
 
