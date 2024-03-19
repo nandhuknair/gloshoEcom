@@ -221,7 +221,7 @@ categoryForm.addEventListener('submit', function(event) {
   const categorySelect = document.getElementById('categorySelect');
   const selectedCategoryId = categorySelect.value;
 
-  window.location.href = `/products?categoryId=${encodeURIComponent(selectedCategoryId)}`;
+  window.location.href = `/all_products?categoryId=${encodeURIComponent(selectedCategoryId)}`;
 });
 
 

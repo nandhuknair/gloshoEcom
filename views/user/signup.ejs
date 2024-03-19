@@ -7,6 +7,7 @@
 	<title>Signup |</title>
 	<link rel="icon" href="/images/icon/title logo.png" type="image/icon type">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 	<link rel="stylesheet" href="/stylesheets/login.css">
 </head>
 
@@ -57,7 +58,13 @@
 					<input type="password" placeholder="Confirm password" name="confirmPassword" id="confirmPassword"
 						onkeyup="confirmPassword()" />
 				</div>
-				<p class="err" id="error-confirmPassword" style="color: red;margin: 3% 0;">&nbsp;<%= data %></p>  
+				<p class="err" id="error-confirmPassword" style="color: red;margin-top: 3% ;">&nbsp;<%= data %></p>  
+
+				<div class="input" style="margin-bottom: 3%;">
+					<i class="fa-solid fa-rug"></i>
+					<input type="text" placeholder="Referral code" id="referralCode" name="referralCode"
+					onkeyup="checkReferralCode()" />
+				</div>
 
 				<button class="loginBtn" type="submit">Signup<i class="fa-solid fa-arrow-right arrow"></i></button>
 				<p class="signup">Already a user ? <a href="/login">Login</a></p>
@@ -68,8 +75,35 @@
 	</div>
 	<script src="/javascripts/validation.js"></script>
 	<script src="/javascripts/spinner.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  	<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 	<script>
 		
+		function checkReferralCode(){
+			const referralCode = document.getElementById('referralCode').value
+			console.log(referralCode)
+			fetch('/check_referralcode',{
+				method:'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					referralCode:referralCode
+				})
+			}).then(response => {
+				if(response.ok){
+					response.json().then(data=> {
+						toastr.success(data.message, 'Success');
+					})
+					
+				}else{
+					response.json().then(data=> {
+						toastr.error(data.message,'Sorry')
+					})
+				}
+			})
+
+		}
 
 		document.getElementById('form-id').addEventListener('submit', event => {
 			let isNameValid = validateName();
@@ -84,6 +118,8 @@
 		});
 
 	</script>
+
+   
 </body>
 
 </html>

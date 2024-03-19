@@ -42,7 +42,7 @@ const walletHistorySchema = new mongoose.Schema({
     },
     createdAt: {
         type: Date,
-        default: Date.now
+        default: Date.now()
     }
 });
 
@@ -82,7 +82,10 @@ const signupSchema = new mongoose.Schema({
         default:0
     }
     ,
-    wallet: [walletHistorySchema]
+    wallet: [walletHistorySchema],
+    referralCode: {
+        type: String
+    }
     
 });
 

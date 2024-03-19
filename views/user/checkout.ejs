@@ -257,7 +257,11 @@
                   </button>
                   <div class=" ">
                     <p class="mt-3 mb-1">Enter Coupon Code</p>
-                    <input id="couponCode" onkeyup="couponCheck()" type="text" width="40px">
+                    <input id="couponCode" type="text" width="40px">
+                    <button onclick="couponCheck()"
+                    style="border: none; outline: none; background-color: transparent;">
+                    <i class="fa-solid fa-share"></i>
+                    </button>
                   </div>
           </div>
           <div class="d-flex justify-content-end mt-3"><button onclick="submitorder()" class="product_cart">PROCEED TO
@@ -654,19 +658,12 @@ function couponCheck(){
         toastr.success(data.message, 'Success')
         const subTotal = document.getElementById('subTotal')
         const totalPrice = document.getElementById('totalPrice')
-        console.log('First t price', totalPrice)
-        console.log(subTotal,'1')
         subTotal.innerHTML = data.discountedPrice
-        console.log(subTotal,'2')
         totalPrice.value = data.discountedPrice
-        console.log('2nd t price',totalPrice)
       })
     }
   })
 }
-
-
-
 
 </script>
 

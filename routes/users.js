@@ -16,6 +16,8 @@ router.get("/logout",userController.userLogout);
 router.post("/signup",userController.signupAction);
 router.post('/otp_verification',userController.otpAction)
 router.post("/login",userController.loginAction);
+router.post("/check_referralcode",userController.checkReferral);
+
 
 router.get('/forgot_password',sessionCheck.userSession,userController.getForgotPass)
 router.post('/forgot_password',userController.sendOTP)
@@ -89,26 +91,25 @@ router.post('/check_coupon',sessionCheck.userActivity,userController.checkCoupon
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 module.exports = router;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

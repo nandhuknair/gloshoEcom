@@ -56,7 +56,15 @@ router.post('/admin_deactive_coupon',session.adminActivity,offerController.deact
 router.post('/admin_activate_coupon',session.adminActivity,offerController.activateCoupon)
 
 router.get('/admin_salesreport',session.adminActivity,adminController.getSalesReport)
+router.get('/admin_salesreport/download',session.adminActivity,adminController.downloadSalesReport)
 
+
+router.get('/admin_banner',session.adminActivity,adminController.getBanner)
+router.post('/admin_banner_add',session.adminActivity,adminController.uploadSingle,adminController.addBanner)
+router.post('/admin_banner_delete',session.adminActivity,adminController.deleteBanner)
+
+
+module.exports = router
 
 
 
@@ -93,5 +101,3 @@ router.get('/admin_salesreport',session.adminActivity,adminController.getSalesRe
 
 
 
-
-module.exports = router

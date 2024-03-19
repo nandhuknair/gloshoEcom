@@ -94,7 +94,7 @@
                             </td>
                     </tr>
 
-                    <!-- Modal for Editing Category -->
+                    <!-- Modal for Editing Product -->
                     <!-- Modal -->
                     <div class="modal fade text-start" id="myModalEdit<%= index %>" tabindex="-1"
                       aria-labelledby="myModalLabel" aria-hidden="true">
@@ -214,19 +214,19 @@
         <div class="modal-body">
           <form action="/admin_add_product" id="addProduct" method="post" enctype="multipart/form-data">
             <div class="mb-3">
-              <label class="form-label" for="modalInputEmail1">Product Name</label>
+              <label class="form-label" >Product Name</label>
               <input class="form-control" id="modalInputEmail1" type="text" name="productName"
                  required>
             </div>
 
             <div class="mb-3">
-              <label class="form-label" for="modalInputEmail1">Price</label>
+              <label class="form-label" >Price</label>
               <input class="form-control" id="modalInputEmail1" type="number" name="price"
                  required>
             </div>
 
             <div class="mb-3">
-              <label class="form-label" for="modalInputEmail1">Size</label>
+              <label class="form-label" >Size</label>
               <select class="form-select" id="categories" name="size" >
                 <option value="M">M</option>
                 <option value="S">S</option>
@@ -235,7 +235,7 @@
             </div>
 
             <div class="mb-3">
-              <label class="form-label" for="modalInputEmail1">Categories</label>
+              <label class="form-label" >Categories</label>
               <select class="form-select" id="categories" name="category" >
                 <% categories.forEach(category => { %>
                   <option value="<%= category._id %>"><%= category.category %></option>
@@ -243,7 +243,7 @@
          </select></div>
  
          <div class="mb-3">
-              <label class="form-label" for="modalInputEmail1">Collections</label>
+              <label class="form-label" >Collections</label>
               <select class="form-select" id="categories" name="collection" >
                 <option value="Men">Men</option>
                 <option value="Women">Women</option>
@@ -252,19 +252,19 @@
             </div>
 
             <div class="mb-3">
-              <label class="form-label" for="modalInputEmail1">Description</label>
+              <label class="form-label" >Description</label>
               <input class="form-control" id="modalInputEmail1" type="" name="description"
                  required>
             </div>
 
             <div class="mb-3">
-              <label class="form-label" for="modalInputEmail1">Stock </label>
+              <label class="form-label" >Stock </label>
               <input class="form-control" id="modalInputEmail1" type="number" name="stock"
                  required>
             </div>
 
             <div class="mb-3">
-              <label class="form-label" for="modalInputEmail1">Images</label>
+              <label class="form-label" >Images</label>
               <p style="color: red;">Can only add up to 12 images *</p>
               
               <div id="previewContainer" class="row mb-4"></div>

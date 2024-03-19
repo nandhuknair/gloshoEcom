@@ -5,6 +5,21 @@
     <div class="row mt-3 mb-5">
         <div class="d-flex justify-content-end"><strong>Total Amount : <%= totalAmount %></strong></div>
     </div>
+<a href="/admin_salesreport/download">Download the sales report</a>
+
+    <div class="row mt-3 mb-4">
+        <form action="/admin_salesreport" method="get">
+            <div class="mb-3">
+                <label for="rangeSelect" class="form-label">Select Time Range:</label>
+                <select class="form-select" id="rangeSelect" name="range">
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="yearly">Yearly</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Generate Report</button>
+        </form>
+    </div>
 
     <table id="salesReportTable" class="table table-striped table-hover">
         <thead>
@@ -13,10 +28,11 @@
                 <th>Username</th>
                 <th>Product Name</th>
                 <th>Product Price</th>
-                <th>Offer Applied</th>
-                <th>Offer Name</th>
-                <th>Offer Price</th>
-                <th>Actual Price</th>
+                <th>Product Offer</th>
+                <th>Category Offer</th>
+                <th>Total Offer</th>
+                <th>Total Amount</th>
+    
             </tr>
         </thead>
         <tbody>
@@ -27,10 +43,12 @@
                         <td><%= orderItem.userId.userName %></td>
                         <td><%= item.product.productName %></td>
                         <td>$<%= item.product.price %></td>
-                        <td><%= item.productOfferPrice > 0 || item.categoryOfferPrice > 0 ? 'Yes' : 'No' %></td>
-                        <td><%= item.productOfferName || item.categoryOfferName || '-' %></td>
-                        <td>$<%= item.productOfferPrice || item.categoryOfferPrice || '-' %></td>
-                        <td class="totalPrice">$<%= item.price %></td>
+                        <td><%= item.productOfferPrice > 0 ? item.productOfferName : 'No offer' %></td>
+                        <td><%= item.categoryOfferPrice > 0 ? item.categoryOfferName : 'No offer' %></td>
+                        <% const totalOffer = item.productOfferPrice + item.categoryOfferPrice; %>
+                        <td><%= totalOffer > 0 ? '$' + totalOffer : '-' %></td>
+                        <td class="totalPrice">$<%= orderItem.totalAmount %></td>
+                        
                     </tr>
                 <% }) %>
             <% }) %>
@@ -39,10 +57,3 @@
 </div>
 
 <%- include('adminFooter') %>
-
-<script>
-    const sum = document.querySelectorAll('.totalPrice')
-    console.log(sum)
-    const totalSaleSum = sum.reduce((accumulator, currentValue) => accumulator + currentValue, 0); 
-    console.log(totalSaleSum)
-</script>

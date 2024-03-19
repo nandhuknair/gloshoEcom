@@ -3,7 +3,63 @@
   <% } else { %>
     <%- include('userHeader') %>
  <% } %>
-  <%- include('banner') %>
+  <!-- Slider main container -->
+<div class="swiper">
+        <!-- Additional required wrapper -->
+        <div class="swiper-wrapper">
+          <!-- Slides -->
+        <% banners.forEach(banner=> { %>
+        
+        
+                <div class="swiper-slide" style="background-image: url('/assets/uploads/<%= banner.image %>');">
+                       <!-- <div class=""> <i class="fa-solid fa-angle-down fa-4x"></i></div> -->
+                        <div class="col-lg-6 ms-5 banner_div">
+                                <h1 class="bannerHeading"><%= banner.heading.toUpperCase() %></h1>
+                                <p class="bannerSubheading"><%= banner.subheading.toUpperCase() %></p>
+                                <a class="bannerBtn" href="/products?categoryId=<%= banner.brandId %>"><%= banner.brandName.toUpperCase() %></a>
+                         </div>
+         
+                 </div>
+                 <% }) %>                                                               
+                                
+                                
+
+        </div>
+        
+        <!-- If we need pagination -->
+        <div class="swiper-pagination"></div>
+      
+        <!-- If we need navigation buttons -->
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+      
+      </div>
+      
+      
+      
+      <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+      <script>
+        const swiper = new Swiper('.swiper', {
+          loop: true,
+          speed: 1000,
+          effect: "cube",
+          grabCursor: true,
+          cubeEffect: {
+            shadow: true,
+            slideShadows: true,
+            shadowOffset: 20,
+            shadowScale: 0.94,
+          },
+      
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        })
+      </script>
+      
+      
+      
 
 
   <section class="section-products">
@@ -77,7 +133,7 @@
                 <% }); %>
         </div>
 </div>
-<div class="text-center"><a href="/all_products"><button class="normalBtn">BROWSE ALL <i class="fa-solid fa-chevron-right"></i></button></a><div>
+<div class="text-center"><a href="/all_products"><button style="border-radius: 50%;" class="browseAll"> <i class="fa-solid fa-chevron-right"></i></button></a><div>
 </section>
 
 <script>

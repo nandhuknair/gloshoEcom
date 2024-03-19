@@ -9,8 +9,9 @@ const moment = require("moment");
 const Wishlist = require("../model/wishlistModel");
 const Offer = require("../model/offerModel");
 const Coupon = require("../model/couponModel");
+const Banner = require("../model/bannerModel")
+const Referral = require("../model/referralModel");
 const Razorpay = require("razorpay");
-const fs = require("fs");
 const razorpay = new Razorpay({
   key_id: process.env.KEY_ID,
   key_secret: process.env.KEY_SECRET,
@@ -19,13 +20,16 @@ const razorpay = new Razorpay({
 //----------get home paage----------
 
 exports.getHome = async function (req, res) {
-  const products = await Product.find({}).limit(8);
-
-  res.render("user/index", {
-    userLoggedIn: req.session.userLoggedIn,
-    products,
-  });
-  console.log(req.session.userLoggedIn);
+try {
+    const products = await Product.find({isAvailable: true}).limit(8);
+    const banners = await Banner.find({})
+    res.render("user/index", {
+      userLoggedIn: req.session.userLoggedIn,
+      products,banners });
+} catch (error) { 
+  console.log(error)
+  res.redirect('/error')
+}
 };
 
 //----------get login paage----------
@@ -65,7 +69,6 @@ exports.signupAction = async (req, res) => {
     reqBody = req.body;
     const { email, password, confirmPassword } = req.body;
     req.session.userMail = email;
-    console.log(reqBody);
     const userExist = await User.findOne({ email: email });
     if (userExist) {
       res.render("user/signup", {
@@ -109,9 +112,18 @@ exports.signupAction = async (req, res) => {
 
 //----------otp action----------
 
+//Generating random referalCode
+const generateRandomCode = () => {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let code = '';
+  for (let i = 0; i < 8; i++) {
+      code += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return code;
+};
+
 exports.otpAction = async (req, res) => {
-  const { userName, email, number } = reqBody;
-  console.log("reqbody is ", reqBody);
+  const { userName, email, number, referralCode } = reqBody;
   try {
     const { otp } = req.body;
     if (
@@ -119,14 +131,46 @@ exports.otpAction = async (req, res) => {
       Date.now() < OTPData.expirationTime &&
       otp === OTPData.otp.toString()
     ) {
-      const newUser = new User({
+
+      const newReferralCode = generateRandomCode()
+      const referralExist = await Referral.findOne({referralCode:referralCode})
+      if(referralExist){ 
+        const creditedAmount = {
+          amount: 200,
+          type: "credit",
+          createdAt: new Date(),
+        };
+        const newUser = new User({
+          userName: userName,
+          email: email,
+          number: number,
+          password: hasedPassword,
+          confirmPassword: hasedconfirmPassword,
+          referralCode:newReferralCode,
+          walletAmount:200,
+          wallet:creditedAmount
+          });
+        await newUser.save();
+       
+
+      }else{
+        const newUser = new User({
         userName: userName,
         email: email,
         number: number,
         password: hasedPassword,
         confirmPassword: hasedconfirmPassword,
+        referralCode:newReferralCode
       });
       await newUser.save();
+      }
+      
+      const user = await User.findOne({userName:userName})
+      const newReferral = new Referral({
+        referralCode:newReferralCode,
+        userId:user._id
+      })
+      await newReferral.save() 
       res.redirect("/login");
     } else {
       res.render("user/otpVerification", { data: "Incorrect or Expired otp" });
@@ -135,6 +179,23 @@ exports.otpAction = async (req, res) => {
     console.log(error);
   }
 };
+
+exports.checkReferral = async (req,res)=> {
+  try {
+    console.log('Entered to check the referral')
+    const referalCodeExist = await Referral.findOne(
+    {referralCode:req.body.referralCode})
+    console.log(referalCodeExist)
+    if(referalCodeExist){
+      return res.status(200).json({message: "Valid Referral Code"})
+    }else{
+      return res.status(400).json({ message: "Invalid Referral Code" });
+    }
+  } catch (error) {
+    console.log(error)
+    res.status(500).redirect('/error')
+  }
+}
 
 //----------login action----------
 
@@ -596,6 +657,7 @@ exports.viewCart = async (req, res) => {
     console.log("Entered to get cart page");
     const userId = req.session.userLoggedIn;
     let cartItem = await Cart.find({ userId: userId }).populate("productId");
+    console.log(cartItem)
 
     cartItem = await Promise.all(
       cartItem.map(async (item) => {
@@ -717,10 +779,17 @@ exports.listProducts = async (req, res) => {
           products = await Product.find({ isAvailable: true });
           break;
       }
-    } else {
+    }else if(req.query.categoryId) {
+      const { categoryId } = req.query
+      products = await Product.find({
+        category:categoryId,
+        isAvailable: true
+      })
+    }
+     else {
       products = await Product.find({ isAvailable: true });
     }
-
+    
     const categories = await Category.find({ active: true });
     let userLoggedIn = req.session.userLoggedIn;
     res.render("user/allProducts", { products, userLoggedIn, categories });
@@ -777,6 +846,7 @@ exports.productDetails = async (req, res) => {
 
 exports.getCheckoutPage = async (req, res) => {
   try {
+    req.session.appliedCoupons = [];
     const userId = req.session.userLoggedIn;
     const cartItems = await Cart.find({ userId: userId }).populate("productId");
     const { type } = req.body;
@@ -1637,6 +1707,9 @@ exports.checkCoupon = async (req, res) => {
   try {
     const { couponCode, date, totalPrice } = req.body;
     const couponExist = await Coupon.findOne({ couponCode: couponCode });
+    console.log(couponCode)
+    console.log(date)
+    console.log(totalPrice)
 
     if (!couponExist) {
       console.log(date, "User enter date");
@@ -1644,6 +1717,8 @@ exports.checkCoupon = async (req, res) => {
     } else {
       // Check if coupon has already been applied
       const appliedCoupons = req.session.appliedCoupons || [];
+      console.log(appliedCoupons)
+      console.log(appliedCoupons.includes(couponCode))
       if (appliedCoupons.includes(couponCode)) {
         return res.status(400).json({ message: "Coupon already applied" });
       }
@@ -1658,6 +1733,7 @@ exports.checkCoupon = async (req, res) => {
       }
       req.session.appliedCoupons = [...appliedCoupons, couponCode];
       const discountedPrice = totalPrice - couponExist.discount;
+      
       res.status(200).json({
         message: "Coupon Applied",
         discountedPrice: discountedPrice,

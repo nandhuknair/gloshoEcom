@@ -1,0 +1,108 @@
+<%- include('adminHeader') %>
+
+    <div class="container">
+        <h3 class="mt-5" style="letter-spacing: 1.5px;">BANNERS</h3>
+
+        <div class="col-lg-11">
+            <div class="card mb-0">
+                <div class="card-header"></div>
+                <div class="card-body pt-0">
+                    <div class="table-responsive">
+                        <table class="table mb-0 table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th> Name</th>
+                                    <th> Heading</th>
+                                    <th> Subheading</th>
+                                    <th>Image</th>
+                                    <th>Brand</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% banner.forEach((data, index)=> { %>
+                                    <tr>
+                                        <th scope="row">
+                                            <%= index + 1 %>
+                                        </th>
+                                        <td>
+                                            <%= data.bannerName %>
+                                        </td>
+                                        <td><%= data.heading %></td>
+                                        <td><%= data.subheading %></td>
+                                        <td> 
+                                        <img src="/assets/uploads/<%= data.image %>" height="50px" width="50px" alt="">
+                                        </td>
+                                        <td><%= data.brandName %></td>
+                                    </tr>
+                    </div>
+                    <% }) %>
+                        </tbody>
+                        </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Add Button for Adding Category -->
+    <div class="card me-5 mt-3">
+        <div class="card-body pt-0 text-center">
+            <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#myModalAdd">ADD
+                BANNER</button>
+        </div>
+    </div>
+
+    <!-- Modal for Adding Banner -->
+    <div class="modal fade text-start" id="myModalAdd" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="myModalLabel">Add Banner</h5>
+                    <button class="btn-close btn-close-white" type="button" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="/admin_banner_add" method="post" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <div class="mb-3">
+                                <label class="form-label" > Banner Name</label>
+                                <input class="form-control" type="text" name="bannerName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" >Heading</label>
+                                <input class="form-control" type="text" name="bannerHeading" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" >Sub heading </label>
+                                <input class="form-control" type="text" name="bannerSubHeading" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" >Brand Name </label>
+                                <select class="form-select" id="categories" name="brandId" required>
+                                    <% categories.forEach(category => { %>
+                                      <option value="<%= category._id %>"><%= category.category %></option>
+                                    <% }); %>
+                             </select>
+                                
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" >Image </label>
+                                <input class="form-control" type="file" name="images" required>
+
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                            <button class="btn btn-primary" type="submit">Add</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Modal for Adding Banner -->
+
+    <%- include('adminFooter') %>
+

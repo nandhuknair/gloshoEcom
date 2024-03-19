@@ -42,7 +42,7 @@ exports.addProductOffer = async (req,res)=> {
        console.log('The type of percentage is ',typeof(percentage))
        console.log(product)
 
-        if(percentage <= 0 || percentage > 100){
+        if(percentage <= 0 || percentage > 99){
             return res.status(400).json({message:"Enter the valid percentage"})
         } 
 
