@@ -412,6 +412,26 @@
         </div>
       </div>
 
+      <!--Failed order -->
+      <div class="fade modal" id="failedPayment" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header justify-content-center">
+
+              <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal"
+                aria-label="Close"></button>
+            </div>
+            <div class="modal-body align-items-center d-flex flex-column">
+              <i class="fa-solid fa-circle-xmark paymentFailedX"></i>
+              <p class="para_text text-center mt-4">Payment Failed </p>
+              <p class="head_text" style="letter-spacing: 1px;">SORRY</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+
 
       <!-- ----Toaster----- -->
       <div id="toaster" class="toast bottom-2end-2  position-fixed border-0"
@@ -442,7 +462,7 @@
 
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script>
-
+    const failedPaymentModal = new bootstrap.Modal(document.getElementById('failedPayment'))
     const placedOrderModal = new bootstrap.Modal(document.getElementById('placedOrder'));
     function submitorder() {
       const selectedaddress = document.querySelector('input[name="deliveryAddress"]:checked');
@@ -520,28 +540,24 @@
             totalPrice: totalPrice
           })
         })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Failed to confirm order');
-              toastr.error('Something went wrong ', 'Sorry');
+        .then(response=> {
+          if(!response.ok){
+            return response.json()
+            .then(data=> {
+              toastr.error(data.message,'Sorry')
+            })
+          }else{
+            return response.json()
+            .then(data=> {
+              console.log('Order confirmed successfully:', data);
+              placedOrderModal.show();
               setTimeout(() => {
-                window.location.href = '/cart'
-              }, 1800);
-
-            }
-            return response.json();
-          })
-          .then(data => {
-            console.log('Order confirmed successfully:', data);
-            placedOrderModal.show();
-            setTimeout(() => {
               window.location.href = '/my_order'
             }, 2600);
-          })
-          .catch(error => {
-            console.error('Error confirming order:', error);
-
-          });
+            })
+          }
+        })
+       
       }
       else if (selectedpayment === 'RAZORPAY') {
         fetch('/confirmOrder', {
@@ -572,13 +588,6 @@
               image: '/images/images/pexels-snack-toronto-1630344.jpg',
               description: 'Payment for your order',
               order_id: data.razorpayOrderId,
-              handler: function (response) {
-                placeOrderAfterPayment()
-                placedOrderModal.show();
-                setTimeout(() => {
-                  window.location.href = '/my_order'
-                }, 2600);
-              },
               prefill: {
                 name: 'User Name',
                 email: 'user@example.com',
@@ -586,12 +595,35 @@
               },
               theme: {
                 color: '#3399cc'
+              },
+              handler: function () {
+                placeOrderAfterPayment()
+                placedOrderModal.show();
+                setTimeout(() => {
+                  window.location.href = '/my_order'
+                }, 2600);
               }
 
             };
-            const rzp1 = new Razorpay(option);
-            rzp1.open();
-            console.log(rzp1)
+            const rzp = new Razorpay(option);
+            rzp.open();
+            rzp.on('payment.failed',function(){
+              fetch('/paymentfailed_handler',{
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+              selectedaddress: selectedaddress,
+              selectedpayment: selectedpayment,
+              cartdocs: cartdocs,
+              totalPrice: totalPrice
+              })
+              })
+              alert('Payment failed')
+              window.location.href = '/payment_failed_page'
+            })
+      
           })
       }
       else if (selectedpayment === 'WALLET') {
@@ -607,16 +639,15 @@
             totalPrice: totalPrice
           })
         })
-
           .then(response => {
-            if (response.ok) {
+            if (response.status === 200) {
               placedOrderModal.show();
               console.log('Successfully placed the order')
               setTimeout(() => {
                 window.location.href = '/my_order'
               }, 1800);
             }
-            else if (response.status === 400) {
+            else if (!response.ok) {
               response.json().then(data => {
                 toastr.error(data.message, 'Sorry')
               })
@@ -633,7 +664,6 @@
 function couponCheck(){
   console.log('On key up')
   const couponCode = document.getElementById('couponCode').value
-
   const totalPrice = document.getElementById('totalPrice').value
   const date = new Date()
   fetch('/check_coupon', {

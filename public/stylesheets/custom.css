@@ -11,6 +11,10 @@
 i{
   color: #db6574;  
 }
-
-
+.cardHover{
+  transition: 1s ease;
+}
+.cardHover:hover {
+  background-color: #db6574; /* Change to the original color on hover */
+}
 

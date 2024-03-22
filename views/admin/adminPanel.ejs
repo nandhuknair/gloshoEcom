@@ -1,9 +1,6 @@
 
         <%- include('adminHeader') %>
-        
-        
-        
-        
+  
         <div class="page-content">
       <!-- Page Header-->
       <div class="bg-dash-dark-2 py-4">
@@ -22,9 +19,9 @@
                       <svg class="svg-icon svg-icon-sm svg-icon-heavy text-gray-600 mb-2">
                         <use xlink:href="#user-1"> </use>
                       </svg>
-                      <p class="text-sm text-uppercase text-gray-600 lh-1 mb-0">New Clients</p>
+                      <p class="text-sm text-uppercase text-gray-600 lh-1 mb-0">Users</p>
                     </div>
-                    <p class="text-xxl lh-1 mb-0 text-dash-color-1">27</p>
+                    <p class="text-xxl lh-1 mb-0 text-dash-color-1"><%= totalUsers %></p>
                   </div>
                   <div class="progress" style="height: 3px">
                     <div class="progress-bar bg-dash-color-1" role="progressbar" style="width: 30%" aria-valuenow="30"
@@ -41,9 +38,9 @@
                       <svg class="svg-icon svg-icon-sm svg-icon-heavy text-gray-600 mb-2">
                         <use xlink:href="#stack-1"> </use>
                       </svg>
-                      <p class="text-sm text-uppercase text-gray-600 lh-1 mb-0">New Projects</p>
+                      <p class="text-sm text-uppercase text-gray-600 lh-1 mb-0">Products</p>
                     </div>
-                    <p class="text-xxl lh-1 mb-0 text-dash-color-2">375</p>
+                    <p class="text-xxl lh-1 mb-0 text-dash-color-2"><%= totalProducts %></p>
                   </div>
                   <div class="progress" style="height: 3px">
                     <div class="progress-bar bg-dash-color-2" role="progressbar" style="width: 70%" aria-valuenow="70"
@@ -60,9 +57,9 @@
                       <svg class="svg-icon svg-icon-sm svg-icon-heavy text-gray-600 mb-2">
                         <use xlink:href="#survey-1"> </use>
                       </svg>
-                      <p class="text-sm text-uppercase text-gray-600 lh-1 mb-0">New Invoices</p>
+                      <p class="text-sm text-uppercase text-gray-600 lh-1 mb-0">Pending Orders</p>
                     </div>
-                    <p class="text-xxl lh-1 mb-0 text-dash-color-3">140</p>
+                    <p class="text-xxl lh-1 mb-0 text-dash-color-3"><%= pendingOrders %></p>
                   </div>
                   <div class="progress" style="height: 3px">
                     <div class="progress-bar bg-dash-color-3" role="progressbar" style="width: 55%" aria-valuenow="55"
@@ -79,9 +76,9 @@
                       <svg class="svg-icon svg-icon-sm svg-icon-heavy text-gray-600 mb-2">
                         <use xlink:href="#paper-stack-1"> </use>
                       </svg>
-                      <p class="text-sm text-uppercase text-gray-600 lh-1 mb-0">All Projects</p>
+                      <p class="text-sm text-uppercase text-gray-600 lh-1 mb-0">Total Orders</p>
                     </div>
-                    <p class="text-xxl lh-1 mb-0 text-dash-color-4">41</p>
+                    <p class="text-xxl lh-1 mb-0 text-dash-color-4"><%= totalOrders %></p>
                   </div>
                   <div class="progress" style="height: 3px">
                     <div class="progress-bar bg-dash-color-4" role="progressbar" style="width: 35%" aria-valuenow="35"
@@ -92,11 +89,138 @@
             </div>
           </div>
         </div>
+
       </section>
+
+
+<div class="container">
+
+  <div class="container-fluid">
+    <div>
+        <label class="me-3" for="filter">Filter:</label>
+        <select id="filter" class="p-1" style="color: #8a8d93; background-color: transparent;">
+            <option value="yearly" >Yearly</option>
+            <option value="monthly">Monthly</option>
+            <option value="daily" selected>Daily</option>
+        </select>
+    </div>
+    <canvas id="salesChart"></canvas>
+</div>
+
 </div>
 
 
- 
+
+
+<div class="page-content">
+  <!-- Display Top Selling Products -->
+  <div class="container-fluid">
+      <h2 class="mt-5 mb-3">TOP SELLING PRODUCTS</h2>
+      <div class="row">
+          <% topSellingProducts.forEach(product => { %>
+              <div class="col-md-4 mb-4">
+                  <div class="card cardHover">
+                    <img src="/assets/uploads/<%= product.lastImage %>" class="card-img-top" alt="Product Image">
+                      <div class="card-body">
+                          <h5 class="card-title"><%= product.productName %></h5>
+                          <p class="card-text">Total Quantity Sold: <%= product.totalQuantity %></p>
+                      </div>
+                  </div>
+              </div>
+          <% }) %>
+      </div>
+  </div>
+
+  <!-- Display Top Selling Categories -->
+  <div class="container-fluid mb-0">
+      <h2 class="mt-5 mb-3">TOP SELLING CATEGORIES</h2>
+      <div class="row ">
+          <% topSellingCategories.forEach(category => { %>
+              <div class="col-md-4 mb-4">
+                  <div class="card cardHover">
+                      <div class="card-body">
+                          <h5 class="card-title"><%= category.categoryName %></h5>
+                          <p class="card-text">Total Quantity Sold: <%= category.totalQuantity %></p>
+                      </div>
+                  </div>
+              </div>
+          <% }) %>
+      </div>
+  </div>
+</div>
+
+<div class="download-button">
+  <a href="/admin_salesreport">
+    <div class="d-flex justify-content-end me-5 mt-0">
+  <button type="button" class="btn" data-toggle="tooltip" data-placement="left" title="Tooltip on left">
+    <i class="fa-solid fa-file-export fa-3x"></i>
+  </button></a>
+</div>
+</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        function fetchSalesData(filter) {
+            fetch(`/sales_data?filter=${filter}`)
+                .then(response => response.json())
+                .then(data => {
+                    updateChart(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching sales data:', error);
+                });
+        }
+
+        // Function to update chart with sales data
+        function updateChart(data) {
+    const labels = data.labels;
+    const salesData = data.sales;
+
+    // Get the canvas element
+    const ctx = document.getElementById('salesChart').getContext('2d');
+
+    // If a chart already exists, destroy it before creating a new one
+    if (window.salesChart instanceof Chart) {
+        window.salesChart.destroy();
+    }
+
+    // Initialize Chart.js with the updated data
+    window.salesChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Sales',
+                data: salesData,
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+}
+
+        // Event listener for filter change
+        document.getElementById('filter').addEventListener('change', function() {
+            const filter = this.value;
+            fetchSalesData(filter);
+        });
+
+        // Fetch initial data on page load
+        fetchSalesData('daily');
+    });
+</script>
 
 
 

@@ -59,11 +59,11 @@ border-left: 0.5px solid rgba(0, 0, 0, 0.371);">
                 <i class="fa-solid fa-arrow-down-short-wide"></i>
         </button>
         <ul class="dropdown-menu" aria-labelledby="sortDropdownMenuButton">
-            <li><a class="dropdown-item" href="/all_products?sortBy=priceLowToHigh">Price Low to High</a></li>
-            <li><a class="dropdown-item" href="/all_products?sortBy=priceHighToLow">Price High to Low</a></li>
+            <li><a class="dropdown-item" href="/all_products?categoryId=<%= categoryId %>&sortBy=priceLowToHigh">Price Low to High</a></li>
+            <li><a class="dropdown-item" href="/all_products?categoryId=<%= categoryId %>&sortBy=priceHighToLow">Price High to Low</a></li>
             <li><a class="dropdown-item" href="#">New Arrivals</a></li>
-            <li><a class="dropdown-item" href="/all_products?sortBy=A-Z">A-Z</a></li>
-            <li><a class="dropdown-item" href="/all_products?sortBy=Z-A">Z-A</a></li>
+            <li><a class="dropdown-item" href="/all_products?categoryId=<%= categoryId %>&sortBy=A-Z">A-Z</a></li>
+            <li><a class="dropdown-item" href="/all_products?categoryId=<%= categoryId %>&sortBy=Z-A">Z-A</a></li>
         </ul>
     </div>
 </div>

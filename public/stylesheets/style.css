@@ -294,7 +294,6 @@ p{
 }
 
 
-
 .section-products .single-product .part-1 .discount,
 .section-products .single-product .part-1 .new {
   position: absolute;
@@ -634,11 +633,25 @@ hr{
   color: white;
 }
 
-.addrss-container{
-  overflow: hidden;
+.address-container {
   display: flex;
-  gap: 2%;
-  justify-content: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.address-item {
+  width: calc(50% - 1%); /* Adjust the width as needed */
+  margin-bottom: 20px; /* Adjust the spacing between items */
+}
+.address-item:hover {
+  background-color: rgba(255, 255, 255, 0.667);
+}
+
+/* Media query for responsiveness */
+@media (max-width: 768px) {
+  .address-item {
+    width: calc(100% - 1%);
+  }
 }
 
 .head_text{
@@ -724,6 +737,11 @@ hr{
   color: #28AF5B;
 }
 
+.paymentFailedX{
+  font-size: 50px;
+  color:red;
+  font-weight: 900;
+}
 .normalBtn{
 border: none;
 border-radius: 50px;
@@ -848,9 +866,11 @@ cursor: pointer;
       background-color: rgba(255, 255, 255, 0.836);
     }
 
-
-
-
+    .error-message {
+      color: red;
+      font-size: 12px; /* Adjust font size as needed */
+      margin-top: 5px; /* Add some space between input field and error message */
+    }
 
 
 

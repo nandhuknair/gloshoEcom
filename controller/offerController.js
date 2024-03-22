@@ -213,34 +213,58 @@ exports.getCoupon = async (req,res)=> {
 }
 
 
-exports.addCoupon = async (req,res)=> {
+exports.addCoupon = async (req, res) => {
     try {
-        const{couponName,couponCode,validity,discount,limit} = req.body
-        if(!couponName || !couponCode || !validity || !discount || !limit){
-            return res.status(400).json({message:"Please fill all the field"})
+        const { couponName, couponCode, validity, discount, limit } = req.body;
+        
+        // Check if all fields are filled
+        if (!couponName || !couponCode || !validity || !discount || !limit) {
+            return res.status(400).json({ message: "Please fill all the fields" });
         }
-        if(limit < 0 || limit < discount){
-            return res.status(400).json({message:"Limit should be less than discount greatet than zero"})
+
+        // Check if validity date is in the past
+        if (new Date(validity) < new Date()) {
+            return res.status(400).json({ message: "Validity date should be in the future" });
         }
-        if(discount < 0 || discount > limit){
-            return res.status(400).json({message:"Enter valid discount"})
+
+        // Check if coupon code already exists
+        const existingCouponCode = await Coupon.findOne({ couponCode });
+        if (existingCouponCode) {
+            return res.status(400).json({ message: "Coupon code already exists" });
         }
+
+        // Check if coupon name already exists
+        const existingCouponName = await Coupon.findOne({ couponName });
+        if (existingCouponName) {
+            return res.status(400).json({ message: "Coupon name already exists" });
+        }
+
+        // Check if limit is less than discount and greater than zero
+        if (limit < 0 || limit < discount) {
+            return res.status(400).json({ message: "Limit should be greater than zero and less than discount" });
+        }
+
+        // Check if discount is between 0 and limit
+        if (discount < 0 || discount > limit) {
+            return res.status(400).json({ message: "Enter valid discount" });
+        }
+
         const newCoupon = new Coupon({
             couponName,
             couponCode,
             validity,
             discount,
             limit,
-            isActive:true
-        })
-        await newCoupon.save()
-        return res.status(200).json({message:"Successfully added new coupon"})
-
+            isActive: true
+        });
+        
+        await newCoupon.save();
+        return res.status(200).json({ message: "Successfully added new coupon" });
     } catch (error) {
-        console.log(error)
+        console.log(error);
         return res.status(500).redirect("/error");
     }
-}
+};
 
 exports.editCoupon = async (req, res) => {
     try {

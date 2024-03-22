@@ -32,8 +32,8 @@
           Change password
         </a>
       </li>
-      <li class="my-2" id="manageAddressItem" onclick="viewManageAddressPage()">
-        <a href="#" class="nav-link link-dark">
+      <li class="my-2" id="manageAddressItem">
+        <a href="/profile" class="nav-link link-dark">
             <i class="fa-solid fa-map-location-dot  me-3"></i>
           Manage address
         </a>
@@ -133,16 +133,85 @@
   <!-- ---------------------------------- ALERT END ------------------------------------------------------------ -->
 
 
-
  <i class="fa-solid fa-user-tie fa-4x"></i>
  <h1 class="mt-3 head_text">HELLO 👋🏼 <%= user.userName.toUpperCase() %></h1>
  <h4 class="para_text">Email : <%= user.email %></h4>
  <h4 class="para_text">Number : <%= user.number %></h4>
  <h4 class="para_text">Referral Code : <strong><%= user.referralCode %></strong> </h4>
+ <div class="card-body pt-0 d-flex justify-content-end" 
+  style="width: 100%;">
+    <button class="addBtn" type="button" data-bs-toggle="modal" data-bs-target="#myModalAdd">ADD</button>
+  </div>
 
- <div class="addrss-container container mt-4">
+    <!-- Add Address modal window start -->
+    <div class="modal fade text-start" id="myModalAdd" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="myModalLabel">Add Address</h5>
+            <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form action="/add_address" id="addAddress" method="post">
+              <div class="mb-3">
+                <label class="form-label">Name</label>
+                <input class="form-control" type="text" id="name" name="name"
+                  onkeyup="addressValidateName()">
+                  <p id="name-error"></p>
+              </div>
+  
+              <div class="mb-3">
+                <label class="form-label">Number</label>
+                <input class="form-control" type="number" id="number" name="number" onkeyup="addressValidateNumber()">
+                <p id="number-error"></p>
+              </div>
+  
+              <div class="mb-3">
+                <label class="form-label">Address</label>
+                <input class="form-control" type="text" name="address" id="address" onkeyup="addressValidateAddress()">
+                <p id="address-error"></p>
+              </div>
+  
+              <div class="mb-3">
+                <label class="form-label">City</label>
+                <input class="form-control" type="text" name="city" id="city" onkeyup="addressValidateCity()">
+                <p id="city-error"></p>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">State</label>
+                <input class="form-control" type="text" name="state" id="state" onkeyup="addressValidateState()">
+                <p id="state-error"></p>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Pincode</label>
+                <input class="form-control" type="number" name="pincode" id="pincode" onkeyup="addressValidatePincode()">
+                <p id="pincode-error"></p>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Landmark</label>
+                <input class="form-control" type="text" name="landmark" id="landmark" onkeyup="addressValidateLandmark()">
+                <p id="landmark-error"></p>
+              </div>
+   
+           
+              
+              <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                <button class="btn btn-primary" type="submit">Add</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Modal for Adding Address -->
+
+ <div class="address-container container mt-4 ">
  <% user.address.forEach((data,index)=>{ %>
-  <div class="border py-4 px-4" >
+  <div class="border py-4 px-4 address-item">
     <h4 class="text-center head_text">Address <%= index+1 %></h4>
     <ul>
      <li><p><%= data.address %> </p></li> 
@@ -151,6 +220,7 @@
       <p><%= data.state %> </p>
       <p><%= data.pincode %> </p>
 </ul>
+
 <div class="d-flex justify-content-end">
 
   <a href="" data-bs-toggle="modal" data-bs-target="#myModalEdit<%= index %>"><i class="fa-solid fa-user-pen"></i></a>
@@ -178,8 +248,8 @@
 
 
 
-  <!-- Edit product modal window start  -->
-
+  <!-- Edit Address modal window start  -->
+        
   <div class="modal fade text-start" id="myModalEdit<%= index %>" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -188,48 +258,59 @@
           <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form action="/edit_address/<%= data._id %>" method="post">
+          <form action="/edit_address/<%= data._id %>" id="editAddressForm<%= index %>" method="post">
             <div class="mb-3">
-              <label class="form-label" for="modalInputEmail1">Name</label>
-              <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.name %>" name="userName"
-                aria-describedby="emailHelp" required >
+              <label class="form-label">Name</label>
+              <input class="form-control" id="name<%= index %>" type="text" value="<%= data.name %>" name="userName"
+                onkeyup="validateName('<%= index %>')" />
+              <p class="mt-2 mb-0" id="error-name<%= index %>"></p>
+              </div>
+
+            <div class="mb-3">
+              <label class="form-label">Number</label>
+              <input class="form-control" id="number<%= index %>" type="number" value="<%= data.number %>" name="number"
+                  onkeyup="validateNumber('<%= index %>')">
+                  <p id="error-number<%= index %>"></p>
+
             </div>
 
             <div class="mb-3">
-              <label class="form-label" for="modalInputEmail1">Number</label>
-              <input class="form-control" id="modalInputEmail1" type="number" value="<%= data.number %>" name="number"
-                aria-describedby="emailHelp" required>
+              <label class="form-label">Address</label>
+              <input class="form-control" id="address<%= index %>" type="text" value="<%= data.address %>" name="address"
+                  onkeyup="validateAddress('<%= index %>')">
+                  <p id="error-address<%= index %>"></p>
+
             </div>
 
             <div class="mb-3">
-              <label class="form-label" for="modalInputEmail1">Address</label>
-              <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.address %>" name="address"
-                aria-describedby="emailHelp" required>
+              <label class="form-label">City</label>
+              <input class="form-control" id="city<%= index %>" type="text" value="<%= data.city %>" name="city"
+                  onkeyup="validateCity('<%= index %>')">
+                  <p  id="error-city<%= index %>"></p>
+                  
             </div>
 
             <div class="mb-3">
-              <label class="form-label" for="modalInputEmail1">City</label>
-              <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.city %>" name="city"
-                aria-describedby="emailHelp" required>
+              <label class="form-label">State</label>
+              <input class="form-control" id="state<%= index %>" type="text" value="<%= data.state %>" name="state"
+                  onkeyup="validateState('<%= index %>')">
+                  <p id="error-state<%= index %>"></p>
+
             </div>
 
             <div class="mb-3">
-              <label class="form-label" for="modalInputEmail1">State</label>
-              <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.state %>" name="state"
-                aria-describedby="emailHelp" required>
+              <label class="form-label">Pincode</label>
+              <input class="form-control" id="pincode<%= index %>" type="number" value="<%= data.pincode %>" name="pincode"
+                  onkeyup="validatePincode('<%= index %>')">
+                  <p id="error-pincode<%= index %>"></p>
+                  
             </div>
 
             <div class="mb-3">
-              <label class="form-label" for="modalInputEmail1">Pincode</label>
-              <input class="form-control" id="modalInputEmail1" type="number" value="<%= data.pincode %>" name="pincode"
-                aria-describedby="emailHelp" required>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label" for="modalInputEmail1">Landmark</label>
-              <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.landmark %>" name="landmark" 
-              aria-describedby="emailHelp" required>
-                
+              <label class="form-label">Landmark</label>
+              <input class="form-control" id="landmark<%= index %>" type="text" value="<%= data.landmark %>" name="landmark"
+                  onkeyup="validateLandmark('<%= index %>')">
+                <p id="error-landmark<%= index %>"></p>
             </div>
  
          
@@ -243,7 +324,7 @@
       </div>
     </div>
   </div>
-  <!-- End Modal for Adding Address -->
+  <!-- End Modal for Editing Address -->
 
  </div>
 
@@ -251,10 +332,7 @@
  </div>
  <% }) %>
 </div> 
-
-    
  
-    
  </div>
 </div>
 
@@ -298,189 +376,6 @@
 
 <!-- ----------------------------Manage address page ---------------------------------------- -->
 
-<div class="col-lg-9 mt-5 ms-5" id="manageAddress">
-  <h4 class="heading" style="margin-bottom: 0;">ADDRESS</h4>
-  <div class="card-body pt-0 d-flex justify-content-end">
-      <button class="addBtn" type="button" data-bs-toggle="modal" data-bs-target="#myModalAdd">ADD</button>
-    </div>
-    
-    
-        <div class="addrss-container container mt-4" style="justify-content: start;">
-          <% user.address.forEach((data,index)=>{ %>
-           <div class="border py-4 px-4" >
-             <ul>
-              <li><p><%= data.address %> </p></li> 
-               <p><%= data.city %> </p>
-               <p><%= data.state %> </p>
-               <p><%= data.pincode %> </p>
-         </ul>
-         <div class="d-flex justify-content-end">
-
-          <a href="" data-bs-toggle="modal" data-bs-target="#myModalEdit2<%= index %>"><i class="fa-solid fa-user-pen"></i></a>
-          <a href="" data-bs-toggle="modal" data-bs-target="#exampleModal2"><i class="fa-solid fa-trash ms-3"></i> </a> 
-
-                          
-  <!-- Modal -->
-  <div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="background-color: rgba(0, 0, 0, 0.534);">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="head_text" id="exampleModalLabel">ARE YOU SURE</h5>
-          <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-        <p class="para_text">Permenently Delete The Address ⚠️</p>  
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">NO</button>
-         <a href="/delete_address/<%= data._id %>"><button type="button" class="btn btn-primary">YES</button></a> 
-        </div>
-      </div>
-    </div>
-  </div>
-        
-          <!-- Edit Address modal window start  -->
-        
-          <div class="modal fade text-start" id="myModalEdit2<%= index %>" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="myModalLabel">Edit Address</h5>
-                  <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                  <form action="/edit_address/<%= data._id %>" method="post">
-                    <div class="mb-3">
-                      <label class="form-label" for="modalInputEmail1">Name</label>
-                      <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.name %>" name="userName"
-                        aria-describedby="emailHelp" required >
-                    </div>
-        
-                    <div class="mb-3">
-                      <label class="form-label" for="modalInputEmail1">Number</label>
-                      <input class="form-control" id="modalInputEmail1" type="number" value="<%= data.number %>" name="number"
-                        aria-describedby="emailHelp" required>
-                    </div>
-        
-                    <div class="mb-3">
-                      <label class="form-label" for="modalInputEmail1">Address</label>
-                      <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.address %>" name="address"
-                        aria-describedby="emailHelp" required>
-                    </div>
-        
-                    <div class="mb-3">
-                      <label class="form-label" for="modalInputEmail1">City</label>
-                      <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.city %>" name="city"
-                        aria-describedby="emailHelp" required>
-                    </div>
-        
-                    <div class="mb-3">
-                      <label class="form-label" for="modalInputEmail1">State</label>
-                      <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.state %>" name="state"
-                        aria-describedby="emailHelp" required>
-                    </div>
-        
-                    <div class="mb-3">
-                      <label class="form-label" for="modalInputEmail1">Pincode</label>
-                      <input class="form-control" id="modalInputEmail1" type="number" value="<%= data.pincode %>" name="pincode"
-                        aria-describedby="emailHelp" required>
-                    </div>
-        
-                    <div class="mb-3">
-                      <label class="form-label" for="modalInputEmail1">Landmark</label>
-                      <input class="form-control" id="modalInputEmail1" type="text" value="<%= data.landmark %>" name="landmark" 
-                      aria-describedby="emailHelp" required>
-                        
-                    </div>
-         
-                 
-                    
-                    <div class="modal-footer">
-                      <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
-                      <button class="btn btn-primary" type="submit">Save & Edit</button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- End Modal for Editing Address -->
-        
-         </div>
-          </div>
-          <% }) %>
-         </div> 
-
-
-    
-    <div class="container txt-container">
-      <!-- Add Address modal window start -->
-    <div class="modal fade text-start" id="myModalAdd" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="myModalLabel">Add Address</h5>
-            <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <form action="/add_address" method="post">
-              <div class="mb-3">
-                <label class="form-label" for="modalInputEmail1">Name</label>
-                <input class="form-control" id="modalInputEmail1" type="text" name="name"
-                  aria-describedby="emailHelp" required>
-              </div>
-  
-              <div class="mb-3">
-                <label class="form-label" for="modalInputEmail1">Number</label>
-                <input class="form-control" id="modalInputEmail1" type="number" name="number"
-                  aria-describedby="emailHelp" required>
-              </div>
-  
-              <div class="mb-3">
-                <label class="form-label" for="modalInputEmail1">Address</label>
-                <input class="form-control" id="modalInputEmail1" type="text" name="address"
-                  aria-describedby="emailHelp" required>
-              </div>
-  
-              <div class="mb-3">
-                <label class="form-label" for="modalInputEmail1">City</label>
-                <input class="form-control" id="modalInputEmail1" type="text" name="city"
-                  aria-describedby="emailHelp" required>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label" for="modalInputEmail1">State</label>
-                <input class="form-control" id="modalInputEmail1" type="text" name="state"
-                  aria-describedby="emailHelp" required>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label" for="modalInputEmail1">Pincode</label>
-                <input class="form-control" id="modalInputEmail1" type="number" name="pincode"
-                  aria-describedby="emailHelp" required>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label" for="modalInputEmail1">Landmark</label>
-                <input class="form-control" id="modalInputEmail1" type="text" name="landmark"
-                  aria-describedby="emailHelp" required>
-              </div>
-   
-           
-              
-              <div class="modal-footer">
-                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
-                <button class="btn btn-primary" type="submit">Add</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- End Modal for Adding Address -->
-  </div>
-
-</div>
 
 <!-- ----------------------------wallet page ---------------------------------------- -->
 <!-- 
@@ -495,7 +390,9 @@
 
 <!-- ------------------------------Main container end---------------------------------------------- -->
 </div>
+<script src="/javascripts/validation.js"></script>
 
+   
 
 <script>
   const sidebar = document.getElementById('sidebar');
@@ -558,20 +455,20 @@
 
   }
 
-  function viewManageAddressPage() {
-    myOrderPage.style.display = 'none';
-    userNamePage.style.display = 'none';
-    changePasswordPage.style.display = 'none';
-    manageAddressPage.style.display = 'block';
-    profileDetailPage.style.display = 'none';
+//   function viewManageAddressPage() {
+//     myOrderPage.style.display = 'none';
+//     userNamePage.style.display = 'none';
+//     changePasswordPage.style.display = 'none';
+//     manageAddressPage.style.display = 'block';
+//     profileDetailPage.style.display = 'none';
 
 
-    document.getElementById('myOrderItem').classList.remove('bg-clr');
-    document.getElementById('changeUsernameItem').classList.remove('bg-clr');
-    document.getElementById('changePasswordItem').classList.remove('bg-clr');
-    document.getElementById('manageAddressItem').classList.add('bg-clr');
-    document.getElementById('walletItem').classList.remove('bg-clr');
-}
+//     document.getElementById('myOrderItem').classList.remove('bg-clr');
+//     document.getElementById('changeUsernameItem').classList.remove('bg-clr');
+//     document.getElementById('changePasswordItem').classList.remove('bg-clr');
+//     document.getElementById('manageAddressItem').classList.add('bg-clr');
+//     document.getElementById('walletItem').classList.remove('bg-clr');
+// }
 
 function viewWalletPage() {
     myOrderPage.style.display = 'none';
@@ -588,6 +485,37 @@ function viewWalletPage() {
     document.getElementById('walletItem').classList.add('bg-clr');
 
 }
+
+'<% user.address.forEach((data,index)=>{ %>'
+    document.getElementById('editAddressForm<%= index %>').addEventListener('submit', function(event) {
+      let isNameValid = validateName('<%= index %>');
+      let isNumberValid = validateNumber('<%= index %>');
+      let isAddressValidate = validateAddress('<%= index %>');
+      let isCityValidate = validateCity('<%= index %>');
+      let isStateValidate = validateState('<%= index %>');
+      let isPincodeValidate = validatePincode('<%= index %>');
+      let isLandmarkValidate = validateLandmark('<%= index %>');
+      
+      if (!(isAddressValidate && isCityValidate && isLandmarkValidate && isNameValid && isNumberValid && isPincodeValidate && isStateValidate)) {
+        event.preventDefault();
+      }
+    });
+  '<% }) %>'
+
+    document.getElementById('addAddress').addEventListener('submit', function(event) {
+      let isNameValid = addressValidateName();
+      let isNumberValid = addressValidateNumber()
+      let isAddressValidate = addressValidateAddress()
+      let isCityValidate = addressValidateCity()
+      let isStateValidate = addressValidateState()
+      let isPincodeValidate = addressValidatePincode()
+      let isLandmarkValidate = addressValidateLandmark()
+      
+      if (!(isAddressValidate && isCityValidate && isLandmarkValidate && isNameValid && isNumberValid && isPincodeValidate && isStateValidate)) {
+        event.preventDefault();
+      }
+    });
+ 
 
 </script>
  

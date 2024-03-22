@@ -59,8 +59,14 @@ router.get('/checkout',sessionCheck.userActivity,userController.getCheckoutPage)
 router.post('/confirmOrder',sessionCheck.userActivity,userController.confirmOrder)
 router.post('/add_address_checkout',sessionCheck.userActivity,userController.addAddressFromCheckout)
 router.post('/placeorderafterpayment',sessionCheck.userActivity,userController.placeOrder)
-  
+router.post('/paymentfailed_handler',sessionCheck.userActivity,userController.handleFailedPayment)
+router.get('/payment_failed_page',sessionCheck.userActivity,userController.paymentFailedPage)
+router.post('/delete_order_from_paymentfail',sessionCheck.userActivity,userController.deleteOrderFromPaymentfail)
+router.post('/order_afterFailedPayment',sessionCheck.userActivity,userController.orderAfterFailedPayment)
+router.post('/order_afterFailedPayment_action',sessionCheck.userActivity,userController.orderAfterFailedPaymentAction)
 
+
+  
 //-------------------Order Management---------------------------
 
 router.get('/my_order',sessionCheck.userActivity,userController.myOrder)

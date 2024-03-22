@@ -37,10 +37,11 @@
                         <th scope="col">Quantity</th>
                         <th scope="col">Status</th>
                         <th scope="col">Action</th>
+                        <th scope="col">View</th>
                     </tr>
                 </thead>
 
-                <tbody style="cursor: grab;" onclick="orderDetailShow(event)">
+                <tbody style="cursor: grab;">
                   <% orderDetails.forEach((order, orderIndex) => { %> 
                     <% order.items.forEach((item, itemIndex) => { %>
                     <tr>
@@ -50,7 +51,7 @@
                         <td><img src="/assets/uploads/<%= item.product.image[item.product.image.length-1] %>" alt="<%= item.product.productName %>" width="60px"></td>
                         <td>$<%= item.price %></td>
                         <td><%= order.paymentType %></td>
-                        <td><%= item.product.category %></td>
+                        <td><%= item.product.category.category %></td>
                         <td><%= item.quantity %></td>
                         <td>
                           <% if (item.orderStatus === "CancelledByAdmin") { %>
@@ -65,21 +66,83 @@
                         </td>
                         <td>
 
-                            <% if ((item.orderStatus === "Delivered" || item.orderStatus === "Shipped") && ((new Date() - new Date(order.createdAt)) / (1000 * 60 * 60 * 24)) <= 1) { %>
-                            <form action="/return_order" method="post">
-                                <input type="hidden" name="orderId" value="<%= order._id %>">
-                                <input type="hidden" name="productId" value="<%= item.product._id %>">
-                                <button type="submit" class="btn btn-danger">Return</button>
-                            </form>
+                            <% if ((item.orderStatus === "Delivered") && ((new Date() - new Date(order.createdAt)) / (1000 * 60 * 60 * 24)) <= 1) { %>
+                            
+                                <button type="submit" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#returnOrderModal<%= itemIndex %>">Return</button>
+
                         <% } else if (item.orderStatus !== "CancelledByAdmin" && item.orderStatus !== "Cancelled By User" && item.orderStatus !== "Returned") { %>
-                            <form action="/cancel_order" method="post">
-                                <input type="hidden" name="orderId" value="<%= order._id %>">
-                                <input type="hidden" name="productId" value="<%= item.product._id %>">
-                                <button type="submit" class="btn btn-danger">Cancel</button>
-                            </form>
+                           
+                                <button type="submit" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelOrderModal<%= itemIndex %>">Cancel</button>
+                            
                         <% } %>
                         </td>
+                        <td><button class="btn btn-success" onclick="orderDetailShow(event)">view detail</button></td>
                     </tr> 
+
+                    <!-- return order model  -->
+
+
+                    <div class="modal fade" id="returnOrderModal<%= itemIndex %>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="exampleModalLabel">Reason for Return this product</h5>
+                              <button type="button" style="background-color: transparent; border: none;"
+                               class="close" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                            <div class="modal-body">
+                              <form action="/return_order" method="post">
+                                <div class="form-group">
+                                <input type="hidden" name="orderId" value="<%= order._id %>">
+                                <input type="hidden" name="productId" value="<%= item.product._id %>">
+                                  <label for="message-text" class="col-form-label"></label>
+                                  <input type="text" name="returnReason" id="message-text">
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                              <button type="submit" class="btn btn-primary">Cancel</button>
+                            </div>
+                        </form>
+                          </div>
+                        </div>
+                      </div>
+
+
+
+                    <!-- cancel order model  -->
+
+                    <div class="modal fade" id="cancelOrderModal<%= itemIndex %>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="exampleModalLabel">Reason For Cancel</h5>
+                              <button type="button" style="background-color: transparent; border: none;"
+                               class="close" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                            <div class="modal-body">
+                              <form action="/cancel_order" method="post">
+                                <div class="form-group">
+                                <input type="hidden" name="orderId" value="<%= order._id %>">
+                                <input type="hidden" name="productId" value="<%= item.product._id %>">
+                                  <label for="message-text" class="col-form-label"></label>
+                                  <input type="text" name="cancelReason" id="message-text">
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                              <button type="submit" class="btn btn-primary">Cancel</button>
+                            </div>
+                        </form>
+                          </div>
+                        </div>
+                      </div>
+
+
                     <% }) %>
               
                   <% }) %>

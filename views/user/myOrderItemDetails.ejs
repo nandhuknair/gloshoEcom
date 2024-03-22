@@ -29,7 +29,14 @@
                         <p class="mt-2 mb-0">Quantity : <%= item.quantity %></p>
                         <p class="">$ <%= item.price %></p>
                         <p>Order Status  <span class="badge bg-warning rounded-pill"><%= item.orderStatus %></span></p>
-
+                        <% if (item.cancelReason) { %>
+                          <h6 style="color: red;">CANCEL REASON</h6>
+                          <p><%= item.cancelReason %></p>
+                      <% } %>
+                      <% if (item.returnReason) { %>
+                        <h6 style="color: red;">RETURN REASON</h6>
+                        <p><%= item.returnReason %></p>
+                    <% } %>
                     </div>  
                 </div>
               </div>

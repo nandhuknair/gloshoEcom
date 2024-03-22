@@ -2,23 +2,96 @@
 
 <div class="container">
 
-    <div class="row mt-3 mb-5">
-        <div class="d-flex justify-content-end"><strong>Total Amount : <%= totalAmount %></strong></div>
+
+        <!-- Modal custom date sales report -->
+<div class="modal fade text-start" id="customDate" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="myModalLabel">Custom date report</h5>
+            <button class="btn-close btn-close-white" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+             
+              <div class="mb-3">
+                <form action="/admin_salesreport" method="get">
+                <label class="form-label" for="start-date">Select Start Date</label>
+                <input class="form-control" id="start-date" type="date" name="start-date" max="9999-12-31" required>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label" for="end-date">Select End Date</label>
+                <input class="form-control" id="end-date" type="date" name="end-date" max="9999-12-31" required>
+              </div>
+
+              <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                <button class="btn btn-primary" id="submitCoupon" type="submit">Generate report</button>
+              </form>
+              </div>
+          </div>
+        </div>
+      </div>
+</div>
+<!-- Modal custom date sales report  -->
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+// Get today's date
+const today = new Date();
+const dd = String(today.getDate()).padStart(2, '0');
+const mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+const yyyy = today.getFullYear();
+const maxDate = `${yyyy}-${mm}-${dd}`;
+
+// Set the maximum date for the date input fields
+document.getElementById('start-date').max = maxDate;
+document.getElementById('end-date').max = maxDate;
+
+// Disable dates greater than today for the end date input field
+document.getElementById('end-date').addEventListener('input', function() {
+    const endDateInput = document.getElementById('end-date');
+    if (endDateInput.value > maxDate) {
+        endDateInput.value = maxDate;
+    }
+});
+});
+
+</script>
+
+<div id="toastContainer" aria-live="polite" aria-atomic="true" style="position: absolute; top: 0; right: 0;">
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true">
+        <div class="toast-header">
+            <strong class="me-auto">Error</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            <span id="toastMessage"></span>
+        </div>
     </div>
-<a href="/admin_salesreport/download">Download the sales report</a>
+</div>
+
+
+    <div class="row mt-3 mb-5">
+        <h3 class=""><%= heading %></h3>
+        <div class="d-flex justify-content-end"> <strong>Total Amount :<h1> <%= totalAmount %></h1></strong></div>
+    </div>
 
     <div class="row mt-3 mb-4">
         <form action="/admin_salesreport" method="get">
             <div class="mb-3">
                 <label for="rangeSelect" class="form-label">Select Time Range:</label>
                 <select class="form-select" id="rangeSelect" name="range">
-                    <option value="weekly">Weekly</option>
                     <option value="monthly">Monthly</option>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
                     <option value="yearly">Yearly</option>
                 </select>
             </div>
             <button type="submit" class="btn btn-primary">Generate Report</button>
+            <a href="/admin_salesreport/download"><button type="button" class="btn btn-primary">Download the sales report</button></a>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#customDate">Custom Date</button>
         </form>
+
     </div>
 
     <table id="salesReportTable" class="table table-striped table-hover">
@@ -27,10 +100,9 @@
                 <th>Order Date</th>
                 <th>Username</th>
                 <th>Product Name</th>
-                <th>Product Price</th>
                 <th>Product Offer</th>
                 <th>Category Offer</th>
-                <th>Total Offer</th>
+                <th>Coupon Applied </th>
                 <th>Total Amount</th>
     
             </tr>
@@ -42,13 +114,10 @@
                         <td><%= orderItem.createdAt %></td>
                         <td><%= orderItem.userId.userName %></td>
                         <td><%= item.product.productName %></td>
-                        <td>$<%= item.product.price %></td>
                         <td><%= item.productOfferPrice > 0 ? item.productOfferName : 'No offer' %></td>
                         <td><%= item.categoryOfferPrice > 0 ? item.categoryOfferName : 'No offer' %></td>
-                        <% const totalOffer = item.productOfferPrice + item.categoryOfferPrice; %>
-                        <td><%= totalOffer > 0 ? '$' + totalOffer : '-' %></td>
+                        <td><%= orderItem.couponApplied ? '$ ' + orderItem.couponApplied.discount : '-' %></td>
                         <td class="totalPrice">$<%= orderItem.totalAmount %></td>
-                        
                     </tr>
                 <% }) %>
             <% }) %>

@@ -48,16 +48,71 @@
                         <td><%= order.estimateDeliveryDate %></td>
                         <td><%= order.paymentType %></td>
                         <td>$<%= order.totalAmount %></td>
-                        <td> <button onclick="orderDetailShow(event)"
-                        style="border: none; background-color: transparent;">
-                        View</button></td>
-                        <td><a href="/download_invoice/:<%= order._id %>">Download Invoice</a></td>
+                        <td> 
+                            <% if(order.paymentType === 'Pending'){ %>
+                                <button class="btn btn-success" onclick="confirmOrder('<%= order._id %>')">Sart Payment Again</button>
+                              <% } else{ %>  
+                                <button onclick="orderDetailShow(event)"
+                                style="border: none; background-color: transparent;">
+                                View</button>
+                             <% } %>
+                        </td>
+                        <td>
+                            <% if(order.paymentType === 'Pending'){ %>
+                                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelOrder<%= orderIndex %>">Cancel order</button>
+                              <% } else{ %>  
+                                <a href="/download_invoice/:<%= order._id %>">Download Invoice</a>
+                             <% } %>
+                        </td>
                     </tr> 
+                    <div class="modal fade" id="cancelOrder<%= orderIndex %>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="exampleModalLabel">Cancel the order</h5>
+                              <button type="button" style="border: none; background-color: transparent;"
+                              class="close" data-bs-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                            <div class="modal-body">
+                              <p style="color:red; font-size: 20px;">Are you sure for cancel this order !</p>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                              <form action="/delete_order_from_paymentfail" method="post">
+                              <input type="hidden" name="orderId" value="<%= order._id %>">
+                              <button type="submit" class="btn btn-primary">Yes</button>
+                            </form>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
                   <% }) %>
                 </tbody>
-                
             </table>
         </div>
+  <!-- Modal -->
+
+       <!--order confirm end -->
+       <div class="fade modal" id="placedOrder" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+       aria-hidden="true">
+       <div class="modal-dialog" role="document">
+         <div class="modal-content">
+           <div class="modal-header justify-content-center">
+
+             <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal"
+               aria-label="Close"></button>
+           </div>
+           <div class="modal-body align-items-center d-flex flex-column">
+             <i class="fa-solid fa-circle-check orderSucessTick"></i>
+             <p class="para_text text-center mt-4">Order Successfully Placed </p>
+             <p class="head_text" style="letter-spacing: 1px;">THANKYOU</p>
+           </div>
+         </div>
+       </div>
+     </div>
 
         <!-- Pagination -->
         <nav aria-label="Page navigation">
@@ -72,12 +127,93 @@
     </div>
     <% } %>
 </div>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
+ const placedOrderModal = new bootstrap.Modal(document.getElementById('placedOrder'));
+function orderDetailShow(event){
+    let orderId = event.target.closest('tr').querySelector('.orderId').value;
+    window.location.href = `/my_order_items?orderId=${orderId}`;
+}
+function placeOrderAfterPayment(orderId) {
+        
+        fetch('/order_afterFailedPayment_action', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            orderId:orderId
+        })
+      })
+        .then(response => {
+          if (response.ok) {
+            return response.json();
+          }
+          else {
+            throw new Error('Failed to place order after payment');
+          }
+        })
+        .then(data => {
+          console.log('Order placed successfully:', data);
 
-    function orderDetailShow(event){
-        let orderId = event.target.closest('tr').querySelector('.orderId').value;
-        window.location.href = `/my_order_items?orderId=${orderId}`;
+        })
+        .catch(error => {
+          console.error('Error placing order after payment:', error);
+        });
     }
+
+
+function confirmOrder(orderId){
+    fetch('/order_afterFailedPayment', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            orderId:orderId
+          })
+        })
+          .then(response => {
+            if (response.ok) {
+              return response.json();
+            } else {
+              throw new Error('Failed to confirm order');
+            }
+          })
+          .then(data => {
+            const option = {
+              key: data.razorpayKey,
+              amount: data.razorpayOrderId.amount,
+              currency: 'INR',
+              name: 'Glosho',
+              image: '/images/images/pexels-snack-toronto-1630344.jpg',
+              description: 'Payment for your order',
+              order_id: data.razorpayOrderId,
+              prefill: {
+                name: 'User Name',
+                email: 'user@example.com',
+                contact: '9999999999'
+              },
+              theme: {
+                color: '#3399cc'
+              },
+              handler: function () {
+                placeOrderAfterPayment(orderId)
+                placedOrderModal.show();
+                setTimeout(() => {
+                  window.location.href = '/my_order'
+                }, 2600);
+              }
+
+            };
+            const rzp = new Razorpay(option);
+            rzp.open();
+            rzp.on('payment.failed',function(){
+              window.location.href = '/payment_failed_page'
+            })
+      
+          })
+}
 
 </script>
 

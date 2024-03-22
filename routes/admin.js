@@ -10,7 +10,7 @@ router.get('/admin_panel',adminController.adminPanel)
 router.get('/admin/forgot_password',session.adminSession,adminController.forgotPassword)
 router.get('/admin/resend_otp',session.adminSession,adminController.resendOtp)
 router.get('/admin_logout',adminController.adminLogout)
-
+router.get('/sales_data', adminController.getSalesData);
 
 router.post('/admin/forgot_password',adminController.sendOTP)
 router.post('/admin_login',adminController.loginAction)

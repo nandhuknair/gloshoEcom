@@ -22,6 +22,14 @@ const orderSchema=new mongoose.Schema({
               type:String,
               default:"Placed"
             },
+            cancelReason: {
+              type:String,
+              default:null
+            },
+            returnReason: {
+              type:String,
+              default:null
+            },
             productOfferName:{
               type:String,
               default:null

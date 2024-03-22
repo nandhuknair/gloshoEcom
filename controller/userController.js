@@ -657,7 +657,6 @@ exports.viewCart = async (req, res) => {
     console.log("Entered to get cart page");
     const userId = req.session.userLoggedIn;
     let cartItem = await Cart.find({ userId: userId }).populate("productId");
-    console.log(cartItem)
 
     cartItem = await Promise.all(
       cartItem.map(async (item) => {
@@ -748,37 +747,48 @@ exports.editCart = async (req, res) => {
 
 exports.listProducts = async (req, res) => {
   try {
+    const categories = await Category.find({ active: true });
+    let userLoggedIn = req.session.userLoggedIn;
     let products;
     if (req.query.sortBy) {
       switch (req.query.sortBy) {
-        case "priceLowToHigh":
-          products = await Product.find({ isAvailable: true }).sort({
-            price: 1,
-          });
-          break;
-
-        case "priceHighToLow":
-          products = await Product.find({ isAvailable: true }).sort({
-            price: -1,
-          });
-          break;
-
-        case "A-Z":
-          products = await Product.find({ isAvailable: true }).sort({
-            productName: 1,
-          });
-          break;
-
-        case "Z-A":
-          products = await Product.find({ isAvailable: true }).sort({
-            productName: -1,
-          });
-          break;
-
-        default:
-          products = await Product.find({ isAvailable: true });
-          break;
+          case "priceLowToHigh":
+              if (req.query.categoryId) {
+                  products = await Product.find({ isAvailable: true, category: req.query.categoryId }).sort({ price: 1 });
+              } else {
+                  products = await Product.find({ isAvailable: true }).sort({ price: 1 });
+              }
+              break;
+  
+          case "priceHighToLow":
+              if (req.query.categoryId) {
+                  products = await Product.find({ isAvailable: true, category: req.query.categoryId }).sort({ price: -1 });
+              } else {
+                  products = await Product.find({ isAvailable: true }).sort({ price: -1 });
+              }
+              break;
+  
+          case "A-Z":
+              if (req.query.categoryId) {
+                  products = await Product.find({ isAvailable: true, category: req.query.categoryId }).sort({ productName: 1 });
+              } else {
+                  products = await Product.find({ isAvailable: true }).sort({ productName: 1 });
+              }
+              break;
+  
+          case "Z-A":
+              if (req.query.categoryId) {
+                  products = await Product.find({ isAvailable: true, category: req.query.categoryId }).sort({ productName: -1 });
+              } else {
+                  products = await Product.find({ isAvailable: true }).sort({ productName: -1 });
+              }
+              break;
+  
+          default:
+                  products = await Product.find({ isAvailable: true, category: req.query.categoryId });
+              break;
       }
+  
     }else if(req.query.categoryId) {
       const { categoryId } = req.query
       products = await Product.find({
@@ -790,9 +800,7 @@ exports.listProducts = async (req, res) => {
       products = await Product.find({ isAvailable: true });
     }
     
-    const categories = await Category.find({ active: true });
-    let userLoggedIn = req.session.userLoggedIn;
-    res.render("user/allProducts", { products, userLoggedIn, categories });
+     res.render("user/allProducts", { products, userLoggedIn, categories ,categoryId:req.query.categoryId});
   } catch (error) {
     console.log(error);
     return res.redirect("/error");
@@ -888,6 +896,9 @@ exports.confirmOrder = async (req, res) => {
 
   try {
     const userData = await User.findById(req.session.userLoggedIn);
+    if(!userData){
+      return res.status(400).json({message:'Something went wrong for the user data'})
+    }
     const address = userData.address[selectedaddress];
     const orderedItems = [];
 
@@ -902,6 +913,7 @@ exports.confirmOrder = async (req, res) => {
           );
         }
         let currentPrice = product.price * quantity;
+
         if (product.productOfferPrice > 0 && product.categoryOfferPrice > 0) {
           orderedItems.push({
             product: product._id,
@@ -943,13 +955,21 @@ exports.confirmOrder = async (req, res) => {
         paymentType: selectedpayment,
         couponApplied: req.session.couponApplied,
       });
+      if(!order){
+       return res.status(400).json({message:"Something went wrong whiel placing the order"})
+      }
       req.session.appliedCoupons = [];
       await order.save();
     }
 
     if (selectedpayment === "COD") {
-      await placeOrder();
-      res.status(200).json({ message: "Order confirmed successfully" });
+      if(totalPrice > 1000){
+       return res.status(400).json({ message: "Order above Rs 1000 should not be allowed for COD" });
+      }else{
+        await placeOrder();
+        return res.status(200).json({ message: "Order confirmed successfully" });
+      }
+      
     } else if (selectedpayment === "RAZORPAY") {
       const orderOptions = {
         amount: totalPrice * 100, // Razorpay amount is in paisa (multiply by 100)
@@ -957,7 +977,11 @@ exports.confirmOrder = async (req, res) => {
         receipt: "order_receipt",
         payment_capture: 1, // Automatically capture the payment
       };
+
+      console.log(orderOptions);
       const razorpayOrder = await razorpay.orders.create(orderOptions);
+
+      console.log(razorpayOrder)
       console.log("Starting to create an order");
       if (!razorpayOrder) {
         res.status(400).json({
@@ -994,7 +1018,7 @@ exports.confirmOrder = async (req, res) => {
     }
   } catch (error) {
     console.error("Error confirming order:", error);
-    return res.redirect("/error");
+    return res.status(500).json({message:'Sorry something went wrong try another method for payment '});
   }
 };
 
@@ -1013,10 +1037,7 @@ exports.placeOrder = async (req, res) => {
           `Product stock limit exceeded for item ${cartItem.productId}`
         );
       }
-
       let currentPrice = product.price * quantity;
-      console.log(currentPrice);
-
       orderedItems.push({
         product: product._id,
         quantity: quantity,
@@ -1115,7 +1136,13 @@ exports.myOrderItemDetails = async (req, res) => {
 exports.myOrderItems = async (req, res) => {
   try {
     const orderId = req.query.orderId;
-    const order = await Order.findById(orderId).populate("items.product");
+    const order = await Order.findById(orderId).populate({
+      path: 'items.product',
+      populate: {
+        path: 'category',
+        model: 'Category'
+      }
+    })
 
     if (!order) {
       return res.status(404).send("Order not found");
@@ -1125,6 +1152,126 @@ exports.myOrderItems = async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).redirect("/error");
+  }
+};
+
+//Handiling failed payments 
+
+exports.handleFailedPayment = async (req,res)=> {
+  try {
+    const { selectedaddress, cartdocs, totalPrice } = req.body;
+    const userData = await User.findById(req.session.userLoggedIn);
+    const address = userData.address[selectedaddress];
+    const orderedItems = [];
+    console.log(cartdocs)
+    for (const cartItem of cartdocs) {
+      const { productId, quantity } = cartItem;
+      const product = await Product.findById(productId);
+
+      let currentPrice = product.price * quantity;
+     
+      orderedItems.push({
+        product: product._id,
+        quantity: quantity,
+        price: currentPrice,
+      });
+      await Cart.findByIdAndDelete(cartItem._id);
+      const order = new Order({
+        userId: req.session.userLoggedIn,
+        items: orderedItems,
+        totalAmount: totalPrice,
+        address: address,
+        paymentType: 'Pending',
+        couponApplied: req.session.couponApplied,
+      });
+      req.session.appliedCoupons = [];
+      await order.save();
+      return res.redirect('/my_order')
+    }
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).redirect("/error");
+  }
+}
+
+exports.paymentFailedPage = async(req,res)=> {
+  try {
+    res.render('user/paymentFailed')
+  } catch (error) {
+    console.error(error);
+    return res.status(500).redirect("/error");
+  }
+}
+
+exports.deleteOrderFromPaymentfail = async(req,res)=> {
+  try {
+    const {orderId} = req.body
+    console.log(orderId)
+    await Order.findByIdAndDelete(orderId)  
+    res.redirect('/my_order')
+  } catch (error) {
+    console.error(error);
+    return res.status(500).redirect("/error");
+  }
+}
+
+exports.orderAfterFailedPayment = async (req,res)=> {
+  try {
+    const order = await Order.findById(req.body.orderId)
+    let totalPrice = order.totalAmount
+    const orderOptions = {
+      amount: totalPrice * 100, // Razorpay amount is in paisa (multiply by 100)
+      currency: "INR",
+      receipt: "order_receipt",
+      payment_capture: 1, // Automatically capture the payment
+    };
+
+    console.log(orderOptions);
+    const razorpayOrder = await razorpay.orders.create(orderOptions);
+    console.log("Starting to create an order");
+    if (!razorpayOrder) {
+      res.status(400).json({
+        message:
+          "Something went wrong while placing order on Razorpay try again",
+      });
+    } else {
+      // Return the Razorpay order details as a response
+      res.status(200).json({
+        razorpayOrderId: razorpayOrder.id,
+        razorpayKey: process.env.KEY_ID,
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).redirect("/error");
+  }
+}
+
+exports.orderAfterFailedPaymentAction = async (req, res) => {
+  try {
+    const { orderId } = req.body; 
+    console.log(orderId +'THIs IS ORDER ID !@#$%^&*()_')
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(400).json({ message: "No order found" });
+    }
+
+    // Update product stock and order item status for each item in the order
+    for (const item of order.items) {
+      const product = await Product.findById(item.product);
+      if (!product) {
+        return res.status(400).json({ message: `Product with ID ${item.product} not found` });
+      }
+      product.stock -= item.quantity; // Decrease product stock
+      await product.save();  
+    }
+    order.paymentType = ' RAZORPAY'
+    await order.save();
+    res.status(200).json({ message: "Order updated after failed payment" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -1429,7 +1576,8 @@ exports.downloadInvoice = async (req, res) => {
 
 exports.cancelOrder = async (req, res) => {
   try {
-    const { orderId, productId } = req.body;
+    const { orderId, productId ,cancelReason} = req.body;
+    console.log(cancelReason)
     const user = await User.findById(req.session.userLoggedIn);
     const order = await Order.findById(orderId);
     if (!order) {
@@ -1443,12 +1591,12 @@ exports.cancelOrder = async (req, res) => {
     }
 
     if (order.paymentType === "COD") {
-      await cancelProductOrder(order, item);
+      await cancelProductOrder(order, item , cancelReason);
     } else if (
       order.paymentType === "RAZORPAY" ||
       order.paymentType === "WALLET"
     ) {
-      await cancelProductOrder(order, item);
+      await cancelProductOrder(order, item, cancelReason);
       await addToWallet(user, item);
     }
     res.redirect("/my_order");
@@ -1458,8 +1606,9 @@ exports.cancelOrder = async (req, res) => {
   }
 };
 
-async function cancelProductOrder(order, item) {
+async function cancelProductOrder(order, item, cancelReason) {
   item.orderStatus = "Cancelled By User";
+  item.cancelReason = cancelReason
   await order.save();
 
   const product = await Product.findById(item.product);
@@ -1485,7 +1634,7 @@ async function addToWallet(user, item) {
 
 exports.returnItem = async (req, res) => {
   try {
-    const { orderId, productId } = req.body;
+    const { orderId, productId , returnReason} = req.body;
 
     const order = await Order.findById(orderId);
     if (!order) {
@@ -1500,6 +1649,7 @@ exports.returnItem = async (req, res) => {
     }
 
     item.orderStatus = "Returned";
+    item.returnReason = returnReason
     await order.save();
 
     const product = await Product.findById(productId);
@@ -1583,6 +1733,7 @@ exports.searchAction = async (req, res) => {
       products,
       userLoggedIn: userLoggedIn,
       categories,
+      categoryId:req.query.categoryId
     });
   } catch (error) {
     console.error(error);
@@ -1732,6 +1883,8 @@ exports.checkCoupon = async (req, res) => {
           .json({ message: `Purchase more than ${couponExist.limit}` });
       }
       req.session.appliedCoupons = [...appliedCoupons, couponCode];
+      const coupon = await Coupon.findOne({couponCode:couponCode})
+      req.session.couponApplied = coupon._id
       const discountedPrice = totalPrice - couponExist.discount;
       
       res.status(200).json({
