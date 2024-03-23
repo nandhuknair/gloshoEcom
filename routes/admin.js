@@ -35,6 +35,7 @@ router.post('/admin_add_product',session.adminActivity,adminController.upload,ad
 router.post('/admin_edit_product',session.adminActivity,adminController.upload,adminController.editProducts)
 router.get('/admin_list_product',session.adminActivity,adminController.listProduct)
 router.get('/admin_unlist_product',session.adminActivity,adminController.unListProduct)
+router.delete('/delete_product_image',session.adminActivity,adminController.deleteImageFromEdit)
 
 
 router.get('/admin_orders',session.adminActivity,adminController.orderDetails)

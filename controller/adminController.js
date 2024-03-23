@@ -585,7 +585,7 @@ exports.addProducts = async function (req, res, next) {
 
 exports.editProducts = async function (req, res, next) {
   try {
-    const { id } = req.query;
+    const { productId } = req.query;
 
     if (req.body.price <= 0) {
       return res.redirect("/admin_products");
@@ -600,7 +600,10 @@ exports.editProducts = async function (req, res, next) {
     }
 
     if (req.files && req.files.length > 0) {
-      const arrImages = req.files.map((value) => value.filename);
+      // Fetch existing product
+      const product = await Product.findById(productId);
+      // Append new images to existing images
+      const arrImages = [...product.image, ...req.files.map((value) => value.filename)];
       updateFields.image = arrImages;
     }
 
@@ -628,13 +631,44 @@ exports.editProducts = async function (req, res, next) {
       updateFields.stock = req.body.stock;
     }
 
-    await Product.findOneAndUpdate({ _id: id }, { $set: updateFields });
+    await Product.findOneAndUpdate({ _id: productId }, { $set: updateFields });
 
     res.redirect("/admin_products");
   } catch (error) {
     console.log(error);
   }
 };
+
+
+exports.deleteImageFromEdit =  async (req, res) => {
+  const productId = req.query.id;
+  const imageToDelete = req.query.image;
+
+  try {
+    // Find the product by ID
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    // Remove the image from the product's images array
+    const index = product.image.indexOf(imageToDelete);
+    if (index !== -1) {
+      product.image.splice(index, 1);
+      // Save the updated product
+      await product.save();
+      return res.status(200).json({ message: 'Image deleted successfully' });
+    } else {
+      return res.status(404).json({ message: 'Image not found in product' });
+    }
+  } catch (error) {
+    console.error('Error deleting image:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+
+};
+
+
 
 exports.listProduct = async (req, res) => {
   try {

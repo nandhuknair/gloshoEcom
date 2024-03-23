@@ -114,7 +114,7 @@
                           </div>
                           <div class="modal-body">
                             <p></p>
-                            <form action="/admin_edit_product?id=<%= data._id %>" id="editProductForm<%= index %>"
+                            <form action="/admin_edit_product?productId=<%= data._id %>" id="editProductForm<%= index %>"
                               method="post" enctype="multipart/form-data" multiple
                               accept="image/png, image/gif, image/jpeg, image/jpg ,image/webp">
                               <div class="mb-3">
@@ -176,21 +176,20 @@
                                 <p style="color: red;" id="error-stock<%= index %>"></p>
                               </div>
 
-                              <% data.image.forEach(image=> { %>
-                                <img src="/assets/uploads/<%= image %>" height="60px" width="60px">
-                                <% }); %>
-
-
-                                  <div class="mb-3">
-                                    <label class="form-label" for="modalInputEmail1">Images</label>
-
-                                    <p>Current Choosed Images</p>
-
-                                    <!-- <div id="previewContainer" class="row mb-4"></div> -->
-
-                                    <p style="color: red;">Can only add up to 12 images *</p>
-                                    <input class="form-control" id="" type="file" name="images" multiple required>
+                              <div class="mb-3">
+                                <label class="form-label" for="modalInputEmail1">Images</label>
+                                <p>Current Choosed Images</p>
+                                <% data.image.forEach((image, imageIndex) => { %>
+                                  <div class="d-flex align-items-center mb-2">
+                                    <img src="/assets/uploads/<%= image %>" height="60px" width="60px">
+                                    <button class="btn btn-danger btn-sm ms-2" type="button" onclick="deleteImage('<%= data._id %>', '<%= image %>', '<%= imageIndex %>')">Delete</button>
                                   </div>
+                                <% }); %>
+                                <div id="imagePreviews" class="mt-2"></div>
+                                <p style="color: red;">Can only add up to 12 images *</p>
+                                <input class="form-control" id="fileInput" type="file" name="images" multiple onchange="previewImages()">
+                              </div>
+
 
                                   <div class="modal-footer">
                                     <button class="btn btn-secondary" type="button"
@@ -211,6 +210,54 @@
     </div>
 
     <script>
+
+
+ // Function to preview newly selected images
+ function previewImages() {
+    const fileInput = document.getElementById('fileInput');
+    const imagePreviews = document.getElementById('imagePreviews');
+    imagePreviews.innerHTML = ''; // Clear previous previews
+
+    const files = fileInput.files;
+    for (const file of files) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const imgElement = document.createElement('img');
+        imgElement.src = e.target.result;
+        imgElement.height = 60;
+        imgElement.width = 60;
+        imagePreviews.appendChild(imgElement);
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+
+//-------------------editing the image 
+async function deleteImage(productId, imageName, imageIndex) {
+    try {
+      const response = await fetch(`/delete_product_image?id=${productId}&image=${imageName}`, {
+        method: 'DELETE'
+      });
+      if (response.ok) {
+        // Remove the deleted image from the UI
+        const imageDiv = document.querySelector(`#image_${imageIndex}`);
+        if (imageDiv) {
+          imageDiv.remove();
+        }
+        toastr.error('Image deleted successfully','Success')
+        setTimeout(() => {
+          window.location.href = '/admin_products'
+        }, 1000);
+      } else {
+        console.error('Failed to delete image');
+        toastr.error('Failed to delete image','Sorry')
+      }
+    } catch (error) {
+      console.error('Error deleting image:', error);
+    }
+  }
+
 
       function editValidateProductName(index) {
         const name = document.getElementById('productName' + index).value
@@ -357,7 +404,7 @@
                 <p style="color: red;">Can only add up to 12 images *</p>
 
                 <div id="previewContainer" class="row mb-4"></div>
-                <input class="form-control" type="file" name="images" multiple required>
+                <input class="form-control" id="fileInput" type="file" name="images" multiple required>
               </div>
 
               <div class="modal-footer">
@@ -407,30 +454,53 @@
   </div>
 
   <script>
-    document.getElementById('modalInputFile').addEventListener('change', function (event) {
-      const previewContainer = document.getElementById('previewContainer');
-      const files = event.target.files;
 
-      previewContainer.innerHTML = ''; // Clear previous previews
+//------------------------- edit image preview 
 
-      for (const file of files) {
-        const reader = new FileReader();
 
-        reader.onload = function (e) {
-          const imgElement = document.createElement('img');
-          imgElement.src = e.target.result;
-          imgElement.style.maxWidth = '110px';
-          imgElement.style.maxHeight = '110px';
-          imgElement.style.marginTop = '10px';
-          previewContainer.style.display = 'flex'
+//add product image preivew container
 
-          previewContainer.appendChild(imgElement);
-        };
+document.getElementById('fileInput').addEventListener('change', function (event) {
+  const previewContainer = document.getElementById('previewContainer');
+  const files = event.target.files;
 
-        reader.readAsDataURL(file);
-      }
-    });
+  previewContainer.innerHTML = ''; // Clear previous previews
 
+  for (const file of files) {
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+      const imgElement = document.createElement('img');
+      imgElement.src = e.target.result;
+      imgElement.style.maxWidth = '110px';
+      imgElement.style.maxHeight = '110px';
+      imgElement.style.marginTop = '10px';
+      
+      const removeBtn = document.createElement('button');
+      removeBtn.textContent = 'Remove';
+      removeBtn.classList.add('btn', 'btn-danger', 'btn-sm', 'mx-2');
+      removeBtn.addEventListener('click', function() {
+        // Remove the corresponding image preview
+        const previewDiv = removeBtn.parentElement;
+        previewContainer.removeChild(previewDiv);
+        // Remove the corresponding file from the file input's files list
+        const removedFileIndex = Array.from(previewContainer.children).indexOf(previewDiv);
+        const updatedFiles = Array.from(files);
+        updatedFiles.splice(removedFileIndex, 1);
+        // Update the file input's files list
+        event.target.files = new FileList(updatedFiles);
+      });
+
+      const previewDiv = document.createElement('div');
+      previewDiv.appendChild(imgElement);
+      previewDiv.appendChild(removeBtn);
+      previewContainer.style.display = 'flex';
+      previewContainer.appendChild(previewDiv);
+    };
+
+    reader.readAsDataURL(file);
+  }
+});
 
     function truncateDescription(text, limit) {
       return text.length > limit ? text.slice(0, limit) + '...' : text;
