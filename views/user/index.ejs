@@ -1,204 +1,312 @@
 <% if (userLoggedIn) { %>
-    <%- include('userAfterLogin') %>
-  <% } else { %>
-    <%- include('userHeader') %>
- <% } %>
-  <!-- Slider main container -->
-<div class="swiper">
+        <%- include('userAfterLogin') %>
+    <% } else { %>
+        <%- include('userHeader') %>
+    <% } %>
+    <!-- Slider main container -->
+    <div class="swiper" data-aos="fade">
         <!-- Additional required wrapper -->
         <div class="swiper-wrapper">
-          <!-- Slides -->
-        <% banners.forEach(banner=> { %>
-        
-        
-                <div class="swiper-slide" style="background-image: url('/assets/uploads/<%= banner.image %>');">
-                       <!-- <div class=""> <i class="fa-solid fa-angle-down fa-4x"></i></div> -->
-                        <div class="col-lg-6 ms-5 banner_div">
-                                <h1 class="bannerHeading"><%= banner.heading.toUpperCase() %></h1>
-                                <p class="bannerSubheading"><%= banner.subheading.toUpperCase() %></p>
-                                <a class="bannerBtn" href="/products?categoryId=<%= banner.brandId %>"><%= banner.brandName.toUpperCase() %></a>
-                         </div>
-         
-                 </div>
-                 <% }) %>                                                               
-                                
-                                
-
+            <!-- Slides -->
+            <% banners.forEach(banner=> { %>
+            <div class="swiper-slide" style="background-image: url('/assets/uploads/<%= banner.image %>');" data-aos="fade">
+            </div>
+            <% }) %>                                                               
         </div>
         
         <!-- If we need pagination -->
         <div class="swiper-pagination"></div>
-      
         <!-- If we need navigation buttons -->
         <div class="swiper-button-prev"></div>
         <div class="swiper-button-next"></div>
-      
-      </div>
-      
-      
-      
-      <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-      <script>
-        const swiper = new Swiper('.swiper', {
-          loop: true,
-          speed: 1000,
-          effect: "cube",
-          grabCursor: true,
-          cubeEffect: {
-            shadow: true,
-            slideShadows: true,
-            shadowOffset: 20,
-            shadowScale: 0.94,
-          },
-      
-          navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-          },
-        })
-      </script>
-      
-      
-      
-
-
-  <section class="section-products">
-    <div class="container">
-            
-        <div class="col-md-8 col-lg-6">
-             
-                  <h2 class="heading">TRENDING</h2>
-             
-              </div>
-
-       
-              <div class="row">
+    </div>
+    
+    <div class="container mb-5 mt-5">
+        <h2 class="heading mt-3 mb-2">STARRING</h2>
+        <section class="text-center about">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-4 col-sm-6 col-ex-12 about-item wowlightSpeedIn" data-wow-offset="200" data-aos-duration="2000" data-aos="fade-right">
+                        <a href="/all_products">  
+                            <span><img src="/images/icon/free-adidas-logo-icon.svg" alt=""></span>
+                        </a>
+                    </div>
+                    <div class="col-lg-4 col-sm-6 col-ex-12 about-item wow lightSpeedIn" data-wow-offset="200" data-aos-duration="2500" data-aos="fade-right">
+                        <span><img src="/images/icon/nike.svg" alt=""></span>
+                    </div>
+                    <div class="col-lg-4 col-sm-6 col-ex-12 about-item wow lightSpeedIn" data-wow-offset="200" data-aos-duration="3000" data-aos="fade-right">
+                        <span><img src="/images/icon/gucci.svg" alt=""></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <!-- Rest of your HTML code with AOS fade animation -->
+    <div class="container mb-5" data-aos-duration="1000" data-aos="fade">
+        <div id="bannerCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <% banners.reverse().forEach((banner, index) => { %>
+                <div class="carousel-item <%= index === 0 ? 'active' : '' %>" >
+                    <div class="row align-items-center banner-container " style="background-color: rgb(240, 240, 240);">
+                        <div class="col-md-6">
+                            <div class="banner-image-wrapper">
+                                <img src="/assets/uploads/<%= banner.image %>" style="height: 450px;" alt="Banner Image" class="img-fluid banner-image">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="banner-content">
+                                <h2 class="banner-heading"><%= banner.heading.toUpperCase() %></h2>
+                                <p class="banner-subheading"><%= banner.subheading.toUpperCase() %></p>
+                                <a href="/all_products?categoryId=<%= banner.brandId %>" class="btn btn-dark">Shop Now</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% }) %>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#bannerCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
+    
+    <section class="section-products">
+        <div class="container">
+            <div class="col-md-8 col-lg-6">
+                <h2 class="heading">TRENDING</h2>
+            </div>
+            <div class="row">
                 <% products.forEach((data,index) => { %>
                 <!-- Single Product -->
-                <div class="col-md-6 col-lg-4 col-xl-3 mb-4 <% if (data.stock <= 0) { %>out-of-stock<% } %>">
-                        <div id="product-1" class="single-product">
-                                <div class="part-1" style="background: url('/assets/uploads/<%= data.image[data.image.length-1] %>'); background-size: cover;
-                                    transition: all 0.3s;
-                                    background-position:center;">
-                                        <ul>
-
-                                             <li>
-
-                                                <% if (userLoggedIn) { %>
-                                                    <button data-bs-toggle="modal" data-bs-target="#exampleModalCart" class="cart_button" value="<%= data._id %>"><i class="fas fa-shopping-cart"></i></button>
-                                                    <% } else { %>
-                                                      <a href="/login"><i class="fas fa-shopping-cart"></i></a>
-                                               <% } %> 
-
-                                               <% if (userLoggedIn) { %>
-                                                    <button class="wishlist_button" value="<%= data._id %>"><i class="fas fa-heart"></i></button>
-                                                    <% } else { %>
-                                                      <a href="/login"><i class="fas fa-heart"></i></a>
-                                               <% } %> 
-                                                    
-                                                <li><a href="/product?id=<%= data._id %>"><i class="fas fa-expand"></i></a></li>
-                                        </ul>
-                                
-                                
-                                    </div>
-                                <div class="part-2">
-                                        <h3 class="product-title" style="letter-spacing: 1px;"><%= data.productName %></h3>
-                                     
-                                        <h4 class="product-price" style="color: #FF871D;">$<%= data.price %></h4>
-                                </div>
-                       
-               </div> 
-               <% if (data.stock <= 0) { %>
+                <div class="col-md-6 col-lg-4 col-xl-3 mb-4 <% if (data.stock <= 0) { %>out-of-stock<% } %>" data-aos-duration="1500" data-aos="fade-right">
+                    <div id="product-1" class="single-product">
+                        <div class="part-1" style="background: url('/assets/uploads/<%= data.image[data.image.length-1] %>'); background-size: cover; transition: all 0.3s; background-position:center;">
+                            <ul>
+                                <li>
+                                    <% if (userLoggedIn) { %>
+                                    <button data-bs-toggle="modal" data-bs-target="#exampleModalCart" class="cart_button" value="<%= data._id %>"><i class="fas fa-shopping-cart"></i></button>
+                                    <% } else { %>
+                                    <a href="/login"><i class="fas fa-shopping-cart"></i></a>
+                                    <% } %>
+                                    <% if (userLoggedIn) { %>
+                                    <button class="wishlist_button" value="<%= data._id %>"><i class="fas fa-heart"></i></button>
+                                    <% } else { %>
+                                    <a href="/login"><i class="fas fa-heart"></i></a>
+                                    <% } %>
+                                    <li><a href="/product?id=<%= data._id %>"><i class="fas fa-expand"></i></a></li>
+                            </ul>
+                        </div>
+                        <div class="part-2">
+                            <h3 class="product-title" style="letter-spacing: 1px;"><%= data.productName %></h3>
+                            <h4 class="product-price" style="color: #FF871D;">$<%= data.price %></h4>
+                        </div>
+                    </div>
+                    <% if (data.stock <= 0) { %>
                     <div style="color:crimson;" class="out-of-stock-label">OUT OF STOCK</div>
-                <% } %>
-            </div>
-
-       <!-- Modal For Add to cart -->
-       
-       <div class="modal fade" id="exampleModalCart" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <!-- <h5 class="head_text" id="exampleModalLabel">ARE YOU SURE</h5> -->
-                  <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <% } %>
                 </div>
-                <div class="modal-body">
-                <p class="para_text text-center">Product Successfully Added To The Cart ✅ </p>  
-                </div>
-              </div>
-            </div>
-          </div>
-
-
                 <% }); %>
+            </div>
         </div>
-</div>
-<div class="text-center"><a href="/all_products"><button style="border-radius: 50%;" class="browseAll"> <i class="fa-solid fa-chevron-right"></i></button></a><div>
-</section>
+    </section>
+    
+    <div class="text-center" data-aos="fade">
+        <a href="/all_products"><button style="border-radius: 50%;" class="browseAll"> <i class="fa-solid fa-chevron-right"></i></button></a>
+    </div>
+    
+    <div class="container-fluid p-4" data-aos="fade">
+        <div class="col-md-8 col-lg-6">
+            <h2 class="heading p-0 m-0 mb-4">GEAR UP</h2>
+        </div>
+        <video id="loopingVideo" autoplay muted style="height: 100%; width: 100%;">
+            <source src="/images/video/pexels-pavel-danilyuk-5705724 (1080p).mp4" type="video/mp4">
+        </video>
+    </div>
+    
+    <!-- Rest of your code with AOS fade animation -->
+    <style>
+        .image-container {
+            position: relative;
+            overflow: hidden;
+        }
+    
+        .image-container:hover .overlay {
+            opacity: 1;
+        }
+    
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+    
+        .overlay a {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+    
+    <div class="container mt-5 pt-5" data-aos-duration="3000" data-aos="flip-right">
+        <div class="row">
+            <div class="col-md-6 image-container" style="background-image: url('/images/images/men.jpg'); background-position: center; background-size: cover; height: 85vh;">
+                <div class="overlay">
+                    <a href="/men_collections">MEN</a>
+                </div>
+            </div>
+            <div class="col-md-6 image-container" style="background-image: url('/images/images/women.jpg'); height: 85vh; background-position: bottom; background-size: cover;">
+                <div class="overlay">
+                    <a href="/women_collections">WOMEN</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <%- include('whyChooseUs') %>
+    
+    <div class="container" data-aos="fade">
+        <h2 class="heading p-0 m-0 mb-4">DON'T MISS</h2>
+    </div>
+    <div class="container d-flex" data-aos="fade">
+        <div class="col-lg-6 d-flex justify-content-center pb-5 position-relative">
+            <div class="container-fluid overlay-container" style="height: 68%; width: 100%; display: flex; justify-content: center; align-items: end;">
+                <h2 class="hover-text" style="color: rgb(51, 51, 51); font-weight: 900;">10% OFFER EVERYDAY</h2>
+                <div class="overlay-content d-none p-5" style="background-color: #ffffff4e; border-radius: 20px;">
+                    <h3 style="color: rgb(17, 17, 17); font-weight: 900;">DON'T MISS IT OUT </h3>
+                    <a href="/all_products" class="btn btn-dark">Shop now</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <video id="loopingVideo" autoplay muted style="height: 65%; width: 100%;">
+                <source src="/images/video/pexels-kampus-production-7287915 (2160p).mp4" type="video/mp4">
+            </video>
+        </div>
+    </div>
 
-<script>
+    <!-- <div class="container d-flex">
+        <header class="bg-dark text-white p-3">
+            <h1 class="text-center">GET UPDATES</h1>
+        </header>
+        <main class="p-5">
+            <p>Stay up to date with the latest news on new arrivals, exclusive sales, and more!</p>
+            <form>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Your email address...</label>
+                    <input type="email" class="form-control" id="email" aria-describedby="emailHelp">
+                    <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+                </div>
+                <button type="submit" class="btn btn-primary">Sign Up</button>
+            </form>
+        </main>
+    </div> -->
 
-//ADD TO CART
-    let cartBtns = document.querySelectorAll('.cart_button')
-    cartBtns.forEach(cartBtn => {
-
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var overlayContainers = document.querySelectorAll('.overlay-container');
+    
+            overlayContainers.forEach(function(overlayContainer) {
+                var overlayContent = overlayContainer.querySelector('.overlay-content');
+    
+                overlayContainer.addEventListener('mouseenter', function() {
+                    overlayContent.classList.remove('d-none');
+                });
+    
+                overlayContainer.addEventListener('mouseleave', function() {
+                    overlayContent.classList.add('d-none');
+                });
+            });
+    
+            var video = document.getElementById('loopingVideo');
+    
+            // When the video ends, rewind to the beginning and play again
+            video.addEventListener('ended', function() {
+                video.currentTime = 0;
+                video.play();
+            });
+        });
+    
+        document.addEventListener('DOMContentLoaded', function() {
+            var video = document.getElementById('loopingVideo');
+    
+            // When the video ends, rewind to the beginning and play again
+            video.addEventListener('ended', function() {
+                video.currentTime = 0;
+                video.play();
+            });
+        });
+    
+        //ADD TO CART
+        let cartBtns = document.querySelectorAll('.cart_button')
+        cartBtns.forEach(cartBtn => {
+    
             cartBtn.addEventListener('click', () => {
-                    console.log(cartBtn.value)
-                    fetch('/cart', {
-                            method: 'POST',
-                            headers: {
-                                    'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                    quantity: 1,
-                                    productId: cartBtn.value
-            })
-                    }).then(response => {
-                            if (response.ok) {
-                                    setTimeout(() => {
-                                            window.location.href = '/cart';
-                                    }, 1000);
-                            } else {
-                                    window.location.href = '/cart';
-                            }
+                console.log(cartBtn.value)
+                fetch('/cart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        quantity: 1,
+                        productId: cartBtn.value
                     })
-                            .catch(error => console.log(error));
+                }).then(response => {
+                    if (response.ok) {
+                        setTimeout(() => {
+                            window.location.href = '/cart';
+                        }, 1000);
+                    } else {
+                        window.location.href = '/cart';
+                    }
+                })
+                    .catch(error => console.log(error));
             });
-    });
-                                    
-
-//ADD TO WISHLIST
-let wishBtns = document.querySelectorAll('.wishlist_button')
-wishBtns.forEach(wishBtn => {
-    wishBtn.addEventListener('click', () => {
-                    fetch('/wishlist', {
-                            method: 'POST',
-                            headers: {
-                                    'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                    productId: wishBtn.value
-            })
-                    }).then(response => {
-                            if (response.ok) {
-                             toastr.success('Successfully Added To Wishlist ', 'Welcome');
-                            }
-                            else if(response.status === 400){
-                                   response.json().then(data=> {
-                                    toastr.error(data.message,'Error')
-                                   })
-                            }
-                             else {
-                                    window.location.href = '/wishlist';
-                            }
+        });
+    
+        //ADD TO WISHLIST
+        let wishBtns = document.querySelectorAll('.wishlist_button')
+        wishBtns.forEach(wishBtn => {
+            wishBtn.addEventListener('click', () => {
+                fetch('/wishlist', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        productId: wishBtn.value
                     })
-                            .catch(error => console.log(error));
+                }).then(response => {
+                    if (response.ok) {
+                        toastr.success('Successfully Added To Wishlist ', 'Welcome');
+                    } else if (response.status === 400) {
+                        response.json().then(data => {
+                            toastr.error(data.message, 'Error')
+                        })
+                    } else {
+                        window.location.href = '/wishlist';
+                    }
+                })
+                    .catch(error => console.log(error));
             });
-    }); 
-
-
-
-
-
-</script>
-<%- include('userFooter') %>
+        });
+    </script>
+    
+    <%- include('userFooter') %>
+        

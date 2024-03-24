@@ -873,8 +873,149 @@ cursor: pointer;
     }
 
 
+    .banner-image-wrapper {
+      overflow: hidden;
+      position: relative;
+  }
+  
+  .banner-image {
+      transition: transform 0.3s ease;
+  }
+  
+  .banner-image:hover {
+      transform: scale(1.05);
+  }
+  
+  .banner-content {
+      padding: 20px;
+  }
+  
+  .banner-heading {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #333;
+      transition: color 0.3s ease;
+  }
+  
+  .banner-subheading {
+      font-size: 1rem;
+      color: #666;
+      transition: color 0.3s ease;
+  }
+  
+  .shop-now-btn {
+      transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+  
+  .shop-now-btn:hover {
+      background-color: #28a745;
+      transform: translateY(-3px);
+  }
+  
+  .banner-container {
+      animation: slideIn 1s ease forwards;
+      opacity: 0;
+  }
+  
+  @keyframes slideIn {
+      from {
+          transform: translateY(50px);
+          opacity: 0;
+      }
+      to {
+          transform: translateY(0);
+          opacity: 1;
+      }
+  }
+
+  
+
+  /* rotating of the brand name  */
+  .about {
+    cursor: pointer;
+    color: #FFFFFF;
+    padding-top: 20px;
+    padding-bottom: 30px;
+  }
+  
+  .about h1 {
+    padding: 10px 0;
+    margin-bottom: 20px;
+  }
+  
+  .about h2 {
+    opacity: .8;
+  }
+  
+  .about span {
+    display: block;
+    width: 100px;
+    height: 100px;
+    line-height: 100px;
+    margin: auto;
+    border-radius: 50%;
+    font-size: 40px;
+    color: #FFFFFF;
+    opacity: 0.7;
+  
+    -webkit-transition: all .5s ease;
+    -moz-transition: all .5s ease;
+    -o-transition: all .5s ease;
+    transition: all .5s ease;
+  }
+  
+  .about-item:hover span {
+    opacity: 1;
+    font-size: 42px;
+    -webkit-transform: scale(1.1) rotate(360deg);
+    -moz-transform: scale(1.1) rotate(360deg);
+    -o-transform: scale(1.1) rotate(360deg);
+    transform: scale(1.1) rotate(360deg);
+  }
+  
+  .about-item:hover h2 {
+    opacity: 1;
+    -webkit-transform: scale(1.1);
+    -moz-transform: scale(1.1);
+    -o-transform: scale(1.1);
+    transform: scale(1.1);
+  }
+  
+  .about .lead {
+    font-size: 14px;
+    font-weight: bold;
+  }
+  
 
 
+  .overlay-container {
+    background-image: url('/images/images/SLIDE-mob_1800x.jpeg');
+    transition: background-color 0.5s;
+    background-position:bottom;
+    position: relative;
+}
+
+.overlay-container:hover {
+    background-image: url('/images/images/mensbanner4-mob_1800x.jpeg');
+    background-position:center;
+}
+
+.hover-text {
+    opacity: 1;
+    transition: opacity 0.5s;
+}
+
+.overlay-container:hover .hover-text {
+    opacity: 0;
+}
+
+.overlay-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
 
 
 

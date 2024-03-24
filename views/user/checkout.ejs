@@ -115,72 +115,73 @@
                 ADDRESS</button>
               <% } %>
 
-                <!-- Add Address modal window start -->
-                <div class="modal fade text-start" id="myModalAdd" tabindex="-1" aria-labelledby="myModalLabel"
-                  aria-hidden="true">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="myModalLabel">Add Address</h5>
-                        <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal"
-                          aria-label="Close"></button>
-                      </div>
-                      <div class="modal-body">
-                        <form action="/add_address_checkout" method="post">
-                          <div class="mb-3">
-                            <label class="form-label" for="modalInputEmail1">Name</label>
-                            <input class="form-control" id="modalInputEmail1" type="text" name="name"
-                              aria-describedby="emailHelp" required>
-                          </div>
-
-                          <div class="mb-3">
-                            <label class="form-label" for="modalInputEmail1">Number</label>
-                            <input class="form-control" id="modalInputEmail1" type="number" name="number"
-                              aria-describedby="emailHelp" required>
-                          </div>
-
-                          <div class="mb-3">
-                            <label class="form-label" for="modalInputEmail1">Address</label>
-                            <input class="form-control" id="modalInputEmail1" type="text" name="address"
-                              aria-describedby="emailHelp" required>
-                          </div>
-
-                          <div class="mb-3">
-                            <label class="form-label" for="modalInputEmail1">City</label>
-                            <input class="form-control" id="modalInputEmail1" type="text" name="city"
-                              aria-describedby="emailHelp" required>
-                          </div>
-
-                          <div class="mb-3">
-                            <label class="form-label" for="modalInputEmail1">State</label>
-                            <input class="form-control" id="modalInputEmail1" type="text" name="state"
-                              aria-describedby="emailHelp" required>
-                          </div>
-
-                          <div class="mb-3">
-                            <label class="form-label" for="modalInputEmail1">Pincode</label>
-                            <input class="form-control" id="modalInputEmail1" type="number" name="pincode"
-                              aria-describedby="emailHelp" required>
-                          </div>
-
-                          <div class="mb-3">
-                            <label class="form-label" for="modalInputEmail1">Landmark</label>
-                            <input class="form-control" id="modalInputEmail1" type="text" name="landmark"
-                              aria-describedby="emailHelp" required>
-                          </div>
 
 
+      <!-- Add Address modal window start -->
+    <div class="modal fade text-start" id="myModalAdd" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="myModalLabel">Add Address</h5>
+            <button class="btn-close btn-close-dark" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form action="/add_address" id="addAddress" method="post">
+              <div class="mb-3">
+                <label class="form-label">Name</label>
+                <input class="form-control" type="text" id="name" name="name"
+                  onkeyup="addressValidateName()">
+                  <p id="name-error"></p>
+              </div>
+  
+              <div class="mb-3">
+                <label class="form-label">Number</label>
+                <input class="form-control" type="number" id="number" name="number" onkeyup="addressValidateNumber()">
+                <p id="number-error"></p>
+              </div>
+  
+              <div class="mb-3">
+                <label class="form-label">Address</label>
+                <input class="form-control" type="text" name="address" id="address" onkeyup="addressValidateAddress()">
+                <p id="address-error"></p>
+              </div>
+  
+              <div class="mb-3">
+                <label class="form-label">City</label>
+                <input class="form-control" type="text" name="city" id="city" onkeyup="addressValidateCity()">
+                <p id="city-error"></p>
+              </div>
 
-                          <div class="modal-footer">
-                            <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
-                            <button class="btn btn-primary" type="submit">Add</button>
-                          </div>
-                        </form>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <!-- End Modal for Adding Address -->
+              <div class="mb-3">
+                <label class="form-label">State</label>
+                <input class="form-control" type="text" name="state" id="state" onkeyup="addressValidateState()">
+                <p id="state-error"></p>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Pincode</label>
+                <input class="form-control" type="number" name="pincode" id="pincode" onkeyup="addressValidatePincode()">
+                <p id="pincode-error"></p>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Landmark</label>
+                <input class="form-control" type="text" name="landmark" id="landmark" onkeyup="addressValidateLandmark()">
+                <p id="landmark-error"></p>
+              </div>
+   
+           
+              
+              <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                <button class="btn btn-primary" type="submit">Add</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Modal for Adding Address -->
 
 
         </div>
@@ -461,6 +462,7 @@
 
 
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="/javascripts/validation.js"></script>
   <script>
     const failedPaymentModal = new bootstrap.Modal(document.getElementById('failedPayment'))
     const placedOrderModal = new bootstrap.Modal(document.getElementById('placedOrder'));
@@ -688,12 +690,28 @@ function couponCheck(){
         toastr.success(data.message, 'Success')
         const subTotal = document.getElementById('subTotal')
         const totalPrice = document.getElementById('totalPrice')
-        subTotal.innerHTML = data.discountedPrice
-        totalPrice.value = data.discountedPrice
+        let discountedPrice = data.discountedPrice.toFixed(2)
+        subTotal.innerHTML = discountedPrice
+        totalPrice.value = discountedPrice
       })
     }
   })
 }
+
+
+document.getElementById('addAddress').addEventListener('submit', function(event) {
+      let isNameValid = addressValidateName();
+      let isNumberValid = addressValidateNumber()
+      let isAddressValidate = addressValidateAddress()
+      let isCityValidate = addressValidateCity()
+      let isStateValidate = addressValidateState()
+      let isPincodeValidate = addressValidatePincode()
+      let isLandmarkValidate = addressValidateLandmark()
+      
+      if (!(isAddressValidate && isCityValidate && isLandmarkValidate && isNameValid && isNumberValid && isPincodeValidate && isStateValidate)) {
+        event.preventDefault();
+      }
+    });s
 
 </script>
 

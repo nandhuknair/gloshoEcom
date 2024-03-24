@@ -5,7 +5,6 @@ let cookieParser = require('cookie-parser');
 let logger = require('morgan');
 let session = require('express-session');
 let connection = require('./config/connection');
-const flash = require('express-flash')
 require('dotenv').config()
   
 let usersRouter = require('./routes/users');
@@ -13,11 +12,12 @@ let adminRouter = require('./routes/admin');
 
 let app = express();
 
-app.use(flash())
+
 app.use((req, res, next) => {
   res.header("cache-control", "no-cache private,no-store,must-revalidate");// ,max-stale=0,post-check=0,pre--check=0 
   next();
 })
+
 
 app.use(
   session({

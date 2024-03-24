@@ -11,6 +11,7 @@ const Offer = require("../model/offerModel");
 const Coupon = require("../model/couponModel");
 const Banner = require("../model/bannerModel")
 const Referral = require("../model/referralModel");
+const pdf = require('html-pdf');
 const Razorpay = require("razorpay");
 const razorpay = new Razorpay({
   key_id: process.env.KEY_ID,
@@ -31,6 +32,19 @@ try {
   res.redirect('/error')
 }
 };
+
+//----------get home paage----------
+
+exports.aboutUs = async function (req, res) {
+  try {
+      res.render("user/aboutUs", {
+        userLoggedIn: req.session.userLoggedIn
+      });
+  } catch (error) { 
+    console.log(error)
+    res.redirect('/error')
+  }
+  };
 
 //----------get login paage----------
 
@@ -505,12 +519,33 @@ exports.addAddress = async (req, res) => {
   }
 };
 
+exports.getChangePassword = async (req,res) => {
+  try {
+    res.render('user/changePassword')
+  } catch (error) {
+    console.log(error);
+    return res.redirect("/error");
+  }
+}
+exports.getChangeUserName = async (req,res) => {
+  try {
+    const user = await User.findById(req.session.userLoggedIn)
+    res.render("user/changeUserName",{user})
+  } catch (error) {
+    console.log(error);
+    return res.redirect("/error");
+  }
+}
+
 exports.changePassword = async (req, res) => {
   try {
     resetMessageVariables();
     const { oldPassword, newPassword, confirmPassword } = req.body;
     const user = await User.findById(req.session.userLoggedIn);
     const passwordMatch = await bcrypt.compare(oldPassword, user.password);
+    if(!passwordMatch){
+      return res.status(400).json({message:"Old password is not correct"})
+    }
 
     if (passwordMatch && newPassword === confirmPassword) {
       const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -525,13 +560,13 @@ exports.changePassword = async (req, res) => {
         },
         { new: true }
       );
-      passError = false;
-      passMessage = true;
-      res.redirect("/profile");
+
+      return res.status(200).json({message:"Successfullyl changed the password"})      
+      
     } else {
-      passMessage = false;
-      passError = true;
-      res.redirect("/profile");
+
+      return res.status(400).json({message:"Not a valid data"})      
+    
     }
   } catch (error) {
     console.log(error);
@@ -874,6 +909,7 @@ exports.getCheckoutPage = async (req, res) => {
         ...coupon.toObject(),
         validity: coupon.validity.toLocaleString(),
       }));
+      totalPrice = totalPrice.toFixed(2)
       res.render("user/checkout", {
         user: user,
         cartItems: cartItems,
@@ -893,7 +929,7 @@ exports.getCheckoutPage = async (req, res) => {
 
 exports.confirmOrder = async (req, res) => {
   const { selectedaddress, selectedpayment, cartdocs, totalPrice } = req.body;
-
+console.log(cartdocs)
   try {
     const userData = await User.findById(req.session.userLoggedIn);
     if(!userData){
@@ -901,20 +937,22 @@ exports.confirmOrder = async (req, res) => {
     }
     const address = userData.address[selectedaddress];
     const orderedItems = [];
-
+    console.log(orderedItems)
     async function placeOrder() {
+      console.log('Called the place order function ')
       for (const cartItem of cartdocs) {
         const { productId, quantity } = cartItem;
         const product = await Product.findById(productId);
+
 
         if (!product || cartItem.quantity > product.stock) {
           throw new Error(
             `Product stock limit exceeded for item ${cartItem.productId}`
           );
         }
-        let currentPrice = product.price * quantity;
 
-        if (product.productOfferPrice > 0 && product.categoryOfferPrice > 0) {
+        let currentPrice = product.price * quantity;
+          if (product.productOfferPrice && product.categoryOfferPrice) {
           orderedItems.push({
             product: product._id,
             quantity: quantity,
@@ -924,7 +962,8 @@ exports.confirmOrder = async (req, res) => {
             categoryOfferPrice: product.categoryOfferPrice,
             categoryOfferName: product.categoryOfferName,
           });
-        } else if (product.productOfferPrice > 0) {
+        } else if (product.productOfferPrice) {
+          console.log('its entered to product offer price')
           orderedItems.push({
             product: product._id,
             quantity: quantity,
@@ -932,15 +971,27 @@ exports.confirmOrder = async (req, res) => {
             productOfferPrice: product.productOfferPrice,
             productOfferName: product.productOfferName,
           });
-        } else if (product.categoryOfferPrice > 0) {
+        } else if (product.categoryOfferPrice) {
           orderedItems.push({
             product: product._id,
             quantity: quantity,
             price: currentPrice,
             categoryOfferPrice: product.categoryOfferPrice,
             categoryOfferName: product.categoryOfferName,
+          });
+        }else{
+          console.log('its entered to the else statement')
+          orderedItems.push({
+            product: product._id,
+            quantity: quantity,
+            price: currentPrice,
+            productOfferPrice: 0,
+            productOfferName: null,
+            categoryOfferPrice: 0,
+            categoryOfferName: null,
           });
         }
+
 
         product.stock -= quantity;
         await product.save();
@@ -1025,6 +1076,7 @@ exports.confirmOrder = async (req, res) => {
 exports.placeOrder = async (req, res) => {
   try {
     const { selectedaddress, selectedpayment, cartdocs, totalPrice } = req.body;
+    console.log(cartdocs)
     const userData = await User.findById(req.session.userLoggedIn);
     const address = userData.address[selectedaddress];
     const orderedItems = [];
@@ -1275,13 +1327,15 @@ exports.orderAfterFailedPaymentAction = async (req, res) => {
   }
 };
 
+
 // Define a function to generate HTML content for the invoice
-function generateInvoiceHTML(
+function generateInvoicePDF(
   order,
   customerName,
   customerPhone,
   customerEmail,
-  subtotal
+  subtotal,
+  couponApplied
 ) {
   // Get order details
   const orderId = order._id;
@@ -1488,7 +1542,7 @@ function generateInvoiceHTML(
                       <h2><strong>Sub Total: </strong></h2>
                     </td>
                     <td class="text-left text-danger">
-                      <h4>$ 0</h4>
+                      <h4>$ ${couponApplied}</h4>
                       <h2><strong>${subtotal.toFixed(2)}</strong></h2>
                       
                     </td>
@@ -1515,19 +1569,6 @@ function generateInvoiceHTML(
         </div>
       </div>
   
-      <script>
-        window.onload = function () {
-            print();
-        };
-  
-        document.getElementById('downloadButton').addEventListener('click', function () {
-           
-            const pdf = new jsPDF();
-            
-            pdf.save('order_invoice.pdf');
-        });
-    </script>
-  
     </body>
   
   </html>
@@ -1535,6 +1576,7 @@ function generateInvoiceHTML(
   `;
   return html;
 }
+
 
 exports.downloadInvoice = async (req, res) => {
   try {
@@ -1544,35 +1586,55 @@ exports.downloadInvoice = async (req, res) => {
 
     const order = await Order.findById(orderId)
       .populate("items.product")
-      .populate("userId");
+      .populate("userId")
+      .populate("couponApplied");
 
     // Replace placeholders with actual customer details
     const customerName = order.userId.userName;
     const customerPhone = order.userId.number;
     const customerEmail = order.userId.email;
     const subtotal = order.totalAmount;
+    let couponApplied
+    if(order.couponApplied){
+      couponApplied = order.couponApplied.discount
+    }else{
+      couponApplied = null
+    }
 
     // Generate the HTML content for the invoice
-    const invoiceHTML = generateInvoiceHTML(
+    const invoiceHTML = generateInvoicePDF(
       order,
       customerName,
       customerPhone,
       customerEmail,
-      subtotal
+      subtotal,
+      couponApplied
     );
 
     // Set headers to make the browser download the file
-    res.setHeader("Content-Type", "application/octet-stream");
+    res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="invoice_${orderId}.html"`
+      `attachment; filename="invoice_${orderId}.pdf"`
     );
-    res.send(invoiceHTML);
+
+    // Generate PDF and send it as a response
+    pdf.create(invoiceHTML, { format: 'Letter' }).toStream((err, stream) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send("Error creating PDF");
+      }
+      console.log("PDF created successfully");
+
+      // Pipe the PDF stream to the response
+      stream.pipe(res);
+    });
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
   }
 };
+
 
 exports.cancelOrder = async (req, res) => {
   try {
@@ -1745,7 +1807,7 @@ exports.womenCollection = async (req, res) => {
   try {
     const userLoggedIn = req.session.userLoggedIn;
     const collectionName = "Women";
-    const products = await Product.find({ collection: collectionName });
+    const products = await Product.find({ collection: collectionName , isAvailable: true });
     res.render("user/womenProducts", { products, userLoggedIn: userLoggedIn });
   } catch (error) {
     return res.status(500).redirect("/error");
@@ -1756,7 +1818,7 @@ exports.menCollection = async (req, res) => {
   try {
     const userLoggedIn = req.session.userLoggedIn;
     const collectionName = "Men";
-    const products = await Product.find({ collection: collectionName });
+    const products = await Product.find({ collection: collectionName , isAvailable:true});
 
     res.render("user/menProducts", { products, userLoggedIn: userLoggedIn });
   } catch (error) {

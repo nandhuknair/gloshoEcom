@@ -21,13 +21,13 @@
         </a>
       </li>
       <li class="my-2" id="changeUsernameItem" onclick="viewUsernamePage()">
-        <a href="#" class="nav-link link-dark">
+        <a href="/change_userName" class="nav-link link-dark">
             <i class="fa-solid fa-signature me-3" ></i>
           Change username
         </a>
       </li>
       <li class="my-2" id="changePasswordItem" onclick="viewChangePasswordPage()">
-        <a href="#" class="nav-link link-dark">
+        <a href="/change_password" class="nav-link link-dark">
             <i class="fa-solid fa-key me-3" ></i>
           Change password
         </a>
@@ -262,14 +262,14 @@
             <div class="mb-3">
               <label class="form-label">Name</label>
               <input class="form-control" id="name<%= index %>" type="text" value="<%= data.name %>" name="userName"
-                onkeyup="validateName('<%= index %>')" />
+                onkeyup="validateAddressName('<%= index %>')" />
               <p class="mt-2 mb-0" id="error-name<%= index %>"></p>
               </div>
 
             <div class="mb-3">
               <label class="form-label">Number</label>
               <input class="form-control" id="number<%= index %>" type="number" value="<%= data.number %>" name="number"
-                  onkeyup="validateNumber('<%= index %>')">
+                  onkeyup="validateAddressNumber('<%= index %>')">
                   <p id="error-number<%= index %>"></p>
 
             </div>
@@ -378,14 +378,14 @@
 
 
 <!-- ----------------------------wallet page ---------------------------------------- -->
-<!-- 
+
 <div class="col-lg-9 mt-5 ms-5" id="wallet">
   <div class="container txt-container" style="height: fit-content;">
   <h2 class="heading">WALLET</h2>
   <div class="container txt-container">
   </div>
 </div>
-</div> -->
+</div>
 
 
 <!-- ------------------------------Main container end---------------------------------------------- -->
@@ -402,94 +402,11 @@
     sidebar.classList.toggle('show-sidebar');
   });
 
-  const myOrderPage = document.getElementById('myOrder');
-  const userNamePage = document.getElementById('changeUsername');
-  const changePasswordPage = document.getElementById('changePassword');
-  const manageAddressPage = document.getElementById('manageAddress');
-  const profileDetailPage = document.getElementById('profileDetail');
-
-
-
-  function viewUsernamePage() {
-    userNamePage.style.display = 'block';
-    myOrderPage.style.display = 'none';
-    changePasswordPage.style.display = 'none';
-    manageAddressPage.style.display = 'none';
-    profileDetailPage.style.display = 'none';
-
-
-    document.getElementById('myOrderItem').classList.remove('bg-clr');
-    document.getElementById('changeUsernameItem').classList.add('bg-clr');
-    document.getElementById('changePasswordItem').classList.remove('bg-clr');
-    document.getElementById('manageAddressItem').classList.remove('bg-clr');
-    document.getElementById('walletItem').classList.remove('bg-clr');
-  }
-
-  function viewMyOrderPage() {
-    myOrderPage.style.display = 'block';
-    userNamePage.style.display = 'none';
-    changePasswordPage.style.display = 'none';
-    manageAddressPage.style.display = 'none';
-    profileDetailPage.style.display = 'none';
-
-
-    document.getElementById('myOrderItem').classList.add('bg-clr');
-    document.getElementById('changeUsernameItem').classList.remove('bg-clr');
-    document.getElementById('changePasswordItem').classList.remove('bg-clr');
-    document.getElementById('manageAddressItem').classList.remove('bg-clr');
-    document.getElementById('walletItem').classList.remove('bg-clr');
-  }
-
-  function viewChangePasswordPage() {
-    myOrderPage.style.display = 'none';
-    userNamePage.style.display = 'none';
-    changePasswordPage.style.display = 'block';
-    manageAddressPage.style.display = 'none';
-    profileDetailPage.style.display = 'none';
-    
-    document.getElementById('myOrderItem').classList.remove('bg-clr');
-    document.getElementById('changeUsernameItem').classList.remove('bg-clr');
-    document.getElementById('changePasswordItem').classList.add('bg-clr');
-    document.getElementById('manageAddressItem').classList.remove('bg-clr');
-    document.getElementById('walletItem').classList.remove('bg-clr');
-
-  }
-
-//   function viewManageAddressPage() {
-//     myOrderPage.style.display = 'none';
-//     userNamePage.style.display = 'none';
-//     changePasswordPage.style.display = 'none';
-//     manageAddressPage.style.display = 'block';
-//     profileDetailPage.style.display = 'none';
-
-
-//     document.getElementById('myOrderItem').classList.remove('bg-clr');
-//     document.getElementById('changeUsernameItem').classList.remove('bg-clr');
-//     document.getElementById('changePasswordItem').classList.remove('bg-clr');
-//     document.getElementById('manageAddressItem').classList.add('bg-clr');
-//     document.getElementById('walletItem').classList.remove('bg-clr');
-// }
-
-function viewWalletPage() {
-    myOrderPage.style.display = 'none';
-    userNamePage.style.display = 'none';
-    changePasswordPage.style.display = 'none';
-    manageAddressPage.style.display = 'none';
-    profileDetailPage.style.display = 'none';
-
-
-    document.getElementById('myOrderItem').classList.remove('bg-clr');
-    document.getElementById('changeUsernameItem').classList.remove('bg-clr');
-    document.getElementById('changePasswordItem').classList.remove('bg-clr');
-    document.getElementById('manageAddressItem').classList.remove('bg-clr');
-    document.getElementById('walletItem').classList.add('bg-clr');
-
-}
-
+  
 '<% user.address.forEach((data,index)=>{ %>'
     document.getElementById('editAddressForm<%= index %>').addEventListener('submit', function(event) {
-      let isNameValid = validateName('<%= index %>');
-      let isNumberValid = validateNumber('<%= index %>');
+      let isNameValid = validateAddressName('<%= index %>'); 
+      let isNumberValid = validateAddressNumber('<%= index %>');
       let isAddressValidate = validateAddress('<%= index %>');
       let isCityValidate = validateCity('<%= index %>');
       let isStateValidate = validateState('<%= index %>');

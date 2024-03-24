@@ -7,6 +7,7 @@ let sessionCheck = require('../middleware/session')
 
 /* GET home page. */
 router.get("/",userController.getHome);
+router.get("/aboutus",userController.aboutUs)
 
 router.get("/login",sessionCheck.userSession,userController.getLogin);
 router.get("/signup",sessionCheck.userSession,userController.getSignup);
@@ -35,8 +36,10 @@ router.get('/product',userController.productDetails)
 
 router.get('/profile',sessionCheck.userActivity,userController.getProfile)
 router.post('/change_userName',sessionCheck.userActivity,userController.changeUserName)
-router.post('/add_address',sessionCheck.userActivity,userController.addAddress)
+router.get('/change_userName',sessionCheck.userActivity,userController.getChangeUserName)
 router.post('/change_password',sessionCheck.userActivity,userController.changePassword)
+router.get('/change_password',sessionCheck.userActivity,userController.getChangePassword)
+router.post('/add_address',sessionCheck.userActivity,userController.addAddress)
 router.get('/delete_address/:addressId',sessionCheck.userActivity,userController.deleteAddress)
 router.post('/edit_address/:addressId',sessionCheck.userActivity,userController.editAddress)
 router.get('/resetMessage',sessionCheck.userActivity,userController.resetMessage)

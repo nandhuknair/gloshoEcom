@@ -8,7 +8,7 @@ const multer = require("multer");
 const Order = require("../model/orderModel");
 const Banner = require("../model/bannerModel");
 const PDFDocument = require("pdfkit");
-
+const pdf = require('html-pdf')
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -886,16 +886,27 @@ exports.getSalesReport = async (req, res) => {
 exports.downloadSalesReport = async (req, res) => {
   try {
 
-
-    // Set response headers for downloading the HTML file
-    res.setHeader('Content-Type', 'text/html');
-    res.setHeader('Content-Disposition', 'attachment; filename=sales_report.html');
     let totalAmount = req.session.totalAmount
     // Generate the HTML content for the sales report
-    const html = generateSalesReportHTML(orders,totalAmount,heading);
+    const salesReportHtml = generateSalesReportPDF(orders,totalAmount,heading);
 
-    // Send the HTML content in the response
-    res.send(html);
+    // Set response headers for downloading the HTML file
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${heading} sales report.pdf"`
+    );
+
+    pdf.create(salesReportHtml, { format: 'Letter' }).toStream((err, stream) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send("Error creating PDF");
+      }
+      console.log("PDF created successfully");
+
+      // Pipe the PDF stream to the response
+      stream.pipe(res);
+    });
 
   } catch (error) {
     console.error(error);
@@ -904,7 +915,7 @@ exports.downloadSalesReport = async (req, res) => {
 };
 
 // Function to generate HTML content for the sales report
-function generateSalesReportHTML(orders,totalAmount,heading) {
+function generateSalesReportPDF(orders,totalAmount,heading) {
   let totalPrice = totalAmount
   let html = `
     <!DOCTYPE html>
@@ -958,7 +969,11 @@ function generateSalesReportHTML(orders,totalAmount,heading) {
           <td>${item.productOfferPrice > 0 ? item.productOfferName : 'No offer'}</td>
           <td>${item.categoryOfferPrice > 0 ? item.categoryOfferName : 'No offer'}</td>
           <td>${order.couponApplied ? '$' + order.couponApplied.discount : '-'}</td>
-          <td>$${totalAmount}</td>
+        </tr>
+        <tr>
+        <td colspan="6" class="text-right">Total Amount of the order:</td>
+        <td class="totalPrice">$<%= order.totalAmount %></td>
+        <td></td> 
         </tr>`;
       
   

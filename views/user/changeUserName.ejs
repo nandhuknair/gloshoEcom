@@ -1,0 +1,49 @@
+
+<%- include('userAfterLogin') %>
+
+<div class="col-lg-9 mt-5 ms-5 mb-5 pb-5">
+    <div class="container txt-container" style="height: fit-content;">
+        <h4 class="heading">CHANGE USERNAME</h4>
+        <form action="/change_userName" method="post" class="d-inline-flex flex-column" id="changeUsernameForm">
+            <h6>ENTER YOUR NEW USERNAME</h6>
+            <input class="mt-3" type="text" name="userName" id="newUsername" placeholder="<%= user.userName %>" required>
+            <span id="usernameError" style="color: red;"></span>
+            <button class="mt-4 change_userName" id="changeUsernameButton">CHANGE</button>
+        </form>
+    </div>
+</div>
+
+
+
+<script>
+    // Function to validate username
+    function validateUsername(username) {
+        // You can add your validation rules here
+        return username.length >= 5; // Example: Username should be at least 5 characters long
+    }
+
+    // Add keyup event listener to the username input
+    document.getElementById('newUsername').addEventListener('keyup', function(event) {
+        const username = event.target.value;
+        const usernameError = document.getElementById('usernameError');
+        if (!validateUsername(username)) {
+            usernameError.textContent = 'Username should be at least 5 characters long.';
+            document.getElementById('changeUsernameButton').disabled = true; // Disable the button if validation fails
+        } else {
+            usernameError.textContent = '';
+            document.getElementById('changeUsernameButton').disabled = false; // Enable the button if validation passes
+        }
+    });
+
+    // Form submission handling
+    document.getElementById('changeUsernameForm').addEventListener('submit', function(event) {
+        const username = document.getElementById('newUsername').value;
+        if (!validateUsername(username)) {
+            event.preventDefault(); // Prevent form submission if validation fails
+            document.getElementById('usernameError').textContent = 'Username should be at least 5 characters long.';
+        }
+    });
+</script>
+
+
+<%- include('userFooter') %>

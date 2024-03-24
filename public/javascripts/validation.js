@@ -71,7 +71,7 @@ function validateMobile() {
 }
 
 //address edit validation
-function validateName(index) {
+function validateAddressName(index) {
   const nameError = document.getElementById("error-name" + index);
   const name = document.getElementById("name" + index).value;
   var disallowedChars = /[.,\/#!$%\^&\*;:{}=\-_`~())"@'|\\]/;
@@ -88,7 +88,7 @@ function validateName(index) {
   }
 }
 
-function validateNumber(index) {
+function validateAddressNumber(index) {
   console.log("Clicked the validate number");
   const numberError = document.getElementById("error-number" + index);
   const number = document.getElementById("number" + index).value;

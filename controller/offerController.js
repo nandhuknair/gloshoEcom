@@ -66,7 +66,7 @@ exports.addProductOffer = async (req,res)=> {
 
         existingProduct.percentage = percentage
         const originalPrice = existingProduct.price;
-        const offerPrice = originalPrice - (originalPrice * (percentage / 100));
+        const offerPrice = originalPrice - (originalPrice * (percentage / 100)).toFixed(2);
         existingProduct.offerPrice = offerPrice
         existingProduct.price = originalPrice - offerPrice
         existingProduct.productOfferName = name
@@ -119,7 +119,7 @@ exports.addCategoryOffer = async (req,res)=> {
 
         for (const product of productsInCategory) {
             const originalPrice = product.price;
-            const offerPrice = originalPrice - (originalPrice * (percentage / 100));
+            const offerPrice = originalPrice - (originalPrice * (percentage / 100)).toFixed(2);
             product.price = originalPrice - offerPrice;
             product.categoryOfferName = name
             product.categoryOfferPrice = offerPrice

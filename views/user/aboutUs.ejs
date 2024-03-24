@@ -1,0 +1,51 @@
+<% if (userLoggedIn) { %>
+    <%- include('userAfterLogin') %>
+  <% } else { %>
+    <%- include('userHeader') %>
+ <% } %>
+
+   <!-- Navigation Bar -->
+    <!-- Include your navigation bar here -->
+
+    <!-- About Banner Section -->
+    <div class="about-banner">
+        <div class="container">
+            <h1>About Glosho</h1>
+        </div>
+    </div>
+
+    <!-- About Content Section -->
+    <div class="container mt-5 about-content">
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <p>
+                    Welcome to Glosho, your ultimate destination for trendy and comfortable footwear. 
+                    At Glosho, we believe that every step matters. That's why we're dedicated to providing 
+                    you with a wide range of high-quality shoes that not only look great but also feel amazing 
+                    to wear.
+                </p>
+                <p>
+                    Our journey began with a simple idea: to offer stylish shoes that don't compromise on 
+                    comfort. Over the years, we've grown into a trusted brand known for our commitment to 
+                    quality, innovation, and customer satisfaction.
+                </p>
+                <img src="about-image.jpg" alt="About Image" class="img-fluid">
+                <p>
+                    At Glosho, we're passionate about footwear and dedicated to staying ahead of the latest 
+                    trends. From classic designs to cutting-edge styles, we have something for everyone. 
+                    Whether you're looking for casual sneakers, elegant heels, or rugged boots, you'll find 
+                    it all here.
+                </p>
+                <p>
+                    Beyond our products, we're proud to foster a community of shoe lovers who share our 
+                    passion for fashion and comfort. We're always here to help you find the perfect pair 
+                    and make every step a stylish one.
+                </p>
+                <p>
+                    Thank you for choosing Glosho. Step into style with us today!
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <%- include('userFooter') %>

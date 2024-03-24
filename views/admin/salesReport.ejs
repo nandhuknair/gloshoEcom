@@ -97,32 +97,51 @@ document.getElementById('end-date').addEventListener('input', function() {
     <table id="salesReportTable" class="table table-striped table-hover">
         <thead>
             <tr>
+                <th>Number</th>
                 <th>Order Date</th>
                 <th>Username</th>
                 <th>Product Name</th>
+                <th>Quantity</th>
                 <th>Product Offer</th>
                 <th>Category Offer</th>
-                <th>Coupon Applied </th>
-                <th>Total Amount</th>
-    
+                <th>Coupon Applied</th>
             </tr>
         </thead>
         <tbody>
-            <% order.forEach(orderItem => { %>
+            <% order.forEach((orderItem, index) => { %>
                 <% orderItem.items.forEach(item => { %>
                     <tr>
+                        <td><%= index + 1 %></td>
                         <td><%= orderItem.createdAt %></td>
                         <td><%= orderItem.userId.userName %></td>
                         <td><%= item.product.productName %></td>
+                        <td><%= item.quantity %></td>
                         <td><%= item.productOfferPrice > 0 ? item.productOfferName : 'No offer' %></td>
                         <td><%= item.categoryOfferPrice > 0 ? item.categoryOfferName : 'No offer' %></td>
                         <td><%= orderItem.couponApplied ? '$ ' + orderItem.couponApplied.discount : '-' %></td>
-                        <td class="totalPrice">$<%= orderItem.totalAmount %></td>
                     </tr>
                 <% }) %>
+                <% let overallDiscount = orderItem.items.reduce((acc, item) => {
+                        return acc + (item.productOfferPrice || 0) + (item.categoryOfferPrice || 0);
+                    }, 0);
+                %>
+                <% // Add coupon discount if applied %>
+                <% if (orderItem.couponApplied) { %>
+                    <% overallDiscount += orderItem.couponApplied.discount; %>
+                <% } %>
+                
+                <tr>
+                    <td colspan="6" class="text-right">Overall Discount:</td>
+                    <td>$<%= overallDiscount.toFixed(2) %></td>
+                    <td></td> <!-- Empty cell for alignment -->
+                </tr>
+                <tr style="background-color: 	#5cb85c39;">
+                    <td  colspan="6" class="text-right">Total Amount of the order:</td>
+                    <td class="totalPrice">$<%= orderItem.totalAmount %></td>
+                    <td></td> <!-- Empty cell for alignment -->
+                </tr>
             <% }) %>
         </tbody>
-    </table>
 </div>
 
 <%- include('adminFooter') %>
