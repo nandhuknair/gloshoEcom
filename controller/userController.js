@@ -246,7 +246,7 @@ exports.loginAction = async (req, res) => {
 //---------- logout action ----------
 
 exports.userLogout = (req, res) => {
-  req.session.destroy();
+  req.session.userLoggedIn = null
   res.redirect("/");
 };
 

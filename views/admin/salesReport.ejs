@@ -94,6 +94,11 @@ document.getElementById('end-date').addEventListener('input', function() {
 
     </div>
 
+    <% if ((!order || order.length === 0)) { %>
+        <div class="row"><h1 style="background-color: rgba(214, 7, 7, 0.418);">SORRY NO ORDER FOUND BOOST YOUR SALE</h1></div>
+        <% } %>
+
+
     <table id="salesReportTable" class="table table-striped table-hover">
         <thead>
             <tr>
@@ -108,6 +113,7 @@ document.getElementById('end-date').addEventListener('input', function() {
             </tr>
         </thead>
         <tbody>
+          
             <% order.forEach((orderItem, index) => { %>
                 <% orderItem.items.forEach(item => { %>
                     <tr>
@@ -137,7 +143,7 @@ document.getElementById('end-date').addEventListener('input', function() {
                 </tr>
                 <tr style="background-color: 	#5cb85c39;">
                     <td  colspan="6" class="text-right">Total Amount of the order:</td>
-                    <td class="totalPrice">$<%= orderItem.totalAmount %></td>
+                    <td class="totalPrice">$<%= orderItem.totalAmount.toFixed(2) %></td>
                     <td></td> <!-- Empty cell for alignment -->
                 </tr>
             <% }) %>

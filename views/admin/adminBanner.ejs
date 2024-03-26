@@ -17,6 +17,7 @@
                                     <th> Subheading</th>
                                     <th>Image</th>
                                     <th>Brand</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -34,8 +35,71 @@
                                         <img src="/assets/uploads/<%= data.image %>" height="50px" width="50px" alt="">
                                         </td>
                                         <td><%= data.brandName %></td>
+                                        <td> 
+                                            <button style="border: none; outline: none; background-color: transparent;"
+                                             data-bs-toggle="modal" data-bs-target="#modelEditBanner<%= index %>"><i class="fa-solid fa-pen-to-square"></i></button>
+                                            <a href="/admin_banner_delete?bannerId=<%= data._id %>"><i class="fa-solid fa-trash"></i></a>
+                                        </td>
                                     </tr>
                     </div>
+
+
+                    
+     <!-- Modal for Editing Banner -->
+     <div class="modal fade text-start" id="modelEditBanner<%= index %>" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="myModalLabel">Edit Banner</h5>
+                    <button class="btn-close btn-close-white" type="button" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="/admin_banner_edit" method="post" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <input type="hidden" name="bannerId" value="<%= data._id %>">
+                            <div class="mb-3">
+                                <label class="form-label" > Banner Name</label>
+                                <input class="form-control" type="text" name="bannerName" value="<%= data.bannerName %>" required >
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" >Heading</label>
+                                <input class="form-control" type="text" name="bannerHeading" value="<%= data.heading %>" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" >Sub heading </label>
+                                <input class="form-control" type="text" name="bannerSubHeading" value="<%= data.subheading %>" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" >Brand Name </label>
+                                <select class="form-select" id="categories" name="brandId" value="<%= data.brandName %>" required>
+
+                                    <% categories.forEach(category => { %>
+                                        <option value="<%= category._id %>" <%= data.brandId.toString() === category._id.toString() ? 'selected' : '' %>><%= category.category %></option>
+                                    <% }); %>
+                             </select>
+                                
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" >Image </label>
+                                <input class="form-control" type="file" name="images" value="<%= data.image %>" >
+
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                            <button class="btn btn-primary" type="submit">Add</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Modal for Editing Banner -->
+
+
+
                     <% }) %>
                         </tbody>
                         </table>
@@ -103,6 +167,7 @@
         </div>
     </div>
     <!-- End Modal for Adding Banner -->
+
 
     <%- include('adminFooter') %>
 

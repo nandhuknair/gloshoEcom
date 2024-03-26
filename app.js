@@ -1,16 +1,16 @@
 
-let express = require('express');
-let path = require('path');
-let cookieParser = require('cookie-parser');
-let logger = require('morgan');
-let session = require('express-session');
-let connection = require('./config/connection');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const session = require('express-session');
+const connection = require('./config/connection');
 require('dotenv').config()
   
-let usersRouter = require('./routes/users');
-let adminRouter = require('./routes/admin');   
+const usersRouter = require('./routes/users');
+const adminRouter = require('./routes/admin');   
 
-let app = express();
+const app = express();
 
 
 app.use((req, res, next) => {

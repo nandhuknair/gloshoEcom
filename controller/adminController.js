@@ -406,7 +406,7 @@ exports.resetPassword = async (req, res) => {
 //--------------------adminLogout------------------------
 
 exports.adminLogout = (req, res) => {
-  req.session.destroy();
+  req.session.admin = null
   res.redirect("/admin_login");
 };
 
@@ -429,8 +429,9 @@ exports.blockUser = async (req, res) => {
     await User.findOneAndUpdate(
       { _id: id },
       { $set: { active: false } },
-      { new: true }
+      { new: true } 
     );
+    req.session.userLoggedIn = null
     res.redirect("/admin_usermanagement");
   } catch (error) {
     console.log(error);
@@ -784,89 +785,62 @@ let heading;
 
 exports.getSalesReport = async (req, res) => {
   try {
+    let query = {
+      paymentType: { $ne: 'Pending' },
+      'items.orderStatus': { $nin: ['Cancelled By User', 'Cancelled By Admin'] }
+    };
+
     if (req.query['start-date'] && req.query['end-date']) {
       const startDate = new Date(req.query['start-date']);
       const endDate = new Date(req.query['end-date']);
-
-      // Add 1 day to include sales on the end date
       endDate.setDate(endDate.getDate() + 1);
-
-      orders = await Order.find({
-        paymentType: { $ne: 'Pending' },
-        createdAt: { $gte: startDate, $lte: endDate }
-      })
-        .sort({ createdAt: -1 })
-        .populate('items.product')
-        .populate('userId')
-        .populate('couponApplied');
-
+      query.createdAt = { $gte: startDate, $lte: endDate };
       heading = `Sales Report from ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}`;
     } else {
       switch (req.query.range) {
         case 'monthly':
-          orders = await Order.find({
-            paymentType: { $ne: 'Pending' },
-            createdAt: { $gte: new Date(new Date().setDate(1)), $lte: new Date() }
-          })
-            .sort({ createdAt: -1 })
-            .populate('items.product')
-            .populate('userId')
-            .populate('couponApplied');
+          query.createdAt = { $gte: new Date(new Date().setDate(1)), $lte: new Date() };
           heading = 'MONTHLY REPORT';
           break;
         case 'daily':
-          orders = await Order.find({
-            paymentType: { $ne: 'Pending' },
-            createdAt: { $gte: new Date(new Date().setHours(0,0,0,0)), $lte: new Date() }
-          })
-            .sort({ createdAt: -1 })
-            .populate('items.product')
-            .populate('userId')
-            .populate('couponApplied');
+          const todayDaily = new Date();
+          const startOfDay = new Date(todayDaily.getFullYear(), todayDaily.getMonth(), todayDaily.getDate(), 0, 0, 0);
+          const endOfDay = new Date(todayDaily.getFullYear(), todayDaily.getMonth(), todayDaily.getDate(), 23, 59, 59);
+          query.createdAt = { $gte: startOfDay, $lte: endOfDay };
           heading = 'DAILY REPORT';
           break;
         case 'weekly':
           const today = new Date();
           const oneWeekAgo = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7);
-          orders = await Order.find({
-            paymentType: { $ne: 'Pending' },
-            createdAt: { $gte: oneWeekAgo, $lte: new Date() }
-          })
-            .sort({ createdAt: -1 })
-            .populate('items.product')
-            .populate('userId')
-            .populate('couponApplied');
+          query.createdAt = { $gte: oneWeekAgo, $lte: new Date() };
           heading = 'WEEKLY REPORT';
           break;
         case 'yearly':
-          orders = await Order.find({
-            paymentType: { $ne: 'Pending' },
-            createdAt: { $gte: new Date(new Date().getFullYear(), 0, 1), $lte: new Date() }
-          })
-            .sort({ createdAt: -1 })
-            .populate('items.product')
-            .populate('userId')
-            .populate('couponApplied');
+          query.createdAt = { $gte: new Date(new Date().getFullYear(), 0, 1), $lte: new Date() };
           heading = 'YEARLY REPORT';
           break;
         default:
-          orders = await Order.find({ paymentType: { $ne: 'Pending' } })
-            .sort({ createdAt: -1 })
-            .populate('items.product')
-            .populate('userId')
-            .populate('couponApplied');
           heading = 'SALES REPORT';
           break;
       }
     }
 
-    if (!orders) {
-      throw new Error('Orders not found in database');
-    }
+    orders = await Order.find(query)
+      .sort({ createdAt: -1 })
+      .populate('items.product')
+      .populate('userId')
+      .populate('couponApplied');
 
-    let totalAmount = orders.reduce((acc, order) => acc + order.totalAmount, 0);
+    // if (!orders || orders.length === 0) {
+    //   throw new Error('Orders not found in database');
+    // }
+
+    let totalAmount = 0;
+    for (const order of orders) {
+      totalAmount += order.totalAmount;
+    }
     totalAmount = totalAmount.toFixed(2);
-    req.session.totalAmount = totalAmount; // Storing the total amount in the session to generate sales report
+    req.session.totalAmount = totalAmount;
 
     const formattedOrders = orders.map((order) => ({
       ...order.toObject(),
@@ -972,7 +946,7 @@ function generateSalesReportPDF(orders,totalAmount,heading) {
         </tr>
         <tr>
         <td colspan="6" class="text-right">Total Amount of the order:</td>
-        <td class="totalPrice">$<%= order.totalAmount %></td>
+        <td class="totalPrice">${order.totalAmount}</td>
         <td></td> 
         </tr>`;
       
@@ -1028,11 +1002,45 @@ exports.addBanner = async (req, res) => {
   }
 };
 
+exports.editBanner = async (req, res) => {
+  try {
+    const banner = await Banner.findById(req.body.bannerId);
+    if (!banner) {
+      return res.redirect("/admin_banner");
+    }
+
+    const brand = await Category.findOne({ _id: req.body.brandId });
+    const brandName = brand ? brand.category : null;
+
+    const updatedBanner = {
+      bannerName: req.body.bannerName,
+      heading: req.body.bannerHeading,
+      subheading: req.body.bannerSubHeading,
+      image: req.file ? req.file.filename : banner.image, // Use existing image if no new file provided
+      brandName: brandName,
+      brandId: req.body.brandId,
+    };
+
+    const updatedBannerDocument = await Banner.findByIdAndUpdate(req.body.bannerId, updatedBanner, { new: true });
+
+    if (!updatedBannerDocument) {
+      return res.status(404).send("Banner not found");
+    }
+
+    res.redirect("/admin_banner");
+  } catch (error) {
+    console.error("Error editing banner:", error);
+    res.status(500).send("Internal server error");
+  }
+};
+
 exports.deleteBanner = async (req, res) => {
   try {
-    // const {bannerId} = req.body.bannerId
-    // await Banner.findByIdAndDelete(bannerId)
+    const {bannerId} = req.query
+    await Banner.findByIdAndDelete(bannerId)
+    res.redirect('/admin_banner')
   } catch (error) {
     console.log(error);
+    res.status(500).send('Network error')
   }
 };

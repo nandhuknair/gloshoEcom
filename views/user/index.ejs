@@ -20,21 +20,40 @@
         <div class="swiper-button-prev"></div>
         <div class="swiper-button-next"></div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+    const swiper = new Swiper('.swiper', {
+        loop: true,
+        speed: 1000,
+        effect: "cube",
+        grabCursor: true,
+        cubeEffect: {
+            shadow: true,
+            slideShadows: true,
+            shadowOffset: 20,
+            shadowScale: 0.94,
+        },
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+    });
+</script>
     
     <div class="container mb-5 mt-5">
         <h2 class="heading mt-3 mb-2">STARRING</h2>
         <section class="text-center about">
             <div class="container">
                 <div class="row">
-                    <div class="col-lg-4 col-sm-6 col-ex-12 about-item wowlightSpeedIn" data-wow-offset="200" data-aos-duration="2000" data-aos="fade-right">
+                    <div class="col-lg-4 col-sm-6 col-ex-12 about-item wowlightSpeedIn" data-wow-offset="200">
                         <a href="/all_products">  
                             <span><img src="/images/icon/free-adidas-logo-icon.svg" alt=""></span>
                         </a>
                     </div>
-                    <div class="col-lg-4 col-sm-6 col-ex-12 about-item wow lightSpeedIn" data-wow-offset="200" data-aos-duration="2500" data-aos="fade-right">
+                    <div class="col-lg-4 col-sm-6 col-ex-12 about-item wow lightSpeedIn" data-wow-offset="200">
                         <span><img src="/images/icon/nike.svg" alt=""></span>
                     </div>
-                    <div class="col-lg-4 col-sm-6 col-ex-12 about-item wow lightSpeedIn" data-wow-offset="200" data-aos-duration="3000" data-aos="fade-right">
+                    <div class="col-lg-4 col-sm-6 col-ex-12 about-item wow lightSpeedIn" data-wow-offset="200">
                         <span><img src="/images/icon/gucci.svg" alt=""></span>
                     </div>
                 </div>

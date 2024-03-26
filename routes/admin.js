@@ -36,7 +36,7 @@ router.post('/admin_edit_product',session.adminActivity,adminController.upload,a
 router.get('/admin_list_product',session.adminActivity,adminController.listProduct)
 router.get('/admin_unlist_product',session.adminActivity,adminController.unListProduct)
 router.delete('/delete_product_image',session.adminActivity,adminController.deleteImageFromEdit)
-
+  
 
 router.get('/admin_orders',session.adminActivity,adminController.orderDetails)
 router.post('/update_orderStatus',session.adminActivity,adminController.updateOrderStatus)
@@ -62,7 +62,8 @@ router.get('/admin_salesreport/download',session.adminActivity,adminController.d
 
 router.get('/admin_banner',session.adminActivity,adminController.getBanner)
 router.post('/admin_banner_add',session.adminActivity,adminController.uploadSingle,adminController.addBanner)
-router.post('/admin_banner_delete',session.adminActivity,adminController.deleteBanner)
+router.post('/admin_banner_edit',session.adminActivity,adminController.uploadSingle,adminController.editBanner)
+router.get('/admin_banner_delete',session.adminActivity,adminController.deleteBanner)
 
 
 module.exports = router
