@@ -8,7 +8,7 @@ const multer = require("multer");
 const Order = require("../model/orderModel");
 const Banner = require("../model/bannerModel");
 const PDFDocument = require("pdfkit");
-const pdf = require('html-pdf')
+const pdf = require("html-pdf");
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -66,31 +66,77 @@ exports.adminPanel = async (req, res) => {
     if (req.session.admin) {
       const userCount = await User.countDocuments();
       const productCount = await Product.countDocuments();
-      const pendingOrders = await Order.find({ paymentType: 'Pending' }).countDocuments();
+      const pendingOrders = await Order.find({
+        paymentType: "Pending",
+      }).countDocuments();
       const totalOrders = await Order.countDocuments();
-      
+
       // Fetch top selling products with product details
       const topSellingProducts = await Order.aggregate([
-        { $unwind: '$items' },
-        { $group: { _id: '$items.product', totalQuantity: { $sum: '$items.quantity' } } },
+        { $unwind: "$items" },
+        {
+          $group: {
+            _id: "$items.product",
+            totalQuantity: { $sum: "$items.quantity" },
+          },
+        },
         { $sort: { totalQuantity: -1 } },
         { $limit: 10 },
-        { $lookup: { from: 'products', localField: '_id', foreignField: '_id', as: 'product' } },
-        { $unwind: '$product' },
-        { $project: { _id: '$product._id', productName: '$product.productName', totalQuantity: 1, lastImage: { $arrayElemAt: ['$product.image', -1] } } }
+        {
+          $lookup: {
+            from: "products",
+            localField: "_id",
+            foreignField: "_id",
+            as: "product",
+          },
+        },
+        { $unwind: "$product" },
+        {
+          $project: {
+            _id: "$product._id",
+            productName: "$product.productName",
+            totalQuantity: 1,
+            lastImage: { $arrayElemAt: ["$product.image", -1] },
+          },
+        },
       ]);
 
       // Fetch top selling categories with category details
       const topSellingCategories = await Order.aggregate([
-        { $unwind: '$items' },
-        { $lookup: { from: 'products', localField: 'items.product', foreignField: '_id', as: 'product' } },
-        { $unwind: '$product' },
-        { $group: { _id: '$product.category', totalQuantity: { $sum: '$items.quantity' } } },
+        { $unwind: "$items" },
+        {
+          $lookup: {
+            from: "products",
+            localField: "items.product",
+            foreignField: "_id",
+            as: "product",
+          },
+        },
+        { $unwind: "$product" },
+        {
+          $group: {
+            _id: "$product.category",
+            totalQuantity: { $sum: "$items.quantity" },
+          },
+        },
         { $sort: { totalQuantity: -1 } },
         { $limit: 5 },
-        { $lookup: { from: 'categories', localField: '_id', foreignField: '_id', as: 'category' } },
-        { $unwind: '$category' },
-        { $project: { _id: '$category._id', categoryName: '$category.category', totalQuantity: 1 } }
+        {
+          $lookup: {
+            from: "categories",
+            localField: "_id",
+            foreignField: "_id",
+            as: "category",
+          },
+        },
+        { $unwind: "$category" },
+        {
+          $project: {
+            _id: "$category._id",
+            categoryName: "$category.category",
+            totalQuantity: 1,
+          },
+        },
       ]);
 
       // Fetch top selling collections with collection details
@@ -115,34 +161,32 @@ exports.adminPanel = async (req, res) => {
         topSellingProducts,
         topSellingCategories,
       });
-    }
-    else res.redirect("/admin_login");
+    } else res.redirect("/admin_login");
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 };
-
 
 // Controller to fetch sales data
 exports.getSalesData = async (req, res) => {
   try {
-      const { filter } = req.query;
+    const { filter } = req.query;
 
-      let salesData = {};
-      if (filter === 'yearly') {
-          salesData = await getYearlySalesData();
-      } else if (filter === 'monthly') {
-          salesData = await getMonthlySalesData();
-      } else if (filter === 'daily') {
-          salesData = await getDailySalesData(); // New function for daily sales data
-      } else {
-          throw new Error('Invalid filter parameter');
-      }
+    let salesData = {};
+    if (filter === "yearly") {
+      salesData = await getYearlySalesData();
+    } else if (filter === "monthly") {
+      salesData = await getMonthlySalesData();
+    } else if (filter === "daily") {
+      salesData = await getDailySalesData(); // New function for daily sales data
+    } else {
+      throw new Error("Invalid filter parameter");
+    }
 
-      res.json(salesData);
+    res.json(salesData);
   } catch (error) {
-      console.error('Error fetching sales data:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Error fetching sales data:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
@@ -150,27 +194,27 @@ async function getDailySalesData() {
   // Logic to fetch daily sales data
   // Example: Aggregate orders by day and calculate total sales for each day
   const dailySalesData = await Order.aggregate([
-      {
-          $group: {
-              _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
-              totalSales: { $sum: '$totalAmount' }
-          }
+    {
+      $group: {
+        _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+        totalSales: { $sum: "$totalAmount" },
       },
-      {
-          $sort: { "_id": 1 } // Sort by date
+    },
+    {
+      $sort: { _id: 1 }, // Sort by date
+    },
+    {
+      $project: {
+        date: "$_id",
+        totalSales: 1,
+        _id: 0,
       },
-      {
-          $project: {
-              date: '$_id',
-              totalSales: 1,
-              _id: 0
-          }
-      }
+    },
   ]);
 
   // Format data for chart
-  const labels = dailySalesData.map(item => item.date);
-  const sales = dailySalesData.map(item => item.totalSales);
+  const labels = dailySalesData.map((item) => item.date);
+  const sales = dailySalesData.map((item) => item.totalSales);
 
   return { labels, sales };
 }
@@ -180,24 +224,24 @@ async function getYearlySalesData() {
   // Your logic to fetch yearly sales data
   // Example: Aggregate orders by year and calculate total sales for each year
   const yearlySalesData = await Order.aggregate([
-      {
-          $group: {
-              _id: { $year: '$createdAt' },
-              totalSales: { $sum: '$totalAmount' }
-          }
+    {
+      $group: {
+        _id: { $year: "$createdAt" },
+        totalSales: { $sum: "$totalAmount" },
       },
-      {
-          $project: {
-              year: '$_id',
-              totalSales: 1,
-              _id: 0
-          }
-      }
+    },
+    {
+      $project: {
+        year: "$_id",
+        totalSales: 1,
+        _id: 0,
+      },
+    },
   ]);
 
   // Format data for chart
-  const labels = yearlySalesData.map(item => item.year);
-  const sales = yearlySalesData.map(item => item.totalSales);
+  const labels = yearlySalesData.map((item) => item.year);
+  const sales = yearlySalesData.map((item) => item.totalSales);
 
   return { labels, sales };
 }
@@ -207,25 +251,25 @@ async function getMonthlySalesData() {
   // Your logic to fetch monthly sales data
   // Example: Aggregate orders by month and year and calculate total sales for each month
   const monthlySalesData = await Order.aggregate([
-      {
-          $group: {
-              _id: { year: { $year: '$createdAt' }, month: { $month: '$createdAt' } },
-              totalSales: { $sum: '$totalAmount' }
-          }
+    {
+      $group: {
+        _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+        totalSales: { $sum: "$totalAmount" },
       },
-      {
-          $project: {
-              month: '$_id.month',
-              year: '$_id.year',
-              totalSales: 1,
-              _id: 0
-          }
-      }
+    },
+    {
+      $project: {
+        month: "$_id.month",
+        year: "$_id.year",
+        totalSales: 1,
+        _id: 0,
+      },
+    },
   ]);
 
   // Format data for chart
-  const labels = monthlySalesData.map(item => `${item.year}-${item.month}`);
-  const sales = monthlySalesData.map(item => item.totalSales);
+  const labels = monthlySalesData.map((item) => `${item.year}-${item.month}`);
+  const sales = monthlySalesData.map((item) => item.totalSales);
 
   return { labels, sales };
 }
@@ -406,7 +450,7 @@ exports.resetPassword = async (req, res) => {
 //--------------------adminLogout------------------------
 
 exports.adminLogout = (req, res) => {
-  req.session.admin = null
+  req.session.admin = null;
   res.redirect("/admin_login");
 };
 
@@ -429,9 +473,9 @@ exports.blockUser = async (req, res) => {
     await User.findOneAndUpdate(
       { _id: id },
       { $set: { active: false } },
-      { new: true } 
+      { new: true }
     );
-    req.session.userLoggedIn = null
+    req.session.userLoggedIn = null;
     res.redirect("/admin_usermanagement");
   } catch (error) {
     console.log(error);
@@ -470,7 +514,9 @@ exports.editCategory = async (req, res) => {
     const { oldCategory, category } = req.body;
     const categoryExist = await Category.findOne({ category: category });
     if (categoryExist) {
-      return res.status(400).json({message:'Category with this name is exist'});
+      return res
+        .status(400)
+        .json({ message: "Category with this name is exist" });
     } else {
       await Category.findOneAndUpdate(
         { category: oldCategory },
@@ -478,7 +524,7 @@ exports.editCategory = async (req, res) => {
         { new: true }
       );
 
-      res.status(200).json({message:'Successfully Edited the category'})
+      res.status(200).json({ message: "Successfully Edited the category" });
     }
   } catch (error) {
     console.log(error);
@@ -490,13 +536,15 @@ exports.addCategory = async (req, res) => {
     const { category } = req.body;
     const categoryExist = await Category.findOne({ category: category });
     if (categoryExist) {
-      return res.status(400).json({message:'Category with this name is exist'});
+      return res
+        .status(400)
+        .json({ message: "Category with this name is exist" });
     } else {
       const newCategory = new Category({
         category: category,
       });
       await newCategory.save();
-      res.status(200).json({message:'Successfully Added the category'})
+      res.status(200).json({ message: "Successfully Added the category" });
     }
   } catch (error) {
     console.log(error);
@@ -564,8 +612,8 @@ exports.addProducts = async function (req, res, next) {
     if (req.body.price <= 0) {
       return res.redirect("/admin_products");
     }
-    let price = parseFloat(req.body.price)
-    price = price.toFixed(2)
+    let price = parseFloat(req.body.price);
+    price = price.toFixed(2);
     const newProduct = new Product({
       productName: req.body.productName,
       image: arrImages, // Use arrImages directly here
@@ -591,8 +639,8 @@ exports.editProducts = async function (req, res, next) {
     if (req.body.price <= 0) {
       return res.redirect("/admin_products");
     }
-    let price = parseFloat(req.body.price)
-    price = price.toFixed(2)
+    let price = parseFloat(req.body.price);
+    price = price.toFixed(2);
 
     const updateFields = {};
 
@@ -604,7 +652,10 @@ exports.editProducts = async function (req, res, next) {
       // Fetch existing product
       const product = await Product.findById(productId);
       // Append new images to existing images
-      const arrImages = [...product.image, ...req.files.map((value) => value.filename)];
+      const arrImages = [
+        ...product.image,
+        ...req.files.map((value) => value.filename),
+      ];
       updateFields.image = arrImages;
     }
 
@@ -640,8 +691,7 @@ exports.editProducts = async function (req, res, next) {
   }
 };
 
-
-exports.deleteImageFromEdit =  async (req, res) => {
+exports.deleteImageFromEdit = async (req, res) => {
   const productId = req.query.id;
   const imageToDelete = req.query.image;
 
@@ -649,7 +699,7 @@ exports.deleteImageFromEdit =  async (req, res) => {
     // Find the product by ID
     const product = await Product.findById(productId);
     if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
+      return res.status(404).json({ message: "Product not found" });
     }
 
     // Remove the image from the product's images array
@@ -658,18 +708,15 @@ exports.deleteImageFromEdit =  async (req, res) => {
       product.image.splice(index, 1);
       // Save the updated product
       await product.save();
-      return res.status(200).json({ message: 'Image deleted successfully' });
+      return res.status(200).json({ message: "Image deleted successfully" });
     } else {
-      return res.status(404).json({ message: 'Image not found in product' });
+      return res.status(404).json({ message: "Image not found in product" });
     }
   } catch (error) {
-    console.error('Error deleting image:', error);
-    return res.status(500).json({ message: 'Internal server error' });
+    console.error("Error deleting image:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
-
 };
-
-
 
 exports.listProduct = async (req, res) => {
   try {
@@ -707,7 +754,8 @@ exports.orderDetails = async (req, res) => {
     const orderCount = await Order.countDocuments();
     const totalPages = Math.ceil(orderCount / perPage);
 
-    const orders = await Order.find({}).sort({createdAt: -1})
+    const orders = await Order.find({})
+      .sort({ createdAt: -1 })
       .populate("userId")
       .populate({
         path: "items.product",
@@ -780,56 +828,82 @@ exports.updateOrderStatus = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
-let orders ;
+let orders;
 let heading;
 
 exports.getSalesReport = async (req, res) => {
   try {
     let query = {
-      paymentType: { $ne: 'Pending' },
-      'items.orderStatus': { $nin: ['Cancelled By User', 'Cancelled By Admin'] }
+      paymentType: { $ne: "Pending" },
+      "items.orderStatus": {
+        $nin: ["Cancelled By User", "Cancelled By Admin"],
+      },
     };
 
-    if (req.query['start-date'] && req.query['end-date']) {
-      const startDate = new Date(req.query['start-date']);
-      const endDate = new Date(req.query['end-date']);
+    if (req.query["start-date"] && req.query["end-date"]) {
+      const startDate = new Date(req.query["start-date"]);
+      const endDate = new Date(req.query["end-date"]);
       endDate.setDate(endDate.getDate() + 1);
       query.createdAt = { $gte: startDate, $lte: endDate };
       heading = `Sales Report from ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}`;
     } else {
       switch (req.query.range) {
-        case 'monthly':
-          query.createdAt = { $gte: new Date(new Date().setDate(1)), $lte: new Date() };
-          heading = 'MONTHLY REPORT';
+        case "monthly":
+          query.createdAt = {
+            $gte: new Date(new Date().setDate(1)),
+            $lte: new Date(),
+          };
+          heading = "MONTHLY REPORT";
           break;
-        case 'daily':
+        case "daily":
           const todayDaily = new Date();
-          const startOfDay = new Date(todayDaily.getFullYear(), todayDaily.getMonth(), todayDaily.getDate(), 0, 0, 0);
-          const endOfDay = new Date(todayDaily.getFullYear(), todayDaily.getMonth(), todayDaily.getDate(), 23, 59, 59);
+          const startOfDay = new Date(
+            todayDaily.getFullYear(),
+            todayDaily.getMonth(),
+            todayDaily.getDate(),
+            0,
+            0,
+            0
+          );
+          const endOfDay = new Date(
+            todayDaily.getFullYear(),
+            todayDaily.getMonth(),
+            todayDaily.getDate(),
+            23,
+            59,
+            59
+          );
           query.createdAt = { $gte: startOfDay, $lte: endOfDay };
-          heading = 'DAILY REPORT';
+          heading = "DAILY REPORT";
           break;
-        case 'weekly':
+        case "weekly":
           const today = new Date();
-          const oneWeekAgo = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7);
+          const oneWeekAgo = new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            today.getDate() - 7
+          );
           query.createdAt = { $gte: oneWeekAgo, $lte: new Date() };
-          heading = 'WEEKLY REPORT';
+          heading = "WEEKLY REPORT";
           break;
-        case 'yearly':
-          query.createdAt = { $gte: new Date(new Date().getFullYear(), 0, 1), $lte: new Date() };
-          heading = 'YEARLY REPORT';
+        case "yearly":
+          query.createdAt = {
+            $gte: new Date(new Date().getFullYear(), 0, 1),
+            $lte: new Date(),
+          };
+          heading = "YEARLY REPORT";
           break;
         default:
-          heading = 'SALES REPORT';
+          heading = "SALES REPORT";
           break;
       }
     }
 
     orders = await Order.find(query)
       .sort({ createdAt: -1 })
-      .populate('items.product')
-      .populate('userId')
-      .populate('couponApplied');
+      .populate("items.product")
+      .populate("userId")
+      .populate("couponApplied");
 
     // if (!orders || orders.length === 0) {
     //   throw new Error('Orders not found in database');
@@ -848,21 +922,26 @@ exports.getSalesReport = async (req, res) => {
       orderTotal: order.totalAmount,
     }));
 
-    res.render('admin/salesReport', { order: formattedOrders, totalAmount, heading });
+    res.render("admin/salesReport", {
+      order: formattedOrders,
+      totalAmount,
+      heading,
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).send('Internal Server Error');
+    res.status(500).send("Internal Server Error");
   }
 };
 
-
-
 exports.downloadSalesReport = async (req, res) => {
   try {
-
-    let totalAmount = req.session.totalAmount
+    let totalAmount = req.session.totalAmount;
     // Generate the HTML content for the sales report
-    const salesReportHtml = generateSalesReportPDF(orders,totalAmount,heading);
+    const salesReportHtml = generateSalesReportPDF(
+      orders,
+      totalAmount,
+      heading
+    );
 
     // Set response headers for downloading the HTML file
     res.setHeader("Content-Type", "application/pdf");
@@ -871,17 +950,18 @@ exports.downloadSalesReport = async (req, res) => {
       `attachment; filename="${heading} sales report.pdf"`
     );
 
-    pdf.create(salesReportHtml, { format: 'Letter' }).toStream((err, stream) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).send("Error creating PDF");
-      }
-      console.log("PDF created successfully");
+    pdf
+      .create(salesReportHtml, { format: "Letter" })
+      .toStream((err, stream) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).send("Error creating PDF");
+        }
+        console.log("PDF created successfully");
 
-      // Pipe the PDF stream to the response
-      stream.pipe(res);
-    });
-
+        // Pipe the PDF stream to the response
+        stream.pipe(res);
+      });
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
@@ -889,8 +969,8 @@ exports.downloadSalesReport = async (req, res) => {
 };
 
 // Function to generate HTML content for the sales report
-function generateSalesReportPDF(orders,totalAmount,heading) {
-  let totalPrice = totalAmount
+function generateSalesReportPDF(orders, totalAmount, heading) {
+  let totalPrice = totalAmount;
   let html = `
     <!DOCTYPE html>
     <html lang="en">
@@ -930,27 +1010,30 @@ function generateSalesReportPDF(orders,totalAmount,heading) {
         <tbody>`;
 
   // Initialize total price
-  
 
   // Populate table rows
-  orders.forEach(order => {
-    order.items.forEach(item => {
+  orders.forEach((order) => {
+    order.items.forEach((item) => {
       html += `
         <tr>
           <td>${order.createdAt.toLocaleString()}</td>
           <td>${order.userId.userName}</td>
           <td>${item.product.productName}</td>
-          <td>${item.productOfferPrice > 0 ? item.productOfferName : 'No offer'}</td>
-          <td>${item.categoryOfferPrice > 0 ? item.categoryOfferName : 'No offer'}</td>
-          <td>${order.couponApplied ? '$' + order.couponApplied.discount : '-'}</td>
+          <td>${
+            item.productOfferPrice > 0 ? item.productOfferName : "No offer"
+          }</td>
+          <td>${
+            item.categoryOfferPrice > 0 ? item.categoryOfferName : "No offer"
+          }</td>
+          <td>${
+            order.couponApplied ? "$" + order.couponApplied.discount : "-"
+          }</td>
         </tr>
         <tr>
         <td colspan="6" class="text-right">Total Amount of the order:</td>
         <td class="totalPrice">${order.totalAmount}</td>
         <td></td> 
         </tr>`;
-      
-  
     });
   });
 
@@ -968,6 +1051,8 @@ function generateSalesReportPDF(orders,totalAmount,heading) {
   return html;
 }
 
+
+//Banner management 
 
 exports.getBanner = async (req, res) => {
   try {
@@ -1021,7 +1106,11 @@ exports.editBanner = async (req, res) => {
       brandId: req.body.brandId,
     };
 
-    const updatedBannerDocument = await Banner.findByIdAndUpdate(req.body.bannerId, updatedBanner, { new: true });
+    const updatedBannerDocument = await Banner.findByIdAndUpdate(
+      req.body.bannerId,
+      updatedBanner,
+      { new: true }
+    );
 
     if (!updatedBannerDocument) {
       return res.status(404).send("Banner not found");
@@ -1036,11 +1125,11 @@ exports.editBanner = async (req, res) => {
 
 exports.deleteBanner = async (req, res) => {
   try {
-    const {bannerId} = req.query
-    await Banner.findByIdAndDelete(bannerId)
-    res.redirect('/admin_banner')
+    const { bannerId } = req.query;
+    await Banner.findByIdAndDelete(bannerId);
+    res.redirect("/admin_banner");
   } catch (error) {
     console.log(error);
-    res.status(500).send('Network error')
+    res.status(500).send("Network error");
   }
 };
