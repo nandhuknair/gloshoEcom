@@ -277,13 +277,18 @@ exports.editCoupon = async (req, res) => {
         console.log(validity)
         console.log(discount)
         console.log(limit)
+        
+        const couponExist = await Coupon.find({couponCode:couponCode})
+        if(couponExist){
+            return res.redirect('/admin_coupon')
+        }
 
         if(limitNumber < 0){
-           return res.status(400).redirect('admin_coupon')
+           return res.status(400).redirect('/admin_coupon')
              
         }
         if(discountNumber < 0 || discountNumber > limitNumber){
-            return res.status(400).redirect('admin_coupon')
+            return res.status(400).redirect('/admin_coupon')
         }
         const updatedCoupon = await Coupon.findByIdAndUpdate(couponId, {
             $set: {
@@ -296,7 +301,7 @@ exports.editCoupon = async (req, res) => {
         },{new:true});
 
         if (!updatedCoupon) {
-            return res.status(400).redirect('admin_coupon')
+            return res.status(400).redirect('/admin_coupon')
         }
             return res.redirect('/admin_coupon')
 

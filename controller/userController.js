@@ -82,13 +82,14 @@ exports.signupAction = async (req, res) => {
   try {
     reqBody = req.body;
     const { email, password, confirmPassword } = req.body;
-    req.session.userMail = email;
+    
     const userExist = await User.findOne({ email: email });
     if (userExist) {
       res.render("user/signup", {
         data: "You are already a user please Login",
       });
     } else {
+      req.session.userMail = email;
       hasedPassword = await bcrypt.hash(password, 10);
       hasedconfirmPassword = await bcrypt.hash(confirmPassword, 10);
 
