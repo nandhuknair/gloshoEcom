@@ -11,7 +11,7 @@ const Offer = require("../model/offerModel");
 const Coupon = require("../model/couponModel");
 const Banner = require("../model/bannerModel")
 const Referral = require("../model/referralModel");
-const pdf = require('html-pdf');
+const puppeteer = require("puppeteer")
 const Razorpay = require("razorpay");
 const razorpay = new Razorpay({
   key_id: process.env.KEY_ID,
@@ -1599,7 +1599,7 @@ exports.downloadInvoice = async (req, res) => {
     if(order.couponApplied){
       couponApplied = order.couponApplied.discount
     }else{
-      couponApplied = null
+      couponApplied = 0
     }
 
     // Generate the HTML content for the invoice
@@ -1612,6 +1612,18 @@ exports.downloadInvoice = async (req, res) => {
       couponApplied
     );
 
+    // Launch Puppeteer browser instance
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+
+    // Set content of the page to invoice HTML
+    await page.setContent(invoiceHTML);
+
+    // Generate PDF
+    const pdfBuffer = await page.pdf({ format: 'A4' });
+
+    await browser.close();
+
     // Set headers to make the browser download the file
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
@@ -1619,17 +1631,10 @@ exports.downloadInvoice = async (req, res) => {
       `attachment; filename="invoice_${orderId}.pdf"`
     );
 
-    // Generate PDF and send it as a response
-    pdf.create(invoiceHTML, { format: 'Letter' }).toStream((err, stream) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).send("Error creating PDF");
-      }
-      console.log("PDF created successfully");
+    // Send PDF buffer as response
+    res.send(pdfBuffer);
+ 
 
-      // Pipe the PDF stream to the response
-      stream.pipe(res);
-    });
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");

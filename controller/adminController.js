@@ -7,8 +7,7 @@ const path = require("path");
 const multer = require("multer");
 const Order = require("../model/orderModel");
 const Banner = require("../model/bannerModel");
-const PDFDocument = require("pdfkit");
-const pdf = require("html-pdf");
+const puppeteer = require('puppeteer')
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -943,25 +942,27 @@ exports.downloadSalesReport = async (req, res) => {
       heading
     );
 
-    // Set response headers for downloading the HTML file
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename="${heading} sales report.pdf"`
-    );
-
-    pdf
-      .create(salesReportHtml, { format: "Letter" })
-      .toStream((err, stream) => {
-        if (err) {
-          console.error(err);
-          return res.status(500).send("Error creating PDF");
-        }
-        console.log("PDF created successfully");
-
-        // Pipe the PDF stream to the response
-        stream.pipe(res);
-      });
+     // Launch Puppeteer browser instance
+     const browser = await puppeteer.launch();
+     const page = await browser.newPage();
+ 
+     // Set content of the page to invoice HTML
+     await page.setContent(salesReportHtml);
+ 
+     // Generate PDF
+     const pdfBuffer = await page.pdf({ format: 'A4' });
+ 
+     await browser.close();
+ 
+     // Set headers to make the browser download the file
+     res.setHeader("Content-Type", "application/pdf");
+     res.setHeader(
+       "Content-Disposition",
+       `attachment; filename="salesreport_${heading}.pdf"`
+     );
+ 
+     // Send PDF buffer as response
+     res.send(pdfBuffer);
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
