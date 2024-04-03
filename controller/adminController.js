@@ -52,13 +52,13 @@ exports.uploadSingle = multer({
   },
 }).single("images");
 
-//--------------------get login page of the admin------------------------
+//====================================== LOGIN PAGE OF ADMIN  =========================================
 
 exports.getLogin = (req, res) => {
   res.render("admin/adminLogin", { data: "" });
 };
 
-//--------------------get admin panel------------------------
+//======================================  GET ADMIN PANEL  =========================================
 
 exports.adminPanel = async (req, res) => {
   try {
@@ -138,18 +138,6 @@ exports.adminPanel = async (req, res) => {
         },
       ]);
 
-      // Fetch top selling collections with collection details
-      // const topSellingCollections = await Order.aggregate([
-      //   { $unwind: '$items' },
-      //   { $lookup: { from: 'products', localField: 'items.product', foreignField: '_id', as: 'product' } },
-      //   { $unwind: '$product' },
-      //   { $group: { _id: '$product.collection', totalQuantity: { $sum: '$items.quantity' } } },
-      //   { $sort: { totalQuantity: -1 } },
-      //   { $limit: 5 },
-      //   { $lookup: { from: 'collections', localField: '_id', foreignField: '_id', as: 'collection' } },
-      //   { $unwind: '$collection' },
-      //   { $project: { _id: '$collection._id', collectionName: '$collection.collection', totalQuantity: 1 } }
-      // ]);
 
       res.render("admin/adminPanel", {
         data: "",
@@ -273,7 +261,7 @@ async function getMonthlySalesData() {
   return { labels, sales };
 }
 
-//--------------------admin login action------------------------
+//======================================  ADMIN LOGIN ACTION  =========================================
 
 exports.loginAction = async (req, res) => {
   try {
@@ -295,13 +283,12 @@ exports.loginAction = async (req, res) => {
   }
 };
 
-//--------------------get forgot Password------------------------
+//======================================  FORGOT ADMIN PASSWORD MANAGEMENT  =========================================
 
 exports.forgotPassword = (req, res) => {
   res.render("admin/adminForgotPass", { data: "" });
 };
 
-//--------------------Forgot password action------------------------
 
 let OTPData = {
   otp: null,
@@ -345,7 +332,7 @@ exports.sendOTP = async (req, res) => {
   }
 };
 
-//--------------------get reset page------------------------
+//======================================  RESET ADMIN PASSWORD MANAGEMENT  =========================================
 
 exports.resetPage = (req, res) => {
   try {
@@ -446,14 +433,14 @@ exports.resetPassword = async (req, res) => {
   }
 };
 
-//--------------------adminLogout------------------------
+//======================================  ADMIN LOGOUT MANAGEMENT  =========================================
 
 exports.adminLogout = (req, res) => {
   req.session.admin = null;
   res.redirect("/admin_login");
 };
 
-//--------------------get admin usermanagement------------------------
+//====================================== ADMIN USER MANAGEMENT   =========================================
 
 exports.userManagemnt = async (req, res) => {
   try {
@@ -572,7 +559,9 @@ exports.unlistCategory = async (req, res) => {
   }
 };
 
-//--------------------product management------------------------
+
+
+//======================================  PRODUCT MANAGEMENT  =========================================
 
 exports.getProducts = async (req, res) => {
   try {
@@ -742,7 +731,7 @@ exports.unListProduct = async (req, res) => {
   }
 };
 
-// --------------------------------------------------Order Management--------------------------------------------------------------
+//======================================  ORDER MANAGEMENT  =========================================
 
 exports.orderDetails = async (req, res) => {
   try {
@@ -773,6 +762,8 @@ exports.orderDetails = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+
+//======================================  UPDATING ORDER STATUS  =========================================
 
 exports.updateOrderStatus = async (req, res) => {
   try {
@@ -827,6 +818,9 @@ exports.updateOrderStatus = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+
+//======================================  SALES REPORT MANAGEMENT  =========================================
+
 let orders;
 let heading;
 
@@ -904,9 +898,6 @@ exports.getSalesReport = async (req, res) => {
       .populate("userId")
       .populate("couponApplied");
 
-    // if (!orders || orders.length === 0) {
-    //   throw new Error('Orders not found in database');
-    // }
 
     let totalAmount = 0;
     for (const order of orders) {
@@ -1053,7 +1044,7 @@ function generateSalesReportPDF(orders, totalAmount, heading) {
 }
 
 
-//Banner management 
+//======================================  BANNER MANAGEMENT  =========================================
 
 exports.getBanner = async (req, res) => {
   try {

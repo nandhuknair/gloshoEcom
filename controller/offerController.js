@@ -4,6 +4,8 @@ const Offer = require('../model/offerModel')
 const Coupon = require('../model/couponModel')
 
 
+//======================================  ADMIN OFFER MANAGEMENT  =========================================
+
 exports.getOffer = async (req,res)=> {
     try {
         const offers = await Offer.find({}).populate('product').populate('category')

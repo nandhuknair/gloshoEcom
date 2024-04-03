@@ -18,7 +18,7 @@ const razorpay = new Razorpay({
   key_secret: process.env.KEY_SECRET,
 });
 
-//----------get home paage----------
+//======================================  GET HOME PAGE  =========================================
 
 exports.getHome = async function (req, res) {
 try {
@@ -33,7 +33,7 @@ try {
 }
 };
 
-//----------get home paage----------
+
 
 exports.aboutUs = async function (req, res) {
   try {
@@ -46,13 +46,13 @@ exports.aboutUs = async function (req, res) {
   }
   };
 
-//----------get login paage----------
+//======================================  GET LOGIN PAGE  =========================================
 
 exports.getLogin = async (req, res) => {
   res.render("user/login", { data: "", passwordChanged: " " });
 };
 
-//----------get signup paage----------
+//======================================  GET SIGNUP PAGE  =========================================
 
 exports.getSignup = async (req, res) => {
   res.render("user/signup", { data: "" });
@@ -76,7 +76,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-//----------signup action----------
+//======================================  SIGNUP ACTION  =========================================
 
 exports.signupAction = async (req, res) => {
   try {
@@ -125,7 +125,7 @@ exports.signupAction = async (req, res) => {
   }
 };
 
-//----------otp action----------
+//======================================  OTP ACTION  =========================================
 
 //Generating random referalCode
 const generateRandomCode = () => {
@@ -195,6 +195,8 @@ exports.otpAction = async (req, res) => {
   }
 };
 
+//======================================  CHECK REFERAL  =========================================
+
 exports.checkReferral = async (req,res)=> {
   try {
     console.log('Entered to check the referral')
@@ -212,7 +214,7 @@ exports.checkReferral = async (req,res)=> {
   }
 }
 
-//----------login action----------
+//======================================  LOGIN ACTION  =========================================
 
 exports.loginAction = async (req, res) => {
   const { email, password } = req.body;
@@ -244,20 +246,19 @@ exports.loginAction = async (req, res) => {
   }
 };
 
-//---------- logout action ----------
+//======================================  USER LOGOUT ACTION  =========================================
 
 exports.userLogout = (req, res) => {
   req.session.userLoggedIn = null
   res.redirect("/");
 };
 
-//---------- get forget password page ----------
+//======================================  FORGOT PASSWORD  =========================================
 
 exports.getForgotPass = (req, res) => {
   res.render("user/forgotPassword", { data: "" });
 };
 
-//---------- forgot password action  ----------
 
 exports.sendOTP = async (req, res) => {
   try {
@@ -401,7 +402,7 @@ exports.resendOTP = async (req, res) => {
   }
 };
 
-//----------Profile Management---------------------------------------------
+//======================================  PROFILE MANAGEMENT  =========================================
 
 let userMessage = false;
 let userError = false;
@@ -648,7 +649,7 @@ exports.resetMessage = async (req, res) => {
   }
 };
 
-// --------------------------------Cart Management ----------------------------------
+//======================================  CART MANAGEMENT  =========================================
 
 exports.addToCart = async (req, res) => {
   try {
@@ -779,7 +780,7 @@ exports.editCart = async (req, res) => {
   }
 };
 
-//----------Product Management---------------------------------------------
+//======================================  PRODUCT MANAGEMENT  =========================================
 
 exports.listProducts = async (req, res) => {
   try {
@@ -886,7 +887,7 @@ exports.productDetails = async (req, res) => {
   }
 };
 
-//----------Order Management---------------------------------------------
+//======================================  ORDER MANAGEMENT  =========================================
 
 exports.getCheckoutPage = async (req, res) => {
   try {
@@ -927,6 +928,8 @@ exports.getCheckoutPage = async (req, res) => {
     return res.redirect("/error");
   }
 };
+
+//CONFIRM ORDER ------------------------------------------------------
 
 exports.confirmOrder = async (req, res) => {
   const { selectedaddress, selectedpayment, cartdocs, totalPrice } = req.body;
@@ -1074,6 +1077,8 @@ console.log(cartdocs)
   }
 };
 
+//PLACE ORDER-----------------------------------
+
 exports.placeOrder = async (req, res) => {
   try {
     const { selectedaddress, selectedpayment, cartdocs, totalPrice } = req.body;
@@ -1208,7 +1213,7 @@ exports.myOrderItems = async (req, res) => {
   }
 };
 
-//Handiling failed payments 
+//======================================  HANDLE FAILED PAYMENT  ========================================= 
 
 exports.handleFailedPayment = async (req,res)=> {
   try {
@@ -1328,6 +1333,8 @@ exports.orderAfterFailedPaymentAction = async (req, res) => {
   }
 };
 
+
+//======================================  INVOICE DOWNLOAD  =========================================
 
 // Define a function to generate HTML content for the invoice
 function generateInvoicePDF(
@@ -1642,6 +1649,8 @@ exports.downloadInvoice = async (req, res) => {
 };
 
 
+//======================================  CANCEL ORDER  =========================================
+
 exports.cancelOrder = async (req, res) => {
   try {
     const { orderId, productId ,cancelReason} = req.body;
@@ -1700,6 +1709,8 @@ async function addToWallet(user, item) {
   await user.save();
 }
 
+//======================================  RETURN ITEM  =========================================
+
 exports.returnItem = async (req, res) => {
   try {
     const { orderId, productId , returnReason} = req.body;
@@ -1734,6 +1745,8 @@ exports.returnItem = async (req, res) => {
   }
 };
 
+//======================================  GET WALLET HISTORY  =========================================
+
 exports.getWalletHistory = async (req, res) => {
   try {
     const userId = req.session.userLoggedIn;
@@ -1744,6 +1757,8 @@ exports.getWalletHistory = async (req, res) => {
     return res.status(500).redirect("/error");
   }
 };
+
+//======================================  ADD ADDRESS FROM CHECKOUT  =========================================
 
 exports.addAddressFromCheckout = async (req, res) => {
   try {
@@ -1774,7 +1789,7 @@ exports.addAddressFromCheckout = async (req, res) => {
   }
 };
 
-// ----------------------------------------Sort management------------------------------------------------
+//======================================  SORT MANAGEMENT  =========================================
 
 exports.searchAction = async (req, res) => {
   const userLoggedIn = req.session.userLoggedIn;
@@ -1861,7 +1876,7 @@ exports.getProductsByCategory = async (req, res) => {
   }
 };
 
-// ----------------------------------------Whish list Management------------------------------------------------
+//======================================  WISH LIST MANAGEMENT  =========================================
 
 exports.getWishlist = async (req, res) => {
   try {
@@ -1921,6 +1936,8 @@ exports.wishlistCount = async (req, res) => {
     return res.redirect("/error");
   }
 };
+
+//======================================  CHECK COUPON  =========================================
 
 exports.checkCoupon = async (req, res) => {
   try {
