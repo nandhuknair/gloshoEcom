@@ -68,6 +68,7 @@ let OTPData = {
   otp: null,
   expirationTime: null,
 };
+
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -100,7 +101,7 @@ exports.signupAction = async (req, res) => {
 
       // Send otp via email
       const mailOptions = {
-        from: "gloshoecom@gmail.com",
+        from: "luxerealty27@gmail.com",
         to: email,
         subject: "otp Verification",
         text: `Your otp for registration is ${OTPData.otp}. Please use this for registration.`,
@@ -654,7 +655,6 @@ exports.resetMessage = async (req, res) => {
 exports.addToCart = async (req, res) => {
   try {
     req.session.stockLimitError = null;
-    console.log("Entered to post of cart");
     const { quantity, productId } = req.body;
     console.log(req.body);
     const userId = req.session.userLoggedIn;
